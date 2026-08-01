@@ -157,12 +157,12 @@ Expert: 100 points
 - Challenge page
 - Admin dashboard
 
-## Security Requirements 
+## Security Requirements
 
--Rate limiting
-SQL injection protection
-Query timeout (30 seconds)
-Maximum query result size: 5000 rows
+- Rate limiting
+- SQL injection protection
+- Query timeout (30 seconds)
+- Maximum query result size: 5000 rows
 
 ## Future Scope
 
@@ -171,6 +171,9 @@ Maximum query result size: 5000 rows
 - More databases (Insurance, E-commerce)
 - User profiles and progress tracking
 - Interview preparation section
+
+## Monetization (Future)
+
 - Google Ads
 - Premium subscription
 - Certificate courses
