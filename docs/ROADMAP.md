@@ -21,7 +21,10 @@
 
 ## Phase 4
 
-- Create tutorials
+- Create beginner to Advanced level tutorials
+- Create SQL challenges
+- Create hints and solutions system
+- Create discussion section
 
 ## Phase 5
 
@@ -36,3 +39,9 @@
 - Testing
 - Bug fixing
 - GitHub deployment
+
+## Phase 8
+
+- Performance optimization
+- Documentation
+- Release v1.0
