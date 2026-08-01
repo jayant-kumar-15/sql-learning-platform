@@ -13,6 +13,10 @@
 - Center SQL editor
 - Bottom result table
 - Query history panel
+- Run button
+- Query execution time
+- Table row count
+- Database selector
 
 ## Database Explorer
 
@@ -26,6 +30,16 @@
 - Example queries
 - Practice questions
 - Solutions
+
+## Challenge Page
+
+- Difficulty filter
+- Question description
+- SQL editor
+- Hints section
+- Solution section
+- Discussion section
+- Progress tracker
 
 ## Settings
 
