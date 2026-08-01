@@ -89,6 +89,7 @@ Auto-delete inactive sandbox after 30 days
 - Medium challenges
 - Hard challenges
 - Expert challenges
+- - Hard and Expert challenges should be case-study and interview oriented.
 - Questions based on healthcare and banking datasets
 - Users can submit queries and view results
 - Track completed challenges
