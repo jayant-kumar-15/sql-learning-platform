@@ -5,6 +5,8 @@
 - Setup repository
 - Freeze requirements
 - Design homepage
+- Design database explorer
+- Design SQL editor UI
 
 ## Phase 2
 
@@ -28,3 +30,9 @@
 ## Phase 6
 
 - Deploy application
+
+## Phase 7
+
+- Testing
+- Bug fixing
+- GitHub deployment
