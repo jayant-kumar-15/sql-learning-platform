@@ -1,2 +1,16 @@
-# sql-learning-platform
-Interactive SQL learning platform with tutorials, healthcare and banking databases. If will have features similar to snowflake like query history, multiple query sheet, auto suggestions query etc.
+# SQL Learning Platform
+
+An interactive SQL learning platform inspired by Snowflake.
+
+## Features
+
+- SQL tutorials
+- Query editor
+- Healthcare schema
+- Banking schema
+- Query history
+- Admin dashboard
+
+## Status
+
+Under development.
