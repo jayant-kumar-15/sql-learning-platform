@@ -2,19 +2,29 @@
 
 ## Progress
 
-Overall Progress: 8%
+Overall Progress: 10%
 
 ## Completed
 
 - Repository created
 - Requirements finalized
 - Roadmap created
-- Initial project structure created
+- UI Planning
+- Project tracking setup
 
 ## In Progress
 
 - UI planning
 - Homepage design
+
+## Upcoming Milestone
+
+### Session 2
+
+- Create folder structure
+- Design homepage
+- Design SQL editor
+- Design database explorer
 
 ## Pending
 
