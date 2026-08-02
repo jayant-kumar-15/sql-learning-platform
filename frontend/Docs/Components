@@ -1,0 +1,8 @@
+frontend/components/
+
+├── Navbar/
+├── Sidebar/
+├── SqlEditor/
+├── ResultTable/
+├── HintPanel/
+└── ChallengeCard/
