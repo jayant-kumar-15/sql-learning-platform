@@ -51,9 +51,16 @@
 
     padding: 12px;
 
+    margin-top: 10px;
+
     border: none;
 
     border-radius: 8px;
 
     cursor: pointer;
+}
+
+.register-btn {
+
+    background: #374151;
 }
