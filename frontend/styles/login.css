@@ -1,27 +1,59 @@
-<div class="login-container">
+.login-container {
 
-    <div class="login-card">
+    min-height: 100vh;
 
-        <h1>SQL Learning Platform</h1>
+    display: flex;
 
-        <h2>Welcome Back</h2>
+    justify-content: center;
 
-        <form>
+    align-items: center;
+}
 
-            <input type="email" placeholder="Enter email">
+.login-card {
 
-            <input type="password" placeholder="Enter password">
+    width: 400px;
 
-            <button type="submit">Login</button>
+    background: #1e293b;
 
-        </form>
+    padding: 30px;
 
-        <a href="#">Forgot Password?</a>
+    border-radius: 12px;
 
-        <p>Don't have an account?</p>
+    text-align: center;
+}
 
-        <button>Create Account</button>
+.login-card h1 {
 
-    </div>
+    margin-bottom: 10px;
+}
 
-</div>
+.login-card h2 {
+
+    margin-bottom: 25px;
+}
+
+.login-card input {
+
+    width: 100%;
+
+    padding: 12px;
+
+    margin-bottom: 15px;
+
+    border: 1px solid #374151;
+
+    border-radius: 8px;
+}
+
+.login-card button {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
