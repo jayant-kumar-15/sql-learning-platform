@@ -39,6 +39,10 @@
         <aside class="sidebar">
 
             <h2>Database Explorer</h2>
+            <input
+    type="text"
+    placeholder="Search tables..."
+    class="search-box">
 
             <div class="database">
 
@@ -69,6 +73,24 @@
                     <li>payments</li>
 
                 </ul>
+
+            </div>
+            <div class="database">
+
+    <h3>🧪 User Sandbox</h3>
+
+    <ul>
+
+        <li>my_database_1</li>
+        <li>my_database_2</li>
+
+    </ul>
+
+    <p class="sandbox-limit">
+
+        Max: 2 databases · 10 tables · 2000 rows
+
+    </p>
 
             </div>
 
@@ -129,6 +151,33 @@ WHERE age > 30;
                 <button>⚙ Settings</button>
 
             </section>
+            <section class="stats">
+
+    <div class="stat-card">
+
+        <h4>Execution Time</h4>
+
+        <p>0.12 sec</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <h4>Rows Returned</h4>
+
+        <p>20</p>
+
+    </div>
+
+    <div class="stat-card">
+
+        <h4>Auto Suggestion</h4>
+
+        <p>ON</p>
+
+    </div>
+
+            </section>
 
             <!-- Query History -->
 
@@ -149,9 +198,17 @@ WHERE age > 30;
 
             <section class="results">
 
-                <h3>Results</h3>
+    <h3>Results</h3>
 
-                <table>
+    <div class="result-toolbar">
+
+        <button>⬇ Export CSV</button>
+
+        <button>📄 Copy Result</button>
+
+    </div>
+
+    <table>
 
                     <thead>
 
