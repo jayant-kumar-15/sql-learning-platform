@@ -14,7 +14,10 @@ CREATE TABLE users (
 
     role TEXT DEFAULT 'user',
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_login TIMESTAMP,
+profile_picture TEXT,
+is_active INTEGER DEFAULT 1
 
 );
 
@@ -52,7 +55,9 @@ CREATE TABLE query_history (
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    database_name TEXT,
+query_status TEXT
 
 );
 
@@ -96,7 +101,9 @@ CREATE TABLE challenges (
 
     hint_2 TEXT,
 
-    solution TEXT
+    solution TEXT,
+    points INTEGER,
+    time_limit_seconds INTEGER
 
 );
 
@@ -219,7 +226,9 @@ CREATE TABLE patients (
 
     city TEXT,
 
-    phone TEXT
+    phone TEXT,
+    date_of_birth DATE,
+blood_group TEXT
 
 );
 
@@ -396,7 +405,9 @@ CREATE TABLE accounts (
         REFERENCES customers(customer_id),
 
     FOREIGN KEY (branch_id)
-        REFERENCES branches(branch_id)
+        REFERENCES branches(branch_id),
+    account_open_date DATE,
+account_status TEXT
 
 );
 
@@ -417,7 +428,8 @@ CREATE TABLE transactions (
     transaction_date DATE,
 
     FOREIGN KEY (account_id)
-        REFERENCES accounts(account_id)
+        REFERENCES accounts(account_id),
+    description TEXT
 
 );
 
