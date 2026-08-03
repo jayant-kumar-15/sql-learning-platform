@@ -494,4 +494,76 @@ CREATE TABLE payments (
     FOREIGN KEY (account_id)
         REFERENCES accounts(account_id)
 
+)
+    
+
+-- ==========================================
+-- REPLIES
+-- ==========================================
+
+CREATE TABLE replies (
+
+    reply_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    comment_id INTEGER NOT NULL,
+
+    user_id INTEGER NOT NULL,
+
+    reply_text TEXT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (comment_id)
+        REFERENCES comments(comment_id),
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+
 );
+
+-- ==========================================
+-- COMMENT LIKES
+-- ==========================================
+
+CREATE TABLE comment_likes (
+
+    like_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    comment_id INTEGER NOT NULL,
+
+    user_id INTEGER NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (comment_id)
+        REFERENCES comments(comment_id),
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+
+);
+
+-- ==========================================
+-- COMMENT REPORTS
+-- ==========================================
+
+CREATE TABLE comment_reports (
+
+    report_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    comment_id INTEGER NOT NULL,
+
+    user_id INTEGER NOT NULL,
+
+    reason TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (comment_id)
+        REFERENCES comments(comment_id),
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+
+);
+    ;
