@@ -5,41 +5,77 @@
 }
 
 body {
+
     font-family: Arial, sans-serif;
-    background: #0f172a;
+
+    background-color: #0f172a;
+
     color: white;
 }
 
 header {
-    background: #111827;
+
+    background-color: #111827;
+
     padding: 20px 50px;
 
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
 
     border-bottom: 1px solid #374151;
 }
 
 header h1 {
+
     font-size: 28px;
 }
 
 nav {
+
     display: flex;
+
     gap: 25px;
 }
 
 nav a {
+
     text-decoration: none;
+
     color: white;
+
+    font-size: 16px;
+
     transition: 0.3s;
 }
 
 nav a:hover {
+
     color: #38bdf8;
 }
 
 button {
+
     cursor: pointer;
+
+    border: none;
+}
+
+@media (max-width: 768px) {
+
+    header {
+
+        flex-direction: column;
+
+        gap: 20px;
+    }
+
+    nav {
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+    }
 }
