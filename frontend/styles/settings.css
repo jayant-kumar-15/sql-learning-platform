@@ -1,1 +1,42 @@
+.settings-container {
 
+    max-width: 800px;
+
+    margin: 40px auto;
+
+    padding: 20px;
+}
+
+.setting-card {
+
+    background: #1e293b;
+
+    padding: 20px;
+
+    margin-bottom: 20px;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.setting-card select {
+
+    padding: 8px;
+
+    border-radius: 6px;
+}
+
+@media (max-width: 768px) {
+
+    .setting-card {
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+}
