@@ -1,0 +1,86 @@
+.challenge-container {
+
+    padding: 40px;
+}
+
+.challenge-container h1 {
+
+    margin-bottom: 30px;
+}
+
+.difficulty-cards {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 20px;
+}
+
+.challenge-card {
+
+    background: #1e293b;
+
+    padding: 25px;
+
+    border-radius: 12px;
+}
+
+.challenge-card button {
+
+    margin-top: 15px;
+
+    padding: 10px 18px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+}
+
+.sample-question {
+
+    margin-top: 40px;
+
+    background: #111827;
+
+    padding: 25px;
+
+    border-radius: 12px;
+}
+
+.sample-question button {
+
+    margin-top: 15px;
+
+    margin-right: 10px;
+
+    padding: 10px 16px;
+}
+
+.discussion {
+
+    margin-top: 40px;
+}
+
+.comment {
+
+    margin-top: 15px;
+
+    background: #1e293b;
+
+    padding: 15px;
+
+    border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+
+    .difficulty-cards {
+
+        grid-template-columns: 1fr;
+    }
+}
