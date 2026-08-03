@@ -2,84 +2,119 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>SQL Playground</title>
 
-    <link rel="stylesheet" href="../Styles/playground.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/playground.css">
+
 </head>
 
 <body>
 
-    <div class="container">
+    <header>
 
-        <!-- Sidebar -->
+        <h1>SQL Learning Platform</h1>
+
+        <nav>
+
+            <a href="home.html">Home</a>
+            <a href="tutorial.html">Tutorials</a>
+            <a href="playground.html">Playground</a>
+            <a href="challanges.html">Challenges</a>
+            <a href="explorer.html">Explorer</a>
+
+        </nav>
+
+    </header>
+
+    <div class="playground-container">
+
+        <!-- Left Sidebar -->
 
         <aside class="sidebar">
 
-            <h2>SQL Studio</h2>
+            <h2>Database Explorer</h2>
 
-            <ul>
+            <div class="database">
 
-                <li>🏠 Home</li>
-
-                <li>📚 Tutorials</li>
-
-                <li>🗄 Database Explorer</li>
-
-                <li>⚡ Playground</li>
-
-                <li>🏆 Challenges</li>
-
-                <li>⚙ Settings</li>
-
-            </ul>
-
-        </aside>
-
-        <!-- Main -->
-
-        <main class="main-content">
-
-            <header class="topbar">
-
-                <h1>SQL Playground</h1>
-
-                <button>Run Query</button>
-
-            </header>
-
-            <!-- Database Explorer -->
-
-            <section class="database-panel">
-
-                <h3>Healthcare Database</h3>
+                <h3>🏥 Healthcare</h3>
 
                 <ul>
 
-                    <li>Patients</li>
-
-                    <li>Doctors</li>
-
-                    <li>Appointments</li>
-
-                    <li>Hospitals</li>
+                    <li>patients</li>
+                    <li>doctors</li>
+                    <li>appointments</li>
+                    <li>prescriptions</li>
+                    <li>billing</li>
 
                 </ul>
 
-            </section>
+            </div>
 
-            <!-- Query Editor -->
+            <div class="database">
+
+                <h3>🏦 Banking</h3>
+
+                <ul>
+
+                    <li>customers</li>
+                    <li>accounts</li>
+                    <li>transactions</li>
+                    <li>loans</li>
+                    <li>payments</li>
+
+                </ul>
+
+            </div>
+
+        </aside>
+
+        <!-- Main Area -->
+
+        <main class="workspace">
+
+            <!-- Query Tabs -->
+
+            <div class="tabs">
+
+                <button class="tab active">Query 1</button>
+
+                <button class="tab">Query 2</button>
+
+                <button class="tab add-tab">+</button>
+
+            </div>
+
+            <!-- Editor -->
 
             <section class="editor-section">
 
-                <textarea placeholder="Write SQL query here...">
+                <textarea id="editor">
 
 SELECT *
-FROM Patients
-WHERE age > 30;
+FROM patients
+LIMIT 10;
 
                 </textarea>
+
+            </section>
+
+            <!-- Action Buttons -->
+
+            <section class="toolbar">
+
+                <button id="run-btn">▶ Run</button>
+
+                <button>💾 Save</button>
+
+                <button>📥 Export CSV</button>
+
+                <button>⚙ Settings</button>
 
             </section>
 
@@ -89,41 +124,54 @@ WHERE age > 30;
 
                 <h3>Query History</h3>
 
-                <div class="history-item">
-                    SELECT * FROM Patients;
-                </div>
+                <ul>
 
-                <div class="history-item">
-                    SELECT * FROM Doctors;
-                </div>
+                    <li>SELECT * FROM patients;</li>
+                    <li>SELECT * FROM doctors;</li>
+
+                </ul>
 
             </section>
 
-            <!-- Result -->
+            <!-- Result Table -->
 
-            <section class="result-section">
+            <section class="results">
 
-                <h3>Result</h3>
+                <h3>Results</h3>
 
                 <table>
 
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Age</th>
-                    </tr>
+                    <thead>
 
-                    <tr>
-                        <td>1</td>
-                        <td>John</td>
-                        <td>32</td>
-                    </tr>
+                        <tr>
 
-                    <tr>
-                        <td>2</td>
-                        <td>Sarah</td>
-                        <td>41</td>
-                    </tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>1</td>
+                            <td>John</td>
+                            <td>28</td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>2</td>
+                            <td>Emma</td>
+                            <td>35</td>
+
+                        </tr>
+
+                    </tbody>
 
                 </table>
 
@@ -132,6 +180,8 @@ WHERE age > 30;
         </main>
 
     </div>
+
+    <script src="../assets/playground.js"></script>
 
 </body>
 
