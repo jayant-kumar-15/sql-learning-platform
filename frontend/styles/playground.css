@@ -61,6 +61,25 @@
     margin-bottom: 20px;
 }
 
+.query-status {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    background: #1e293b;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    margin-bottom: 20px;
+
+    color: #cbd5e1;
+
+    font-size: 14px;
+}
+
 .tab {
 
     padding: 10px 16px;
@@ -96,6 +115,9 @@
     padding: 16px;
 
     font-size: 15px;
+    font-family: monospace;
+
+line-height: 1.6;
 }
 
 .toolbar {
