@@ -1,1 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Database Explorer</title>
+
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/explorer.css">
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>SQL Learning Platform</h1>
+
+        <nav>
+
+            <a href="home.html">Home</a>
+            <a href="tutorial.html">Tutorials</a>
+            <a href="playground.html">Playground</a>
+            <a href="challenge.html">Challenges</a>
+            <a href="explorer.html">Explorer</a>
+
+        </nav>
+
+    </header>
+
+    <div class="explorer-container">
+
+        <!-- Left panel -->
+
+        <aside class="explorer-sidebar">
+
+            <h2>🗄 Database Explorer</h2>
+
+            <input
+                type="text"
+                placeholder="Search database..."
+                class="search-box">
+
+            <div class="schema-section">
+
+                <h3>🏥 Healthcare</h3>
+
+                <ul>
+
+                    <li>patients</li>
+                    <li>doctors</li>
+                    <li>appointments</li>
+                    <li>prescriptions</li>
+                    <li>billing</li>
+
+                </ul>
+
+            </div>
+
+            <div class="schema-section">
+
+                <h3>🏦 Banking</h3>
+
+                <ul>
+
+                    <li>customers</li>
+                    <li>accounts</li>
+                    <li>transactions</li>
+                    <li>loans</li>
+                    <li>payments</li>
+
+                </ul>
+
+            </div>
+
+            <div class="schema-section">
+
+                <h3>🧪 User Sandbox</h3>
+
+                <ul>
+
+                    <li>my_database_1</li>
+                    <li>my_database_2</li>
+
+                </ul>
+
+            </div>
+
+        </aside>
+
+        <!-- Right panel -->
+
+        <main class="table-view">
+
+            <h2>patients</h2>
+
+            <p>Schema: healthcare</p>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Column</th>
+                        <th>Data Type</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>patient_id</td>
+                        <td>INTEGER</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>patient_name</td>
+                        <td>VARCHAR</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>age</td>
+                        <td>INTEGER</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>city</td>
+                        <td>VARCHAR</td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>
