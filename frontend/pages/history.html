@@ -1,1 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Query History</title>
+
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/history.css">
+
+</head>
+
+<body>
+
+    <header>
+
+        <h1>SQL Learning Platform</h1>
+
+        <nav>
+
+            <a href="home.html">Home</a>
+            <a href="tutorial.html">Tutorials</a>
+            <a href="playground.html">Playground</a>
+            <a href="challenge.html">Challenges</a>
+            <a href="explorer.html">Explorer</a>
+
+        </nav>
+
+    </header>
+
+    <main class="history-container">
+
+        <h1>📜 Query History</h1>
+
+        <input
+            type="text"
+            placeholder="Search history..."
+            class="history-search">
+
+        <div class="history-card">
+
+            <h3>Healthcare Database</h3>
+
+            <p>SELECT * FROM patients WHERE age > 30;</p>
+
+            <span>Executed in 0.24 sec</span>
+
+        </div>
+
+        <div class="history-card">
+
+            <h3>Banking Database</h3>
+
+            <p>SELECT * FROM accounts LIMIT 100;</p>
+
+            <span>Executed in 0.11 sec</span>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>
