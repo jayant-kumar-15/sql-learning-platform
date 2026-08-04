@@ -103,8 +103,15 @@ function loadQuestions() {
 
         const button = document.createElement("button");
 
-        button.textContent = challenge.id;
+        button.innerHTML = `
 
+    <strong>${challenge.id} ❌</strong>
+
+    <br>
+
+    <small>${challenge.question}</small>
+
+`;
         if (challenge.status === "completed") {
 
             button.textContent += " ✅";
