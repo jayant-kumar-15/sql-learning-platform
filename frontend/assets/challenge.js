@@ -129,6 +129,8 @@ function loadQuestions() {
 
         `;
 
+        console.log(challenge.table);
+        
         button.addEventListener("click", function () {
 
             questionTitle.textContent =
