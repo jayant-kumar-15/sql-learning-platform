@@ -82,17 +82,21 @@
 
             </div>
 
-        </section>
+            <section class="sample-question">
 
-        <section class="sample-question">
-
-    <h2>Question 1: Find all customers</h2>
-
-    <p><strong>Database:</strong> Banking</p>
-
-    <p><strong>Table:</strong> customers</p>
+    <h2 id="question-title">Question 1: Find all customers</h2>
 
     <p>
+        <strong>Database:</strong>
+        <span id="database-name">Banking</span>
+    </p>
+
+    <p>
+        <strong>Table:</strong>
+        <span id="table-name">customers</span>
+    </p>
+
+    <p id="question-text">
 
         Find all customers whose balance is greater than 50,000.
 
@@ -100,7 +104,7 @@
 
     <h3>Expected Output</h3>
 
-    <table>
+    <table id="expected-output">
 
         <tr>
 
@@ -138,15 +142,7 @@
 
         <p id="hint-text" style="display: none;">
 
-       Use the WHERE clause with balance > 50000.
-
-        </p>
-
-        <p id="solution-text" style="display: none;">
-
-    SELECT *
-    FROM customers
-    WHERE balance > 50000;
+            Use the WHERE clause with balance > 50000.
 
         </p>
 
@@ -158,9 +154,9 @@
 
         <p id="solution-text" style="display: none;">
 
-    SELECT *
-    FROM customers
-    WHERE balance > 50000;
+            SELECT *
+            FROM customers
+            WHERE balance > 50000;
 
         </p>
 
@@ -172,7 +168,7 @@
 
     </div>
 
-        </section>
+            </section>
 
     <div id="overlay" style="display: none;"></div>
         
