@@ -37,6 +37,9 @@ solutionButton.addEventListener("click", function () {
     if (confirmAnswer) {
 
     currentQuestion.status = "skipped";
+        localStorage.setItem(
+    "sqlChallenges",
+    JSON.stringify(challenges)
 
     loadQuestions();
         updateScoreBoard();
@@ -264,6 +267,11 @@ runButton.addEventListener("click", function () {
 
     currentQuestion.status = "completed";
 
+    localStorage.setItem(
+        "sqlChallenges",
+        JSON.stringify(challenges)
+    );
+
     resultMessage.textContent =
         "✅ Correct answer! +" +
         currentQuestion.points +
@@ -273,6 +281,8 @@ runButton.addEventListener("click", function () {
 
     updateScoreBoard();
 
+    }
+
 } else {
 
     resultMessage.textContent =
@@ -281,6 +291,20 @@ runButton.addEventListener("click", function () {
 }
 
 });
+const savedChallenges = localStorage.getItem(
+    "sqlChallenges"
+);
 
+if (savedChallenges) {
+
+    const parsedChallenges = JSON.parse(
+        savedChallenges
+    );
+
+    challenges.length = 0;
+
+    challenges.push(...parsedChallenges);
+
+}
 loadQuestions();
 updateScoreBoard();
