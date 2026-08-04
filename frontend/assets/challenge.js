@@ -76,3 +76,21 @@ document.getElementById("all-questions-btn").addEventListener("click", function 
     );
 
 });
+
+const allQuestionsButton = document.getElementById("all-questions-btn");
+
+const questionsPopup = document.getElementById("questions-popup");
+
+const closePopupButton = document.getElementById("close-popup");
+
+allQuestionsButton.addEventListener("click", function () {
+
+    questionsPopup.style.display = "block";
+
+});
+
+closePopupButton.addEventListener("click", function () {
+
+    questionsPopup.style.display = "none";
+
+});
