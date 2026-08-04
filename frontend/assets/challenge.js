@@ -1,3 +1,5 @@
+alert("challenge.js loaded");
+
 const hintButton = document.getElementById("hint-btn");
 
 const hintText = document.getElementById("hint-text");
