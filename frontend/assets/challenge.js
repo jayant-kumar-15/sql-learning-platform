@@ -181,22 +181,37 @@ const runButton = document.getElementById("run-query-btn");
 
 const resultMessage = document.getElementById("result-message");
 
-alert(runButton);
-
 runButton.addEventListener("click", function () {
 
-    alert("Run Query clicked!");
+    const userQuery = document
+        .getElementById("sql-editor")
+        .value
+        .trim()
+        .toLowerCase();
 
-    const userQuery = document.getElementById("sql-editor").value;
+    const expectedQuery = challenges[0]
+        .solution
+        .trim()
+        .toLowerCase();
 
-    if (userQuery.trim() === "") {
+    if (userQuery === "") {
 
-        resultMessage.textContent = "❌ Please enter a query.";
+        resultMessage.textContent =
+            "❌ Please enter a query.";
 
         return;
-
     }
 
-    resultMessage.textContent = "✅ Query submitted successfully.";
+    if (userQuery === expectedQuery) {
+
+        resultMessage.textContent =
+            "✅ Correct answer! +10 points";
+
+    } else {
+
+        resultMessage.textContent =
+            "❌ Wrong answer. Try again.";
+
+    }
 
 });
