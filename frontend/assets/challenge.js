@@ -99,3 +99,48 @@ closePopupButton.addEventListener("click", function () {
 overlay.style.display = "none";
 
 });
+
+const questionsGrid = document.getElementById("questions-grid");
+
+function loadQuestions() {
+
+    questionsGrid.innerHTML = "";
+
+    challenges.forEach(function (challenge) {
+
+        const button = document.createElement("button");
+
+        button.textContent = challenge.id;
+
+        if (challenge.status === "completed") {
+
+            button.textContent += " ✅";
+
+        } else if (challenge.status === "skipped") {
+
+            button.textContent += " ⏭️";
+
+        } else {
+
+            button.textContent += " ❌";
+
+        }
+
+        button.addEventListener("click", function () {
+
+            alert(
+                "Question " +
+                challenge.id +
+                "\n\n" +
+                challenge.question
+            );
+
+        });
+
+        questionsGrid.appendChild(button);
+
+    });
+
+}
+
+loadQuestions();
