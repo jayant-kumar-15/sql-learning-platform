@@ -82,15 +82,20 @@ const allQuestionsButton = document.getElementById("all-questions-btn");
 const questionsPopup = document.getElementById("questions-popup");
 
 const closePopupButton = document.getElementById("close-popup");
+const overlay = document.getElementById("overlay");
 
 allQuestionsButton.addEventListener("click", function () {
 
     questionsPopup.style.display = "block";
+
+overlay.style.display = "block";
 
 });
 
 closePopupButton.addEventListener("click", function () {
 
     questionsPopup.style.display = "none";
+
+overlay.style.display = "none";
 
 });
