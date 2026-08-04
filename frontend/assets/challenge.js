@@ -181,8 +181,56 @@ function loadQuestions() {
 
 }
 
+const totalScore = document.getElementById("total-score");
+
+const completedCount = document.getElementById("completed-count");
+
+const skippedCount = document.getElementById("skipped-count");
+
+const remainingCount = document.getElementById("remaining-count");
+
+function updateScoreBoard() {
+
+    let score = 0;
+
+    let completed = 0;
+
+    let skipped = 0;
+
+    let remaining = 0;
+
+    challenges.forEach(function (challenge) {
+
+        if (challenge.status === "completed") {
+
+            completed++;
+
+            score += challenge.points;
+
+        } else if (challenge.status === "skipped") {
+
+            skipped++;
+
+        } else {
+
+            remaining++;
+
+        }
+
+    });
+
+    totalScore.textContent = score;
+
+    completedCount.textContent = completed;
+
+    skippedCount.textContent = skipped;
+
+    remainingCount.textContent = remaining;
+
+}
 loadQuestions();
 
+updateScoreBoard();
 const runButton = document.getElementById("run-query-btn");
 
 const resultMessage = document.getElementById("result-message");
