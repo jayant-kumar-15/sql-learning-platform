@@ -37,6 +37,8 @@ solutionButton.addEventListener("click", function () {
     currentQuestion.status = "skipped";
 
     loadQuestions();
+        updateScoreBoard();
+        
 
     solutionText.style.display = "block";
 
@@ -258,14 +260,18 @@ runButton.addEventListener("click", function () {
 
     if (userQuery === expectedQuery) {
 
-        currentQuestion.status = "completed";
+    currentQuestion.status = "completed";
 
-resultMessage.textContent =
-    "✅ Correct answer! +" +
-    currentQuestion.points +
-    " points";
+    resultMessage.textContent =
+        "✅ Correct answer! +" +
+        currentQuestion.points +
+        " points";
 
-loadQuestions();
+    loadQuestions();
+
+    updateScoreBoard();
+
+    }
 
     } else {
 
