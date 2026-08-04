@@ -98,9 +98,6 @@ const databaseName = document.getElementById("database-name");
 const tableName = document.getElementById("table-name");
 
 const questionText = document.getElementById("question-text");
-console.log(questionsGrid);
-
-console.log(challenges);
 
 function loadQuestions() {
 
