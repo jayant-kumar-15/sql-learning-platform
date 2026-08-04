@@ -110,62 +110,65 @@ function loadQuestions() {
 
         const button = document.createElement("button");
 
-        button.innerHTML = `
+        let statusIcon = "❌";
 
-    <strong>${challenge.id} ❌</strong>
-
-    <br>
-
-    <small>${challenge.question}</small>
-
-`;
         if (challenge.status === "completed") {
 
-            button.textContent += " ✅";
+            statusIcon = "✅";
 
         } else if (challenge.status === "skipped") {
 
-            button.textContent += " ⏭️";
-
-        } else {
-
-            button.textContent += " ❌";
+            statusIcon = "⏭️";
 
         }
 
+        button.innerHTML = `
+
+            <strong>${challenge.id} ${statusIcon}</strong>
+
+            <br><br>
+
+            <small>${challenge.table}</small>
+
+        `;
+
         button.addEventListener("click", function () {
 
-    questionTitle.textContent =
-        "Question " + challenge.id;
+            questionTitle.textContent =
+                "Question " + challenge.id;
 
-    databaseName.textContent =
-        challenge.database;
+            databaseName.textContent =
+                challenge.database;
 
-    tableName.textContent =
-        challenge.table;
+            tableName.textContent =
+                challenge.table;
 
-    questionText.textContent =
-        challenge.question;
+            questionText.textContent =
+                challenge.question;
 
-    hintText.textContent =
-        challenge.hint;
+            hintText.textContent =
+                challenge.hint;
 
-    solutionText.textContent =
-        challenge.solution;
+            solutionText.textContent =
+                challenge.solution;
 
-    hintText.style.display = "none";
+            hintText.style.display = "none";
 
-    solutionText.style.display = "none";
+            solutionText.style.display = "none";
 
-    hintButton.textContent = "🔒 Show Hint";
+            hintButton.textContent =
+                "🔒 Show Hint";
 
-    solutionButton.textContent = "🔒 View Solution";
+            solutionButton.textContent =
+                "🔒 View Solution";
 
-    questionsPopup.style.display = "none";
+            questionsPopup.style.display =
+                "none";
 
-    overlay.style.display = "none";
+            overlay.style.display =
+                "none";
 
-});
+        });
 
         questionsGrid.appendChild(button);
 
