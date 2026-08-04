@@ -19,3 +19,25 @@ hintButton.addEventListener("click", function () {
     }
 
 });
+
+const solutionButton = document.getElementById("solution-btn");
+
+const solutionText = document.getElementById("solution-text");
+
+solutionButton.addEventListener("click", function () {
+
+    const confirmAnswer = confirm(
+
+        "⚠️ Viewing the solution will make this question ineligible for points.\n\nDo you want to continue?"
+
+    );
+
+    if (confirmAnswer) {
+
+        solutionText.style.display = "block";
+
+        solutionButton.textContent = "👀 Solution Viewed";
+
+    }
+
+});
