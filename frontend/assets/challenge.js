@@ -91,6 +91,13 @@ overlay.style.display = "none";
 });
 
 const questionsGrid = document.getElementById("questions-grid");
+const questionTitle = document.getElementById("question-title");
+
+const databaseName = document.getElementById("database-name");
+
+const tableName = document.getElementById("table-name");
+
+const questionText = document.getElementById("question-text");
 console.log(questionsGrid);
 
 console.log(challenges);
@@ -128,14 +135,37 @@ function loadQuestions() {
 
         button.addEventListener("click", function () {
 
-            alert(
-                "Question " +
-                challenge.id +
-                "\n\n" +
-                challenge.question
-            );
+    questionTitle.textContent =
+        "Question " + challenge.id;
 
-        });
+    databaseName.textContent =
+        challenge.database;
+
+    tableName.textContent =
+        challenge.table;
+
+    questionText.textContent =
+        challenge.question;
+
+    hintText.textContent =
+        challenge.hint;
+
+    solutionText.textContent =
+        challenge.solution;
+
+    hintText.style.display = "none";
+
+    solutionText.style.display = "none";
+
+    hintButton.textContent = "🔒 Show Hint";
+
+    solutionButton.textContent = "🔒 View Solution";
+
+    questionsPopup.style.display = "none";
+
+    overlay.style.display = "none";
+
+});
 
         questionsGrid.appendChild(button);
 
