@@ -34,9 +34,13 @@ solutionButton.addEventListener("click", function () {
 
     if (confirmAnswer) {
 
-        solutionText.style.display = "block";
+    currentQuestion.status = "skipped";
 
-        solutionButton.textContent = "👀 Solution Viewed";
+    loadQuestions();
+
+    solutionText.style.display = "block";
+
+    solutionButton.textContent = "👀 Solution Viewed";
 
     }
 
@@ -206,8 +210,14 @@ runButton.addEventListener("click", function () {
 
     if (userQuery === expectedQuery) {
 
-        resultMessage.textContent =
-            "✅ Correct answer! +10 points";
+        currentQuestion.status = "completed";
+
+resultMessage.textContent =
+    "✅ Correct answer! +" +
+    currentQuestion.points +
+    " points";
+
+loadQuestions();
 
     } else {
 
