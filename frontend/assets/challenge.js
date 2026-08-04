@@ -176,3 +176,26 @@ function loadQuestions() {
 }
 
 loadQuestions();
+
+const runButton = document.getElementById("run-query-btn");
+
+const resultMessage = document.getElementById("result-message");
+
+runButton.addEventListener("click", function () {
+
+    const userQuery =
+        document.getElementById("sql-editor").value;
+
+    if (userQuery.trim() === "") {
+
+        resultMessage.textContent =
+            "❌ Please enter a query.";
+
+        return;
+
+    }
+
+    resultMessage.textContent =
+        "✅ Query submitted successfully.";
+
+});
