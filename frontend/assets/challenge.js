@@ -41,3 +41,38 @@ solutionButton.addEventListener("click", function () {
     }
 
 });
+
+document.getElementById("easy-btn").addEventListener("click", function () {
+
+    alert("🟢 Easy questions will open here.");
+
+});
+
+document.getElementById("medium-btn").addEventListener("click", function () {
+
+    alert("🟡 Medium questions will open here.");
+
+});
+
+document.getElementById("hard-btn").addEventListener("click", function () {
+
+    alert("🟠 Hard questions will open here.");
+
+});
+
+document.getElementById("expert-btn").addEventListener("click", function () {
+
+    alert("🔴 Expert questions will open here.");
+
+});
+
+document.getElementById("all-questions-btn").addEventListener("click", function () {
+
+    alert(
+        "📋 Question List\n\n" +
+        "1. Completed ✅\n" +
+        "2. Skipped ⏭️\n" +
+        "3. Incomplete ❌"
+    );
+
+});
