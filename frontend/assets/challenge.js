@@ -192,7 +192,7 @@ const skippedCount = document.getElementById("skipped-count");
 const remainingCount = document.getElementById("remaining-count");
 
 function updateScoreBoard() {
-
+console.log(challenges);
     let score = 0;
 
     let completed = 0;
@@ -200,7 +200,7 @@ function updateScoreBoard() {
     let skipped = 0;
 
     let remaining = 0;
-
+    
     challenges.forEach(function (challenge) {
 
         if (challenge.status === "completed") {
@@ -271,13 +271,14 @@ runButton.addEventListener("click", function () {
 
     updateScoreBoard();
 
-    }
+} else {
 
-    } else {
+    resultMessage.textContent =
+        "❌ Wrong answer. Try again.";
 
-        resultMessage.textContent =
-            "❌ Wrong answer. Try again.";
-
-    }
+}
 
 });
+
+loadQuestions();
+updateScoreBoard();
