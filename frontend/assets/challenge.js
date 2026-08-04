@@ -66,16 +66,6 @@ document.getElementById("expert-btn").addEventListener("click", function () {
 
 });
 
-document.getElementById("all-questions-btn").addEventListener("click", function () {
-
-    alert(
-        "📋 Question List\n\n" +
-        "1. Completed ✅\n" +
-        "2. Skipped ⏭️\n" +
-        "3. Incomplete ❌"
-    );
-
-});
 
 const allQuestionsButton = document.getElementById("all-questions-btn");
 
