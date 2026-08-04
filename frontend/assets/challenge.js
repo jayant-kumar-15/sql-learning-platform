@@ -101,6 +101,9 @@ overlay.style.display = "none";
 });
 
 const questionsGrid = document.getElementById("questions-grid");
+console.log(questionsGrid);
+
+console.log(challenges);
 
 function loadQuestions() {
 
