@@ -98,6 +98,7 @@ const databaseName = document.getElementById("database-name");
 const tableName = document.getElementById("table-name");
 
 const questionText = document.getElementById("question-text");
+let currentQuestion = challenges[0];
 
 function loadQuestions() {
 
@@ -132,6 +133,7 @@ function loadQuestions() {
         console.log(challenge.table);
         
         button.addEventListener("click", function () {
+            currentQuestion = challenge;
 
             questionTitle.textContent =
                 "Question " + challenge.id;
@@ -189,10 +191,10 @@ runButton.addEventListener("click", function () {
         .trim()
         .toLowerCase();
 
-    const expectedQuery = challenges[0]
-        .solution
-        .trim()
-        .toLowerCase();
+    const expectedQuery = currentQuestion
+    .solution
+    .trim()
+    .toLowerCase();
 
     if (userQuery === "") {
 
