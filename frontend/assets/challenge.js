@@ -127,7 +127,6 @@ const questionText = document.getElementById("question-text");
 let currentQuestion = null;
 
 function showQuestion(question) {
-    alert(question.question);
 
     currentQuestion = question;
 
