@@ -16,9 +16,11 @@ alert(
 
             currentQuestion = challenges[0];
 
-            loadQuestions();
+showQuestion(currentQuestion);
 
-            updateScoreBoard();
+loadQuestions();
+
+updateScoreBoard();
 
         })
         .catch(error => {
