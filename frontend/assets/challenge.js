@@ -198,6 +198,22 @@ const skippedCount = document.getElementById("skipped-count");
 
 const remainingCount = document.getElementById("remaining-count");
 
+const easyProgress = document.getElementById(
+    "easy-progress"
+);
+
+const mediumProgress = document.getElementById(
+    "medium-progress"
+);
+
+const hardProgress = document.getElementById(
+    "hard-progress"
+);
+
+const expertProgress = document.getElementById(
+    "expert-progress"
+);
+
 function updateScoreBoard() {
 console.log(challenges);
     let score = 0;
@@ -207,8 +223,68 @@ console.log(challenges);
     let skipped = 0;
 
     let remaining = 0;
+
+    let easyTotal = 0;
+let easyCompleted = 0;
+
+let mediumTotal = 0;
+let mediumCompleted = 0;
+
+let hardTotal = 0;
+let hardCompleted = 0;
+
+let expertTotal = 0;
+let expertCompleted = 0;
     
     challenges.forEach(function (challenge) {
+if (challenge.difficulty === "Easy") {
+
+    easyTotal++;
+
+    if (challenge.status === "completed") {
+
+        easyCompleted++;
+
+    }
+
+}
+
+if (challenge.difficulty === "Medium") {
+
+    mediumTotal++;
+
+    if (challenge.status === "completed") {
+
+        mediumCompleted++;
+
+    }
+
+}
+
+if (challenge.difficulty === "Hard") {
+
+    hardTotal++;
+
+    if (challenge.status === "completed") {
+
+        hardCompleted++;
+
+    }
+
+}
+
+if (challenge.difficulty === "Expert") {
+
+    expertTotal++;
+
+    if (challenge.status === "completed") {
+
+        expertCompleted++;
+
+    }
+
+}
+        
         console.log(
     challenge.id,
     challenge.status,
@@ -241,6 +317,37 @@ console.log(challenges);
 
     remainingCount.textContent = remaining;
 
+    easyProgress.textContent =
+
+    easyTotal === 0
+        ? "0%"
+        : Math.round(
+              (easyCompleted / easyTotal) * 100
+          ) + "%";
+
+mediumProgress.textContent =
+
+    mediumTotal === 0
+        ? "0%"
+        : Math.round(
+              (mediumCompleted / mediumTotal) * 100
+          ) + "%";
+
+hardProgress.textContent =
+
+    hardTotal === 0
+        ? "0%"
+        : Math.round(
+              (hardCompleted / hardTotal) * 100
+          ) + "%";
+
+expertProgress.textContent =
+
+    expertTotal === 0
+        ? "0%"
+        : Math.round(
+              (expertCompleted / expertTotal) * 100
+          ) + "%";
 }
 loadQuestions();
 
