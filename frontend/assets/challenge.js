@@ -1,4 +1,4 @@
-
+    alert("START OF FILE");
 const hintButton = document.getElementById("hint-btn");
 
 const hintText = document.getElementById("hint-text");
