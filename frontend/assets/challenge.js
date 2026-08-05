@@ -317,6 +317,8 @@ function filterQuestions(difficulty) {
 
     questionsGrid.innerHTML = "";
 
+    let questionFound = false;
+
     challenges.forEach(function (challenge) {
 
         if (challenge.difficulty !== difficulty) {
@@ -324,6 +326,8 @@ function filterQuestions(difficulty) {
             return;
 
         }
+
+        questionFound = true;
 
         const button = document.createElement("button");
 
@@ -375,13 +379,17 @@ function filterQuestions(difficulty) {
 
             solutionText.style.display = "none";
 
-            hintButton.textContent = "🔒 Show Hint";
+            hintButton.textContent =
+                "🔒 Show Hint";
 
-            solutionButton.textContent = "🔒 View Solution";
+            solutionButton.textContent =
+                "🔒 View Solution";
 
-            questionsPopup.style.display = "none";
+            questionsPopup.style.display =
+                "none";
 
-            overlay.style.display = "none";
+            overlay.style.display =
+                "none";
 
         });
 
@@ -389,11 +397,22 @@ function filterQuestions(difficulty) {
 
     });
 
+    if (!questionFound) {
+
+        questionsGrid.innerHTML = `
+
+            <p style="padding:20px; text-align:center;">
+
+                No ${difficulty} questions available.
+
+            </p>
+
+        `;
+
+    }
+
     questionsPopup.style.display = "block";
 
     overlay.style.display = "block";
 
 }
-
-loadQuestions();
-updateScoreBoard();
