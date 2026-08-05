@@ -393,6 +393,7 @@ loadQuestions();
 
 updateScoreBoard();
 const runButton = document.getElementById("run-query-btn");
+console.log(runButton);
 
 const resultMessage = document.getElementById("result-message");
 
