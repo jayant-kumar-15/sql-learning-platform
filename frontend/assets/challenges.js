@@ -1,94 +1,23 @@
-const challenges = [
+let challenges = [];
 
-    {
-        id: 1,
+fetch("../assets/questions.json")
+    .then(response => response.json())
+    .then(data => {
 
-        difficulty: "Beginner",
+        challenges = data;
 
-        database: "Banking",
+        currentQuestion = challenges[0];
 
-        table: "customers",
+        loadQuestions();
 
-        points: 10,
+        updateScoreBoard();
 
-        status: "incomplete",
+    })
+    .catch(error => {
 
-        question: "Find all customers whose balance is greater than 50000.",
+        console.error(
+            "Error loading questions:",
+            error
+        );
 
-        expectedOutput: [
-            {
-                customer_name: "Rahul",
-                balance: 75000
-            },
-            {
-                customer_name: "Priya",
-                balance: 90000
-            }
-        ],
-
-        hint: "Use the WHERE clause.",
-
-        solution: "SELECT * FROM customers WHERE balance > 50000;"
-    },
-
-    {
-        id: 2,
-
-        difficulty: "Beginner",
-
-        database: "Healthcare",
-
-        table: "patients",
-
-        points: 10,
-
-        status: "incomplete",
-
-        question: "Display all patients.",
-
-        expectedOutput: [
-            {
-                patient_name: "John"
-            },
-            {
-                patient_name: "Emma"
-            }
-        ],
-
-        hint: "Use SELECT *.",
-
-        solution: "SELECT * FROM patients;"
-    },
-
-    {
-        id: 3,
-
-        difficulty: "Beginner",
-
-        database: "Healthcare",
-
-        table: "patients",
-
-        points: 10,
-
-        status: "incomplete",
-
-        question: "Display all patients whose age is greater than 30.",
-
-        expectedOutput: [
-            {
-                patient_name: "Emma",
-                age: 35
-            },
-            {
-                patient_name: "Sophia",
-                age: 42
-            }
-        ],
-
-        hint: "Use WHERE age > 30.",
-
-        solution: "SELECT * FROM patients WHERE age > 30;"
-    }
-
-];
+    });
