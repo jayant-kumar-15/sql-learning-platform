@@ -126,6 +126,39 @@ const tableName = document.getElementById("table-name");
 const questionText = document.getElementById("question-text");
 let currentQuestion = null;
 
+function showQuestion(question) {
+
+    currentQuestion = question;
+
+    questionTitle.textContent =
+        "Question " + question.id;
+
+    databaseName.textContent =
+        question.database;
+
+    tableName.textContent =
+        question.table;
+
+    questionText.textContent =
+        question.question;
+
+    hintText.textContent =
+        question.hint;
+
+    solutionText.textContent =
+        question.solution;
+
+    hintText.style.display = "none";
+
+    solutionText.style.display = "none";
+
+    hintButton.textContent =
+        "🔒 Show Hint";
+
+    solutionButton.textContent =
+        "🔒 View Solution";
+}
+
 function loadQuestions() {
 
     questionsGrid.innerHTML = "";
@@ -159,47 +192,16 @@ function loadQuestions() {
         console.log(challenge.table);
         
         button.addEventListener("click", function () {
-            currentQuestion = challenge;
 
-            questionTitle.textContent =
-                "Question " + challenge.id;
+    showQuestion(challenge);
 
-            databaseName.textContent =
-                challenge.database;
+    questionsPopup.style.display =
+        "none";
 
-            tableName.textContent =
-                challenge.table;
+    overlay.style.display =
+        "none";
 
-            questionText.textContent =
-                challenge.question;
-
-            hintText.textContent =
-                challenge.hint;
-
-            solutionText.textContent =
-                challenge.solution;
-
-            hintText.style.display = "none";
-
-            solutionText.style.display = "none";
-
-            hintButton.textContent =
-                "🔒 Show Hint";
-
-            solutionButton.textContent =
-                "🔒 View Solution";
-
-            questionsPopup.style.display =
-                "none";
-
-            overlay.style.display =
-                "none";
-
-        });
-
-        questionsGrid.appendChild(button);
-
-    });
+});
 
 }
 
@@ -478,28 +480,7 @@ resetButton.addEventListener("click", function () {
 
     localStorage.removeItem("sqlChallenges");
 
-    function showQuestion(question) {
-
-    currentQuestion = question;
-
-    questionTitle.textContent =
-        "Question " + question.id;
-
-    databaseName.textContent =
-        question.database;
-
-    tableName.textContent =
-        question.table;
-
-    questionText.textContent =
-        question.question;
-
-    hintText.textContent =
-        question.hint;
-
-    solutionText.textContent =
-        question.solution;
-    }
+    
 
     alert("✅ Progress has been reset.");
 
