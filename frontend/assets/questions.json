@@ -9,10 +9,6 @@
 
         "question": "Find all customers whose balance is greater than 50000.",
 
-        "hint": "Use WHERE clause.",
-
-        "solution": "SELECT * FROM customers WHERE balance > 50000;",
-
         "expectedOutput": [
             {
                 "customer_name": "Rahul",
@@ -22,7 +18,11 @@
                 "customer_name": "Priya",
                 "balance": 90000
             }
-        ]
+        ],
+
+        "hint": "Use the WHERE clause.",
+
+        "solution": "SELECT * FROM customers WHERE balance > 50000;"
     },
 
     {
@@ -35,10 +35,6 @@
 
         "question": "Display all patients.",
 
-        "hint": "Use SELECT *.",
-
-        "solution": "SELECT * FROM patients;",
-
         "expectedOutput": [
             {
                 "patient_name": "John"
@@ -46,6 +42,10 @@
             {
                 "patient_name": "Emma"
             }
-        ]
+        ],
+
+        "hint": "Use SELECT *.",
+
+        "solution": "SELECT * FROM patients;"
     }
 ]
