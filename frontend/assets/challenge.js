@@ -131,7 +131,7 @@ const databaseName = document.getElementById("database-name");
 const tableName = document.getElementById("table-name");
 
 const questionText = document.getElementById("question-text");
-let currentQuestion = challenges[0];
+let currentQuestion = null;
 
 function loadQuestions() {
 
@@ -386,9 +386,7 @@ expertFill.style.width =
     expertPercentage + "%";
 }
 alert("AFTER SCOREBOARD");
-loadQuestions();
 
-updateScoreBoard();
     
 const runButton = document.getElementById("run-query-btn");
 
