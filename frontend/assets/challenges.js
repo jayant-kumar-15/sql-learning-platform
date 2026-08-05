@@ -1,23 +1,24 @@
 let challenges = [];
 
-fetch("../assets/questions.json")
-    .then(response => response.json())
-    .then(data => {
+function loadDifficulty(level) {
 
-        challenges = data;
+    fetch(`../assets/questions-${level}.json`)
+        .then(response => response.json())
+        .then(data => {
 
-        currentQuestion = challenges[0];
+            challenges = data;
 
-        loadQuestions();
+            currentQuestion = challenges[0];
 
-        updateScoreBoard();
+            loadQuestions();
 
-    })
-    .catch(error => {
+            updateScoreBoard();
 
-        console.error(
-            "Error loading questions:",
-            error
-        );
+        })
+        .catch(error => {
 
-    });
+            console.error(error);
+
+        });
+
+}
