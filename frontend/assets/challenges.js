@@ -7,20 +7,26 @@ function loadDifficulty(level) {
         .then(data => {
 
             challenges = data;
+
             console.log(challenges);
-alert(
-    "Loaded " +
-    challenges.length +
-    " questions"
-);
 
-            currentQuestion = challenges[0];
+            alert(
+                "Loaded " +
+                challenges.length +
+                " questions"
+            );
 
-showQuestion(currentQuestion);
+            if (challenges.length > 0) {
 
-loadQuestions();
+                currentQuestion = challenges[0];
 
-updateScoreBoard();
+                showQuestion(currentQuestion);
+
+            }
+
+            loadQuestions();
+
+            updateScoreBoard();
 
         })
         .catch(error => {
