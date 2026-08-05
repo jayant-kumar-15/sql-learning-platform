@@ -247,13 +247,17 @@ const resultMessage = document.getElementById("result-message");
 runButton.addEventListener("click", function () {
 
     const userQuery = document
-        .getElementById("sql-editor")
-        .value
-        .trim()
-        .toLowerCase();
+    .getElementById("sql-editor")
+    .value
+    .replace(/\s+/g, " ")
+    .replace(/;+$/, "")
+    .trim()
+    .toLowerCase();
 
-    const expectedQuery = currentQuestion
+const expectedQuery = currentQuestion
     .solution
+    .replace(/\s+/g, " ")
+    .replace(/;+$/, "")
     .trim()
     .toLowerCase();
 
