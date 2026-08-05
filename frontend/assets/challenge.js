@@ -209,6 +209,11 @@ console.log(challenges);
     let remaining = 0;
     
     challenges.forEach(function (challenge) {
+        console.log(
+    challenge.id,
+    challenge.status,
+    challenge.points
+);
 
         if (challenge.status === "completed") {
 
