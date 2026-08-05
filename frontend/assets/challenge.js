@@ -258,11 +258,11 @@ let expertCompleted = 0;
         
 if (challenge.difficulty === "Beginner") {
 
-    easyTotal++;
+    beginnerTotal++;
 
     if (challenge.status === "completed") {
 
-        easyCompleted++;
+        beginnerCompleted++;
 
     }
 
@@ -270,11 +270,12 @@ if (challenge.difficulty === "Beginner") {
 
 if (challenge.difficulty === "Intermediate") {
 
-    mediumTotal++;
+    
+    intermediateTotal++;
 
     if (challenge.status === "completed") {
 
-        mediumCompleted++;
+        intermediateCompleted++;
 
     }
 
