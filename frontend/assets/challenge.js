@@ -58,7 +58,7 @@ document.getElementById("beginner-btn").addEventListener(
     "click",
     function () {
 
-        filterQuestions("Beginner");
+        loadDifficulty("beginner");
 
     }
 );
@@ -67,7 +67,7 @@ document.getElementById("intermediate-btn").addEventListener(
     "click",
     function () {
 
-        filterQuestions("Intermediate");
+        loadDifficulty("intermediate");
 
     }
 );
@@ -76,7 +76,7 @@ document.getElementById("expert-btn").addEventListener(
     "click",
     function () {
 
-        filterQuestions("Expert");
+        loadDifficulty("expert");
 
     }
 );
