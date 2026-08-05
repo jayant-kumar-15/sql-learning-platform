@@ -365,16 +365,30 @@ expertProgress.textContent =
           ) + "%";
 }
 
-easyFill.style.width = easyProgress.textContent;
-console.log(easyProgress.textContent);
+const easyPercentage = easyTotal === 0
+    ? 0
+    : Math.round((easyCompleted / easyTotal) * 100);
 
-console.log(easyFill.style.width);
+const mediumPercentage = mediumTotal === 0
+    ? 0
+    : Math.round((mediumCompleted / mediumTotal) * 100);
 
-mediumFill.style.width = mediumProgress.textContent;
+const hardPercentage = hardTotal === 0
+    ? 0
+    : Math.round((hardCompleted / hardTotal) * 100);
 
-hardFill.style.width = hardProgress.textContent;
+const expertPercentage = expertTotal === 0
+    ? 0
+    : Math.round((expertCompleted / expertTotal) * 100);
 
-expertFill.style.width = expertProgress.textContent;
+easyFill.style.width = easyPercentage + "%";
+
+mediumFill.style.width = mediumPercentage + "%";
+
+hardFill.style.width = hardPercentage + "%";
+
+expertFill.style.width = expertPercentage + "%";
+
 loadQuestions();
 
 updateScoreBoard();
