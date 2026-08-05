@@ -99,13 +99,6 @@ const questionsPopup = document.getElementById("questions-popup");
 
 const closePopupButton = document.getElementById("close-popup");
 const overlay = document.getElementById("overlay");
-alert(allQuestionsButton);
-
-alert(questionsPopup);
-
-alert(closePopupButton);
-
-alert(overlay);
 
 allQuestionsButton.addEventListener("click", function () {
 
@@ -241,7 +234,7 @@ const intermediateFill = document.getElementById(
 const expertFill = document.getElementById(
     "expert-fill"
 );
-alert("BEFORE SCOREBOARD");
+
 
 function updateScoreBoard() {
 console.log(challenges);
@@ -385,8 +378,6 @@ intermediateFill.style.width =
 expertFill.style.width =
     expertPercentage + "%";
 }
-alert("AFTER SCOREBOARD");
-
     
 const runButton = document.getElementById("run-query-btn");
 
