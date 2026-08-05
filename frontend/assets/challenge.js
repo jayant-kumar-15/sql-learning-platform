@@ -283,7 +283,6 @@ if (challenge.difficulty === "Intermediate") {
 }
 
 
-
 if (challenge.difficulty === "Expert") {
 
     expertTotal++;
