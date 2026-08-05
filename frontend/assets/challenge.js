@@ -366,6 +366,9 @@ expertProgress.textContent =
 }
 
 easyFill.style.width = easyProgress.textContent;
+console.log(easyProgress.textContent);
+
+console.log(easyFill.style.width);
 
 mediumFill.style.width = mediumProgress.textContent;
 
