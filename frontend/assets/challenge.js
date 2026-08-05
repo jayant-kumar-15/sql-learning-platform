@@ -478,11 +478,28 @@ resetButton.addEventListener("click", function () {
 
     localStorage.removeItem("sqlChallenges");
 
-    currentQuestion = challenges[0];
+    function showQuestion(question) {
 
-    loadQuestions();
+    currentQuestion = question;
 
-    updateScoreBoard();
+    questionTitle.textContent =
+        "Question " + question.id;
+
+    databaseName.textContent =
+        question.database;
+
+    tableName.textContent =
+        question.table;
+
+    questionText.textContent =
+        question.question;
+
+    hintText.textContent =
+        question.hint;
+
+    solutionText.textContent =
+        question.solution;
+    }
 
     alert("✅ Progress has been reset.");
 
