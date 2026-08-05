@@ -462,10 +462,6 @@ if (savedChallenges) {
 
 }
 
-loadQuestions();
-
-updateScoreBoard();
-
 const resetButton = document.getElementById(
     "reset-progress-btn"
 );
