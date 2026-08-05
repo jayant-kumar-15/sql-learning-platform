@@ -363,7 +363,6 @@ expertProgress.textContent =
         : Math.round(
               (expertCompleted / expertTotal) * 100
           ) + "%";
-}
 
 const easyPercentage = easyTotal === 0
     ? 0
@@ -388,6 +387,7 @@ mediumFill.style.width = mediumPercentage + "%";
 hardFill.style.width = hardPercentage + "%";
 
 expertFill.style.width = expertPercentage + "%";
+} 
 
 loadQuestions();
 
