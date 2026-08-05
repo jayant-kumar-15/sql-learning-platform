@@ -3,7 +3,7 @@ const challenges = [
     {
         id: 1,
 
-        difficulty: "Easy",
+        difficulty: "Beginner",
 
         database: "Banking",
 
@@ -34,7 +34,7 @@ const challenges = [
     {
         id: 2,
 
-        difficulty: "Easy",
+        difficulty: "Beginner",
 
         database: "Healthcare",
 
@@ -63,7 +63,7 @@ const challenges = [
     {
         id: 3,
 
-        difficulty: "Easy",
+        difficulty: "Beginner",
 
         database: "Healthcare",
 
