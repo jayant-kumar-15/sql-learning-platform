@@ -203,8 +203,12 @@ function loadQuestions() {
         "none";
 
 });
+        questionsGrid.appendChild(button);
+
+});
 
 }
+console.log("loadQuestions function ended");
 
 const totalScore = document.getElementById("total-score");
 
