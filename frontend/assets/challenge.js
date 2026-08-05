@@ -285,11 +285,6 @@ if (challenge.difficulty === "Expert") {
 
 }
         
-        console.log(
-    challenge.id,
-    challenge.status,
-    challenge.points
-);
 
         if (challenge.status === "completed") {
 
@@ -428,7 +423,6 @@ if (savedChallenges) {
     challenges.push(...parsedChallenges);
 
 }
-console.log(challenges);
 
 loadQuestions();
 
