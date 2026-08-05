@@ -241,6 +241,7 @@ const intermediateFill = document.getElementById(
 const expertFill = document.getElementById(
     "expert-fill"
 );
+alert("BEFORE SCOREBOARD");
 
 function updateScoreBoard() {
 console.log(challenges);
@@ -603,3 +604,4 @@ function filterQuestions(difficulty) {
     overlay.style.display = "block";
 
 }
+    alert("END OF FILE");
