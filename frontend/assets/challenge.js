@@ -214,6 +214,22 @@ const expertProgress = document.getElementById(
     "expert-progress"
 );
 
+const easyFill = document.getElementById(
+    "easy-fill"
+);
+
+const mediumFill = document.getElementById(
+    "medium-fill"
+);
+
+const hardFill = document.getElementById(
+    "hard-fill"
+);
+
+const expertFill = document.getElementById(
+    "expert-fill"
+);
+
 function updateScoreBoard() {
 console.log(challenges);
     let score = 0;
@@ -348,6 +364,14 @@ expertProgress.textContent =
               (expertCompleted / expertTotal) * 100
           ) + "%";
 }
+
+easyFill.style.width = easyProgress.textContent;
+
+mediumFill.style.width = mediumProgress.textContent;
+
+hardFill.style.width = hardProgress.textContent;
+
+expertFill.style.width = expertProgress.textContent;
 loadQuestions();
 
 updateScoreBoard();
