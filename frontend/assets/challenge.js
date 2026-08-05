@@ -57,25 +57,25 @@ solutionButton.addEventListener("click", function () {
 
 document.getElementById("easy-btn").addEventListener("click", function () {
 
-    alert("🟢 Easy questions will open here.");
+    filterQuestions("Easy");
 
 });
 
 document.getElementById("medium-btn").addEventListener("click", function () {
 
-    alert("🟡 Medium questions will open here.");
+    filterQuestions("Medium");
 
 });
 
 document.getElementById("hard-btn").addEventListener("click", function () {
 
-    alert("🟠 Hard questions will open here.");
+    filterQuestions("Hard");
 
 });
 
 document.getElementById("expert-btn").addEventListener("click", function () {
 
-    alert("🔴 Expert questions will open here.");
+    filterQuestions("Expert");
 
 });
 
@@ -312,5 +312,88 @@ if (savedChallenges) {
     challenges.push(...parsedChallenges);
 
 }
+
+function filterQuestions(difficulty) {
+
+    questionsGrid.innerHTML = "";
+
+    challenges.forEach(function (challenge) {
+
+        if (challenge.difficulty !== difficulty) {
+
+            return;
+
+        }
+
+        const button = document.createElement("button");
+
+        let statusIcon = "❌";
+
+        if (challenge.status === "completed") {
+
+            statusIcon = "✅";
+
+        } else if (challenge.status === "skipped") {
+
+            statusIcon = "⏭️";
+
+        }
+
+        button.innerHTML = `
+
+            <strong>${challenge.id} ${statusIcon}</strong>
+
+            <br><br>
+
+            <small>${challenge.table}</small>
+
+        `;
+
+        button.addEventListener("click", function () {
+
+            currentQuestion = challenge;
+
+            questionTitle.textContent =
+                "Question " + challenge.id;
+
+            databaseName.textContent =
+                challenge.database;
+
+            tableName.textContent =
+                challenge.table;
+
+            questionText.textContent =
+                challenge.question;
+
+            hintText.textContent =
+                challenge.hint;
+
+            solutionText.textContent =
+                challenge.solution;
+
+            hintText.style.display = "none";
+
+            solutionText.style.display = "none";
+
+            hintButton.textContent = "🔒 Show Hint";
+
+            solutionButton.textContent = "🔒 View Solution";
+
+            questionsPopup.style.display = "none";
+
+            overlay.style.display = "none";
+
+        });
+
+        questionsGrid.appendChild(button);
+
+    });
+
+    questionsPopup.style.display = "block";
+
+    overlay.style.display = "block";
+
+}
+
 loadQuestions();
 updateScoreBoard();
