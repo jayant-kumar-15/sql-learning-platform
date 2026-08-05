@@ -81,6 +81,18 @@ document.getElementById("expert-btn").addEventListener(
     }
 );
 
+console.log(
+    document.getElementById("beginner-btn")
+);
+
+console.log(
+    document.getElementById("intermediate-btn")
+);
+
+console.log(
+    document.getElementById("expert-btn")
+);
+
 const allQuestionsButton = document.getElementById("all-questions-btn");
 
 const questionsPopup = document.getElementById("questions-popup");
