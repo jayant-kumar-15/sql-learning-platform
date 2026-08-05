@@ -1,4 +1,3 @@
-alert("challenge.js loaded");
 
 const hintButton = document.getElementById("hint-btn");
 
@@ -55,24 +54,32 @@ solutionButton.addEventListener("click", function () {
 
 });
 
-document.getElementById("easy-btn").addEventListener("click", function () {
-document.getElementById("beginner-btn").addEventListener("click", function () {
+document.getElementById("beginner-btn").addEventListener(
+    "click",
+    function () {
 
-    filterQuestions("Beginner");
+        filterQuestions("Beginner");
 
-});
+    }
+);
 
-document.getElementById("intermediate-btn").addEventListener("click", function () {
+document.getElementById("intermediate-btn").addEventListener(
+    "click",
+    function () {
 
-    filterQuestions("Intermediate");
+        filterQuestions("Intermediate");
 
-});
+    }
+);
 
-document.getElementById("expert-btn").addEventListener("click", function () {
+document.getElementById("expert-btn").addEventListener(
+    "click",
+    function () {
 
-    filterQuestions("Expert");
+        filterQuestions("Expert");
 
-});
+    }
+);
 
 const allQuestionsButton = document.getElementById("all-questions-btn");
 
@@ -192,32 +199,24 @@ const skippedCount = document.getElementById("skipped-count");
 
 const remainingCount = document.getElementById("remaining-count");
 
-const easyProgress = document.getElementById(
+const beginnerProgress = document.getElementById(
     "easy-progress"
 );
 
-const mediumProgress = document.getElementById(
+const intermediateProgress = document.getElementById(
     "medium-progress"
-);
-
-const hardProgress = document.getElementById(
-    "hard-progress"
 );
 
 const expertProgress = document.getElementById(
     "expert-progress"
 );
 
-const easyFill = document.getElementById(
+const beginnerFill = document.getElementById(
     "easy-fill"
 );
 
-const mediumFill = document.getElementById(
+const intermediateFill = document.getElementById(
     "medium-fill"
-);
-
-const hardFill = document.getElementById(
-    "hard-fill"
 );
 
 const expertFill = document.getElementById(
@@ -234,20 +233,18 @@ console.log(challenges);
 
     let remaining = 0;
 
-    let easyTotal = 0;
-let easyCompleted = 0;
+    let beginnerTotal = 0;
+let beginnerCompleted = 0;
 
-let mediumTotal = 0;
-let mediumCompleted = 0;
-
-let hardTotal = 0;
-let hardCompleted = 0;
+let intermediateTotal = 0;
+let intermediateCompleted = 0;
 
 let expertTotal = 0;
 let expertCompleted = 0;
     
     challenges.forEach(function (challenge) {
-if (challenge.difficulty === "Easy") {
+        
+if (challenge.difficulty === "Beginner") {
 
     easyTotal++;
 
@@ -259,7 +256,7 @@ if (challenge.difficulty === "Easy") {
 
 }
 
-if (challenge.difficulty === "Medium") {
+if (challenge.difficulty === "Intermediate") {
 
     mediumTotal++;
 
@@ -271,17 +268,7 @@ if (challenge.difficulty === "Medium") {
 
 }
 
-if (challenge.difficulty === "Hard") {
 
-    hardTotal++;
-
-    if (challenge.status === "completed") {
-
-        hardCompleted++;
-
-    }
-
-}
 
 if (challenge.difficulty === "Expert") {
 
@@ -374,21 +361,22 @@ const expertPercentage = expertTotal === 0
     ? 0
     : Math.round((expertCompleted / expertTotal) * 100);
 
-easyFill.style.width = easyPercentage + "%";
+beginnerFill.style.width =
+    beginnerPercentage + "%";
 
-mediumFill.style.width = mediumPercentage + "%";
+intermediateFill.style.width =
+    intermediatePercentage + "%";
 
-hardFill.style.width = hardPercentage + "%";
+expertFill.style.width =
+    expertPercentage + "%";
+}
 
-expertFill.style.width = expertPercentage + "%";
-} 
-alert("Reached run button");
 loadQuestions();
 
 updateScoreBoard();
 const runButton = document.getElementById("run-query-btn");
-console.log(runButton);
-alert("Run button section reached");
+
+
 const resultMessage = document.getElementById("result-message");
 
 runButton.addEventListener("click", function () {
@@ -446,7 +434,7 @@ const expectedQuery = currentQuestion
 const savedChallenges = localStorage.getItem(
     "sqlChallenges"
 );
-console.log(savedChallenges);
+
 
 if (savedChallenges) {
 
