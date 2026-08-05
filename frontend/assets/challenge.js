@@ -384,11 +384,12 @@ intermediateFill.style.width =
 
 expertFill.style.width =
     expertPercentage + "%";
-
+}
+alert("AFTER SCOREBOARD");
 loadQuestions();
 
 updateScoreBoard();
-    alert("AFTER SCOREBOARD");
+    
 const runButton = document.getElementById("run-query-btn");
 
 
