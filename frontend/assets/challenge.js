@@ -37,13 +37,15 @@ solutionButton.addEventListener("click", function () {
     if (confirmAnswer) {
 
     currentQuestion.status = "skipped";
-        localStorage.setItem(
-    "sqlChallenges",
-    JSON.stringify(challenges)
+
+    localStorage.setItem(
+        "sqlChallenges",
+        JSON.stringify(challenges)
+    );
 
     loadQuestions();
-        updateScoreBoard();
-        
+
+    updateScoreBoard();
 
     solutionText.style.display = "block";
 
@@ -263,6 +265,7 @@ runButton.addEventListener("click", function () {
         return;
     }
 
+    
     if (userQuery === expectedQuery) {
 
     currentQuestion.status = "completed";
@@ -281,14 +284,12 @@ runButton.addEventListener("click", function () {
 
     updateScoreBoard();
 
-    }
-
 } else {
 
     resultMessage.textContent =
         "❌ Wrong answer. Try again.";
 
-}
+    }
 
 });
 const savedChallenges = localStorage.getItem(
