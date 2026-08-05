@@ -1,1 +1,51 @@
+[
+    {
+        "id": 1,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "table": "customers",
+        "points": 10,
+        "status": "incomplete",
 
+        "question": "Find all customers whose balance is greater than 50000.",
+
+        "hint": "Use WHERE clause.",
+
+        "solution": "SELECT * FROM customers WHERE balance > 50000;",
+
+        "expectedOutput": [
+            {
+                "customer_name": "Rahul",
+                "balance": 75000
+            },
+            {
+                "customer_name": "Priya",
+                "balance": 90000
+            }
+        ]
+    },
+
+    {
+        "id": 2,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "table": "patients",
+        "points": 10,
+        "status": "incomplete",
+
+        "question": "Display all patients.",
+
+        "hint": "Use SELECT *.",
+
+        "solution": "SELECT * FROM patients;",
+
+        "expectedOutput": [
+            {
+                "patient_name": "John"
+            },
+            {
+                "patient_name": "Emma"
+            }
+        ]
+    }
+]
