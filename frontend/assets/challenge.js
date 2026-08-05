@@ -313,40 +313,32 @@ if (challenge.difficulty === "Expert") {
 
     });
 
-    totalScore.textContent = score;
+totalScore.textContent = score;
 
-    completedCount.textContent = completed;
+completedCount.textContent = completed;
 
-    skippedCount.textContent = skipped;
+skippedCount.textContent = skipped;
 
-    remainingCount.textContent = remaining;
+remainingCount.textContent = remaining;
 
-    console.log("Easy total =", easyTotal);
+console.log("Beginner total =", beginnerTotal);
 
-console.log("Easy completed =", easyCompleted);
+console.log("Beginner completed =", beginnerCompleted);
 
-    easyProgress.textContent =
+beginnerProgress.textContent =
 
-    easyTotal === 0
+    beginnerTotal === 0
         ? "0%"
         : Math.round(
-              (easyCompleted / easyTotal) * 100
+              (beginnerCompleted / beginnerTotal) * 100
           ) + "%";
 
-mediumProgress.textContent =
+intermediateProgress.textContent =
 
-    mediumTotal === 0
+    intermediateTotal === 0
         ? "0%"
         : Math.round(
-              (mediumCompleted / mediumTotal) * 100
-          ) + "%";
-
-hardProgress.textContent =
-
-    hardTotal === 0
-        ? "0%"
-        : Math.round(
-              (hardCompleted / hardTotal) * 100
+              (intermediateCompleted / intermediateTotal) * 100
           ) + "%";
 
 expertProgress.textContent =
@@ -357,21 +349,23 @@ expertProgress.textContent =
               (expertCompleted / expertTotal) * 100
           ) + "%";
 
-const easyPercentage = easyTotal === 0
+const beginnerPercentage = beginnerTotal === 0
     ? 0
-    : Math.round((easyCompleted / easyTotal) * 100);
+    : Math.round(
+          (beginnerCompleted / beginnerTotal) * 100
+      );
 
-const mediumPercentage = mediumTotal === 0
+const intermediatePercentage = intermediateTotal === 0
     ? 0
-    : Math.round((mediumCompleted / mediumTotal) * 100);
-
-const hardPercentage = hardTotal === 0
-    ? 0
-    : Math.round((hardCompleted / hardTotal) * 100);
+    : Math.round(
+          (intermediateCompleted / intermediateTotal) * 100
+      );
 
 const expertPercentage = expertTotal === 0
     ? 0
-    : Math.round((expertCompleted / expertTotal) * 100);
+    : Math.round(
+          (expertCompleted / expertTotal) * 100
+      );
 
 beginnerFill.style.width =
     beginnerPercentage + "%";
@@ -381,7 +375,6 @@ intermediateFill.style.width =
 
 expertFill.style.width =
     expertPercentage + "%";
-}
 
 loadQuestions();
 
