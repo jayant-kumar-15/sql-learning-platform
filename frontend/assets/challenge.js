@@ -394,7 +394,7 @@ loadQuestions();
 updateScoreBoard();
 const runButton = document.getElementById("run-query-btn");
 console.log(runButton);
-
+alert("Run button section reached");
 const resultMessage = document.getElementById("result-message");
 
 runButton.addEventListener("click", function () {
