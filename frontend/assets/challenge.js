@@ -294,6 +294,7 @@ runButton.addEventListener("click", function () {
 const savedChallenges = localStorage.getItem(
     "sqlChallenges"
 );
+console.log(savedChallenges);
 
 if (savedChallenges) {
 
