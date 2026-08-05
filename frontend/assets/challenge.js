@@ -56,20 +56,15 @@ solutionButton.addEventListener("click", function () {
 });
 
 document.getElementById("easy-btn").addEventListener("click", function () {
+document.getElementById("beginner-btn").addEventListener("click", function () {
 
-    filterQuestions("Easy");
-
-});
-
-document.getElementById("medium-btn").addEventListener("click", function () {
-
-    filterQuestions("Medium");
+    filterQuestions("Beginner");
 
 });
 
-document.getElementById("hard-btn").addEventListener("click", function () {
+document.getElementById("intermediate-btn").addEventListener("click", function () {
 
-    filterQuestions("Hard");
+    filterQuestions("Intermediate");
 
 });
 
@@ -78,7 +73,6 @@ document.getElementById("expert-btn").addEventListener("click", function () {
     filterQuestions("Expert");
 
 });
-
 
 const allQuestionsButton = document.getElementById("all-questions-btn");
 
