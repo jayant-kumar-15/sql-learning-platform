@@ -99,6 +99,13 @@ const questionsPopup = document.getElementById("questions-popup");
 
 const closePopupButton = document.getElementById("close-popup");
 const overlay = document.getElementById("overlay");
+alert(allQuestionsButton);
+
+alert(questionsPopup);
+
+alert(closePopupButton);
+
+alert(overlay);
 
 allQuestionsButton.addEventListener("click", function () {
 
