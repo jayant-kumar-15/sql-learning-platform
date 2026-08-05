@@ -313,6 +313,45 @@ if (savedChallenges) {
 
 }
 
+loadQuestions();
+
+updateScoreBoard();
+
+const resetButton = document.getElementById(
+    "reset-progress-btn"
+);
+
+resetButton.addEventListener("click", function () {
+
+    const confirmReset = confirm(
+
+        "⚠️ Are you sure you want to reset your progress?"
+
+    );
+
+    if (!confirmReset) {
+
+        return;
+
+    }
+
+    challenges.forEach(function (challenge) {
+
+        challenge.status = "incomplete";
+
+    });
+
+    localStorage.removeItem("sqlChallenges");
+
+    currentQuestion = challenges[0];
+
+    loadQuestions();
+
+    updateScoreBoard();
+
+    alert("✅ Progress has been reset.");
+
+});
 function filterQuestions(difficulty) {
 
     questionsGrid.innerHTML = "";
