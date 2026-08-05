@@ -7,6 +7,12 @@ function loadDifficulty(level) {
         .then(data => {
 
             challenges = data;
+            console.log(challenges);
+alert(
+    "Loaded " +
+    challenges.length +
+    " questions"
+);
 
             currentQuestion = challenges[0];
 
