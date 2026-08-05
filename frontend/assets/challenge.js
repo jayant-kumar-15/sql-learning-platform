@@ -388,7 +388,7 @@ hardFill.style.width = hardPercentage + "%";
 
 expertFill.style.width = expertPercentage + "%";
 } 
-
+alert("Reached run button");
 loadQuestions();
 
 updateScoreBoard();
