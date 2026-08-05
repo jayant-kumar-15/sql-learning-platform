@@ -317,6 +317,10 @@ if (challenge.difficulty === "Expert") {
 
     remainingCount.textContent = remaining;
 
+    console.log("Easy total =", easyTotal);
+
+console.log("Easy completed =", easyCompleted);
+
     easyProgress.textContent =
 
     easyTotal === 0
@@ -424,6 +428,7 @@ if (savedChallenges) {
     challenges.push(...parsedChallenges);
 
 }
+console.log(challenges);
 
 loadQuestions();
 
