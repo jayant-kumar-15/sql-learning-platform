@@ -206,6 +206,10 @@ function loadQuestions() {
 
 });
 
+        if (challenges.length > 0 && currentQuestion === null) {
+
+        showQuestion(challenges[0]);
+}
 }
 console.log("loadQuestions function ended");
 
