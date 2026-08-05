@@ -388,6 +388,7 @@ expertFill.style.width =
 loadQuestions();
 
 updateScoreBoard();
+    alert("AFTER SCOREBOARD");
 const runButton = document.getElementById("run-query-btn");
 
 
