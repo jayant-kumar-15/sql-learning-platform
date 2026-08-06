@@ -75,3 +75,47 @@
     }
 
 }
+
+.badges-section {
+
+    margin-top: 30px;
+
+}
+
+#badges-container {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 15px;
+
+}
+
+.badge {
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    text-align: center;
+
+    font-weight: bold;
+
+}
+
+.locked {
+
+    background-color: #444;
+
+    color: #999;
+
+}
+
+.unlocked {
+
+    background-color: #22c55e;
+
+    color: white;
+
+}
