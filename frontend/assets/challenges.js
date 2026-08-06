@@ -68,7 +68,7 @@ console.log(
 
             loadQuestions();
 
-            updateScoreBoard();
+            updateScoreBoard(allChallenges);
 
         })
         .catch(error => {
