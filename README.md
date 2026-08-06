@@ -14,3 +14,4 @@ An interactive SQL learning platform inspired by Snowflake.
 ## Status
 
 Under development.
+redeploy code
