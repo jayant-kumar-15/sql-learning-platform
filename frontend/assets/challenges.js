@@ -107,11 +107,6 @@ async function loadAllProgress() {
 
     updateScoreBoard(allChallenges);
 
-alert(
-    "Total questions loaded: " +
-    allChallenges.length
-);
-
 }
 
 loadAllProgress();
