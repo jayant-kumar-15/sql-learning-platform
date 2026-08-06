@@ -109,4 +109,8 @@ async function loadAllProgress() {
 
 }
 
-loadAllProgress();
+window.addEventListener("load", async function () {
+
+    await loadAllProgress();
+
+});
