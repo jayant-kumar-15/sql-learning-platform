@@ -39,6 +39,12 @@ console.log(
     "Questions loaded:",
     challenges
 );
+            alert(
+    "Level = " +
+    level +
+    "\nQuestions = " +
+    challenges.length
+);
 
 
             if (challenges.length > 0) {
