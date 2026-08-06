@@ -125,12 +125,12 @@ async function loadAllProgress() {
     }
 
     updateScoreBoard();
-    console.log(
-    "Total questions loaded:",
+
+alert(
+    "Total questions loaded: " +
     challenges.length
 );
 
-console.log(challenges);
-
 }
+
 loadAllProgress();
