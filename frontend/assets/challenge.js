@@ -1,4 +1,4 @@
-    alert("START OF FILE Now");
+
 const hintButton = document.getElementById("hint-btn");
 
 const hintText = document.getElementById("hint-text");
@@ -89,9 +89,6 @@ document
         overlay.style.display = "block";
 
     });
-console.log(
-    document.getElementById("beginner-btn")
-);
 
 console.log(
     document.getElementById("intermediate-btn")
@@ -197,7 +194,6 @@ function loadQuestions() {
 
         `;
 
-        console.log(challenge.table);
         
         button.addEventListener("click", function () {
 
@@ -575,4 +571,3 @@ function filterQuestions(difficulty) {
     overlay.style.display = "block";
 
 }
-    alert("END OF FILE");
