@@ -38,9 +38,10 @@ solutionButton.addEventListener("click", function () {
     currentQuestion.status = "skipped";
 
     localStorage.setItem(
-        "sqlChallenges",
-        JSON.stringify(challenges)
-    );
+    "sqlChallenges_" +
+    currentQuestion.difficulty,
+    JSON.stringify(challenges)
+);
 
     loadQuestions();
 
@@ -255,7 +256,7 @@ const expertFill = document.getElementById(
 
 
 function updateScoreBoard(data = allChallenges) {
-console.log(challenges);
+console.log(data);
     let score = 0;
 
     let completed = 0;
@@ -453,9 +454,7 @@ const expectedQuery = currentQuestion
     }
 
 });
-const savedChallenges = localStorage.getItem(
-    "sqlChallenges"
-);
+
 
 
 
@@ -484,7 +483,11 @@ resetButton.addEventListener("click", function () {
 
     });
 
-    localStorage.removeItem("sqlChallenges");
+    localStorage.removeItem("sqlChallenges_Beginner");
+
+localStorage.removeItem("sqlChallenges_Intermediate");
+
+localStorage.removeItem("sqlChallenges_Expert");
 
     
 
@@ -533,35 +536,7 @@ function filterQuestions(difficulty) {
 
         button.addEventListener("click", function () {
 
-            currentQuestion = challenge;
-
-            questionTitle.textContent =
-                "Question " + challenge.id;
-
-            databaseName.textContent =
-                challenge.database;
-
-            tableName.textContent =
-                challenge.table;
-
-            questionText.textContent =
-                challenge.question;
-
-            hintText.textContent =
-                challenge.hint;
-
-            solutionText.textContent =
-                challenge.solution;
-
-            hintText.style.display = "none";
-
-            solutionText.style.display = "none";
-
-            hintButton.textContent =
-                "🔒 Show Hint";
-
-            solutionButton.textContent =
-                "🔒 View Solution";
+            showQuestion(challenge);
 
             questionsPopup.style.display =
                 "none";
