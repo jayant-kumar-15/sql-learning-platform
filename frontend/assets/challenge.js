@@ -54,33 +54,41 @@ solutionButton.addEventListener("click", function () {
 
 });
 
-document.getElementById("beginner-btn").addEventListener(
-    "click",
-    function () {
+document
+    .getElementById("beginner-btn")
+    .addEventListener("click", function () {
 
         loadDifficulty("beginner");
 
-    }
-);
+        questionsPopup.style.display = "block";
 
-document.getElementById("intermediate-btn").addEventListener(
-    "click",
-    function () {
+        overlay.style.display = "block";
+
+    });
+
+document
+    .getElementById("intermediate-btn")
+    .addEventListener("click", function () {
 
         loadDifficulty("intermediate");
 
-    }
-);
+        questionsPopup.style.display = "block";
 
-document.getElementById("expert-btn").addEventListener(
-    "click",
-    function () {
+        overlay.style.display = "block";
+
+    });
+
+document
+    .getElementById("expert-btn")
+    .addEventListener("click", function () {
 
         loadDifficulty("expert");
 
-    }
-);
+        questionsPopup.style.display = "block";
 
+        overlay.style.display = "block";
+
+    });
 console.log(
     document.getElementById("beginner-btn")
 );
