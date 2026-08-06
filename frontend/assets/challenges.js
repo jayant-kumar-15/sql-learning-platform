@@ -8,6 +8,34 @@ function loadDifficulty(level) {
 
             challenges = data;
 
+const savedChallenges = localStorage.getItem(
+    "sqlChallenges"
+);
+
+if (savedChallenges) {
+
+    const parsedChallenges = JSON.parse(
+        savedChallenges
+    );
+
+    parsedChallenges.forEach(function(savedQuestion) {
+
+        const current = challenges.find(function(question) {
+
+            return question.id === savedQuestion.id;
+
+        });
+
+        if (current) {
+
+            current.status = savedQuestion.status;
+
+        }
+
+    });
+
+}
+
             console.log(challenges);
 
             alert(
