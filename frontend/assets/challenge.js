@@ -42,10 +42,9 @@ solutionButton.addEventListener("click", function () {
     currentQuestion.difficulty,
     JSON.stringify(challenges)
 );
+loadQuestions();
 
-    loadQuestions();
-
-    updateScoreBoard();
+loadAllProgress();
 
     solutionText.style.display = "block";
 
@@ -433,9 +432,10 @@ const expectedQuery = currentQuestion
     currentQuestion.status = "completed";
 
     localStorage.setItem(
-        "sqlChallenges",
-        JSON.stringify(challenges)
-    );
+    "sqlChallenges_" +
+    currentQuestion.difficulty,
+    JSON.stringify(challenges)
+);
 
     resultMessage.textContent =
         "✅ Correct answer! +" +
@@ -444,7 +444,7 @@ const expectedQuery = currentQuestion
 
     loadQuestions();
 
-    updateScoreBoard();
+loadAllProgress();
 
 } else {
 
