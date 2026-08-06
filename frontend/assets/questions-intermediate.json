@@ -1,1 +1,13 @@
-
+[
+    {
+        "id": 101,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "table": "customers",
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find all customers whose balance is greater than 50000 and sort them by balance in descending order.",
+        "hint": "Use WHERE and ORDER BY.",
+        "solution": "SELECT * FROM customers WHERE balance > 50000 ORDER BY balance DESC;"
+    }
+]
