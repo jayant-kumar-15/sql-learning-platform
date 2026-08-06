@@ -30,7 +30,15 @@ savedChallenges.forEach(function (savedQuestion) {
 });
             
 
-            console.log(challenges);
+            console.log(
+    "Level:",
+    level
+);
+
+console.log(
+    "Questions loaded:",
+    challenges
+);
 
 
             if (challenges.length > 0) {
