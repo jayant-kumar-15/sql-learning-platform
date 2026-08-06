@@ -12,7 +12,11 @@ function loadDifficulty(level) {
 
             const savedChallenges =
     JSON.parse(
-        localStorage.getItem("sqlChallenges")
+        localStorage.getItem(
+            "sqlChallenges_" +
+            level.charAt(0).toUpperCase() +
+            level.slice(1)
+        )
     ) || [];
 
 savedChallenges.forEach(function (savedQuestion) {
@@ -87,9 +91,13 @@ async function loadAllProgress() {
         const data = await response.json();
 
         const savedChallenges =
-            JSON.parse(
-                localStorage.getItem("sqlChallenges")
-            ) || [];
+    JSON.parse(
+        localStorage.getItem(
+            "sqlChallenges_" +
+            level.charAt(0).toUpperCase() +
+            level.slice(1)
+        )
+    ) || [];
 
         data.forEach(function (question) {
 
