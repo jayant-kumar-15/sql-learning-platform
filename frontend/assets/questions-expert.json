@@ -1,1 +1,13 @@
-
+[
+    {
+        "id": 201,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "table": "customers",
+        "points": 50,
+        "status": "incomplete",
+        "question": "Find the top 3 customers with the highest balance.",
+        "hint": "Use ORDER BY and LIMIT.",
+        "solution": "SELECT * FROM customers ORDER BY balance DESC LIMIT 3;"
+    }
+]
