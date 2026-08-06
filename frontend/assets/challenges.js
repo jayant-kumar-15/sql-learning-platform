@@ -1,5 +1,5 @@
 let challenges = [];
-
+let allChallenges = [];
 function loadDifficulty(level) {
 
     alert("Loading " + level);
@@ -8,8 +8,10 @@ function loadDifficulty(level) {
         .then(response => response.json())
         .then(data => {
 
-            let allChallenges = [];
-         let challenges = [];
+    challenges = [];
+
+    challenges.push(...data);
+        
             
 challenges.push(...data);
 
@@ -129,7 +131,7 @@ async function loadAllProgress() {
 
 alert(
     "Total questions loaded: " +
-    challenges.length
+    allChallenges.length
 );
 
 }
