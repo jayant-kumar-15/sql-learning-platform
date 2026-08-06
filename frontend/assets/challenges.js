@@ -1,7 +1,7 @@
 let challenges = [];
 
 function loadDifficulty(level) {
-
+console.log("Beginner button clicked");
     fetch(`../assets/questions-${level}.json`)
         .then(response => response.json())
         .then(data => {
