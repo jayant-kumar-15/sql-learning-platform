@@ -450,17 +450,7 @@ const savedChallenges = localStorage.getItem(
 );
 
 
-if (savedChallenges) {
 
-    const parsedChallenges = JSON.parse(
-        savedChallenges
-    );
-
-    challenges.length = 0;
-
-    challenges.push(...parsedChallenges);
-
-}
 
 const resetButton = document.getElementById(
     "reset-progress-btn"
