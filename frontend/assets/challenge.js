@@ -254,7 +254,7 @@ const expertFill = document.getElementById(
 );
 
 
-function updateScoreBoard() {
+function updateScoreBoard(data = allChallenges) {
 console.log(challenges);
     let score = 0;
 
@@ -273,7 +273,7 @@ let intermediateCompleted = 0;
 let expertTotal = 0;
 let expertCompleted = 0;
     
-    challenges.forEach(function (challenge) {
+    data.forEach(function (challenge) {
         
 if (challenge.difficulty === "Beginner") {
 
