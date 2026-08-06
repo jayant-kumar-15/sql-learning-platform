@@ -2,61 +2,38 @@ let challenges = [];
 let allChallenges = [];
 function loadDifficulty(level) {
 
-    alert("Loading " + level);
-
     fetch(`../assets/questions-${level}.json`)
         .then(response => response.json())
         .then(data => {
 
-    challenges = [];
+            challenges = [];
 
-    challenges.push(...data);
-        
-            
-challenges.push(...data);
+            challenges.push(...data);
 
             const savedChallenges =
-    JSON.parse(
-        localStorage.getItem(
-            "sqlChallenges_" +
-            level.charAt(0).toUpperCase() +
-            level.slice(1)
-        )
-    ) || [];
+                JSON.parse(
+                    localStorage.getItem(
+                        "sqlChallenges_" +
+                        level.charAt(0).toUpperCase() +
+                        level.slice(1)
+                    )
+                ) || [];
 
-savedChallenges.forEach(function (savedQuestion) {
+            savedChallenges.forEach(function (savedQuestion) {
 
-    const current = challenges.find(function (q) {
+                const current = challenges.find(function (q) {
 
-        return q.id === savedQuestion.id;
+                    return q.id === savedQuestion.id;
 
-    });
+                });
 
-    if (current) {
+                if (current) {
 
-        current.status = savedQuestion.status;
+                    current.status = savedQuestion.status;
 
-    }
+                }
 
-});
-            
-
-            console.log(
-    "Level:",
-    level
-);
-
-console.log(
-    "Questions loaded:",
-    challenges
-);
-            alert(
-    "Level = " +
-    level +
-    "\nQuestions = " +
-    challenges.length
-);
-
+            });
 
             if (challenges.length > 0) {
 
@@ -71,6 +48,7 @@ console.log(
             updateScoreBoard(allChallenges);
 
         })
+
         .catch(error => {
 
             console.error(error);
