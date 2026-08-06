@@ -436,6 +436,12 @@ const expectedQuery = currentQuestion
     currentQuestion.difficulty,
     JSON.stringify(challenges)
 );
+        console.log(
+    localStorage.getItem(
+        "sqlChallenges_" +
+        currentQuestion.difficulty
+    )
+);
 
     resultMessage.textContent =
         "✅ Correct answer! +" +
