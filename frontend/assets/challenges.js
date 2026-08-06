@@ -8,7 +8,9 @@ function loadDifficulty(level) {
         .then(response => response.json())
         .then(data => {
 
-            challenges = data;
+            challenges = [];
+
+challenges.push(...data);
 
             const savedChallenges =
     JSON.parse(
@@ -81,6 +83,7 @@ async function loadAllProgress() {
         "intermediate",
         "expert"
     ];
+    challenges = [];
 
     for (const level of levels) {
 
@@ -125,3 +128,4 @@ async function loadAllProgress() {
 
 }
 loadAllProgress();
+console.log(challenges);
