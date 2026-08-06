@@ -53,3 +53,51 @@ savedChallenges.forEach(function (savedQuestion) {
         });
 
 }
+
+async function loadAllProgress() {
+
+    const levels = [
+        "beginner",
+        "intermediate",
+        "expert"
+    ];
+
+    for (const level of levels) {
+
+        const response = await fetch(
+            `../assets/questions-${level}.json`
+        );
+
+        const data = await response.json();
+
+        const savedChallenges =
+            JSON.parse(
+                localStorage.getItem("sqlChallenges")
+            ) || [];
+
+        data.forEach(function (question) {
+
+            const saved = savedChallenges.find(
+                function (q) {
+
+                    return q.id === question.id;
+
+                }
+            );
+
+            if (saved) {
+
+                question.status = saved.status;
+
+            }
+
+        });
+
+        challenges.push(...data);
+
+    }
+
+    updateScoreBoard();
+
+}
+loadAllProgress();
