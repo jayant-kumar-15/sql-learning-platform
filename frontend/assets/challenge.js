@@ -168,6 +168,9 @@ function showQuestion(question) {
 
 function loadQuestions() {
 
+    console.log("Challenges length:", challenges.length);
+console.log(challenges);
+    
     questionsGrid.innerHTML = "";
 
     challenges.forEach(function (challenge) {
