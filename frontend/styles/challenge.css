@@ -198,6 +198,52 @@
 
 }
 
+.question-filters {
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin: 15px 0;
+
+}
+
+.filter-btn {
+
+    padding: 8px 14px;
+
+    border: 1px solid #475569;
+
+    border-radius: 8px;
+
+    background: #334155;
+
+    color: #e2e8f0;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+}
+
+.filter-btn:hover {
+
+    background: #475569;
+
+}
+
+.filter-btn.active {
+
+    background: #2563eb;
+
+    color: white;
+
+    border-color: #2563eb;
+
+}
+
 .question-popup-card {
 
     display: flex;
