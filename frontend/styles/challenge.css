@@ -160,10 +160,9 @@
 
     width: 90%;
 
-    max-width: 900px;
-    max-height: 80vh;
+    max-width: 750px;
 
-overflow-y: auto;
+    max-height: 80vh;
 
     background: #1e293b;
 
@@ -171,20 +170,106 @@ overflow-y: auto;
 
     border-radius: 12px;
 
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
 
     z-index: 1000;
+
+    overflow: hidden;
+
 }
 
 .questions-grid {
 
-    display: grid;
+    display: flex;
 
-    grid-template-columns: repeat(4, 1fr);
+    flex-direction: column;
 
-    gap: 15px;
+    gap: 12px;
 
     margin: 20px 0;
+
+    max-height: 60vh;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding-right: 8px;
+
+}
+
+.question-popup-card {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 16px;
+
+    background: #334155;
+
+    border: 1px solid #475569;
+
+    border-radius: 10px;
+
+    min-height: 70px;
+
+}
+
+.question-popup-text {
+
+    flex: 1;
+
+    color: #f8fafc;
+
+    line-height: 1.5;
+
+}
+
+.question-popup-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    flex-shrink: 0;
+
+}
+
+.question-status {
+
+    font-size: 20px;
+
+}
+
+.popup-start-btn {
+
+    padding: 9px 16px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #2563eb;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+}
+
+.popup-start-btn:hover {
+
+    background: #1d4ed8;
+
 }
 
 .questions-grid button {
