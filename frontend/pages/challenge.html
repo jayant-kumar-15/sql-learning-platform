@@ -295,20 +295,46 @@
         <h2>📋 All Questions</h2>
 
         <button id="close-popup">
-
             ✖
-
         </button>
 
     </div>
 
-    <input
-        type="text"
-        id="question-search"
-        placeholder="🔍 Search question..."
-    >
+    <div class="question-filters">
 
-    <div class="questions-grid" id="questions-grid">
+        <button
+            type="button"
+            class="filter-btn active"
+            id="filter-all">
+            All
+        </button>
+
+        <button
+            type="button"
+            class="filter-btn"
+            id="filter-beginner">
+            🟢 Beginner
+        </button>
+
+        <button
+            type="button"
+            class="filter-btn"
+            id="filter-intermediate">
+            🟡 Intermediate
+        </button>
+
+        <button
+            type="button"
+            class="filter-btn"
+            id="filter-expert">
+            🔴 Expert
+        </button>
+
+    </div>
+
+    <div
+        class="questions-grid"
+        id="questions-grid">
 
     </div>
 
