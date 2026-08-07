@@ -576,7 +576,7 @@ function filterQuestions(difficulty) {
     overlay.style.display = "block";
 
 }
-/* const searchBox = document.getElementById("question-search"); 
+ const searchBox = document.getElementById("question-search"); 
 
 if (searchBox) {
 
@@ -609,4 +609,4 @@ if (searchBox) {
     });
 
 }
-*/
+
