@@ -571,3 +571,29 @@ function filterQuestions(difficulty) {
     overlay.style.display = "block";
 
 }
+
+const searchBox = document.getElementById("question-search");
+
+searchBox.addEventListener("input", function () {
+
+    const searchText = searchBox.value.toLowerCase();
+
+    const buttons = questionsGrid.querySelectorAll("button");
+
+    buttons.forEach(function (button) {
+
+        const text = button.textContent.toLowerCase();
+
+        if (text.includes(searchText)) {
+
+            button.style.display = "block";
+
+        } else {
+
+            button.style.display = "none";
+
+        }
+
+    });
+
+});
