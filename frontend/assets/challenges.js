@@ -1,5 +1,49 @@
 let challenges = [];
 let allChallenges = [];
+function loadAllDifficultyQuestions() {
+
+    const levels = [
+        "beginner",
+        "intermediate",
+        "expert"
+    ];
+
+    const requests = levels.map(function (level) {
+
+        return fetch(`../assets/questions-${level}.json`)
+            .then(response => response.json());
+
+    });
+
+    Promise.all(requests)
+        .then(function (results) {
+
+            allChallenges = [];
+
+            results.forEach(function (questions) {
+
+                allChallenges.push(...questions);
+
+            });
+
+            console.log(
+                "All questions loaded:",
+                allChallenges.length
+            );
+
+        })
+        .catch(function (error) {
+
+            console.error(
+                "Error loading all questions:",
+                error
+            );
+
+        });
+
+}
+
+
 function loadDifficulty(level) {
 
     fetch(`../assets/questions-${level}.json`)
