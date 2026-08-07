@@ -107,9 +107,11 @@ const overlay = document.getElementById("overlay");
 
 allQuestionsButton.addEventListener("click", function () {
 
+    loadQuestions();
+
     questionsPopup.style.display = "block";
 
-overlay.style.display = "block";
+    overlay.style.display = "block";
 
 });
 
@@ -571,29 +573,36 @@ function filterQuestions(difficulty) {
     overlay.style.display = "block";
 
 }
-
 const searchBox = document.getElementById("question-search");
 
-searchBox.addEventListener("input", function () {
+if (searchBox) {
 
-    const searchText = searchBox.value.toLowerCase();
+    searchBox.addEventListener("input", function () {
 
-    const buttons = questionsGrid.querySelectorAll("button");
+        const searchText = searchBox.value.toLowerCase();
 
-    buttons.forEach(function (button) {
+        const buttons = document.querySelectorAll(
+            "#questions-grid button"
+        );
 
-        const text = button.textContent.toLowerCase();
+        buttons.forEach(function (button) {
 
-        if (text.includes(searchText)) {
+            const text = button.textContent.toLowerCase();
 
-            button.style.display = "block";
+            if (
+                text.includes(searchText)
+            ) {
 
-        } else {
+                button.style.display = "";
 
-            button.style.display = "none";
+            } else {
 
-        }
+                button.style.display = "none";
+
+            }
+
+        });
 
     });
 
-});
+}
