@@ -168,14 +168,13 @@ function showQuestion(question) {
 
 function loadQuestions() {
 
-    console.log("Challenges length:", challenges.length);
-console.log(challenges);
-    
     questionsGrid.innerHTML = "";
 
     challenges.forEach(function (challenge) {
 
-        const button = document.createElement("button");
+        const card = document.createElement("div");
+
+        card.className = "question-popup-card";
 
         let statusIcon = "❌";
 
@@ -189,36 +188,56 @@ console.log(challenges);
 
         }
 
-        button.innerHTML = `
+        card.innerHTML = `
 
-            <strong>${challenge.id} ${statusIcon}</strong>
+            <div class="question-popup-text">
 
-            <br><br>
+                <strong>
+                    ${challenge.id}. ${challenge.question}
+                </strong>
 
-            <small>${challenge.table}</small>
+            </div>
+
+            <div class="question-popup-actions">
+
+                <span class="question-status">
+                    ${statusIcon}
+                </span>
+
+                <button
+                    type="button"
+                    class="popup-start-btn"
+                >
+                    Start
+                </button>
+
+            </div>
 
         `;
 
-        
-        button.addEventListener("click", function () {
+        const startButton =
+            card.querySelector(".popup-start-btn");
 
-    showQuestion(challenge);
+        startButton.addEventListener("click", function () {
 
-    questionsPopup.style.display =
-        "none";
+            showQuestion(challenge);
 
-    overlay.style.display =
-        "none";
+            questionsPopup.style.display = "none";
 
-});
-        questionsGrid.appendChild(button);
+            overlay.style.display = "none";
 
-});
+        });
 
-        if (challenges.length > 0 && currentQuestion === null) {
+        questionsGrid.appendChild(card);
+
+    });
+
+    if (challenges.length > 0 && currentQuestion === null) {
 
         showQuestion(challenges[0]);
-}
+
+    }
+
 }
 console.log("loadQuestions function ended");
 
