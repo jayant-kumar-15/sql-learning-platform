@@ -35,6 +35,30 @@ function loadDifficulty(level) {
 
             });
 
+            /*
+             * Keep all questions available for
+             * the View All Questions popup.
+             */
+
+            const existingIds = new Set(
+                allChallenges.map(function (q) {
+                    return q.id + "-" + q.difficulty;
+                })
+            );
+
+            challenges.forEach(function (question) {
+
+                const uniqueKey =
+                    question.id + "-" + question.difficulty;
+
+                if (!existingIds.has(uniqueKey)) {
+
+                    allChallenges.push(question);
+
+                }
+
+            });
+
             if (challenges.length > 0) {
 
                 currentQuestion = challenges[0];
@@ -51,7 +75,10 @@ function loadDifficulty(level) {
 
         .catch(error => {
 
-            console.error(error);
+            console.error(
+                "Error loading questions:",
+                error
+            );
 
         });
 
