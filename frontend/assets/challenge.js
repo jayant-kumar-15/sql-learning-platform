@@ -107,7 +107,7 @@ const overlay = document.getElementById("overlay");
 
 allQuestionsButton.addEventListener("click", function () {
 
-    loadQuestions();
+    loadQuestions(allChallenges);
 
     questionsPopup.style.display = "block";
 
@@ -166,11 +166,11 @@ function showQuestion(question) {
         "🔒 View Solution";
 }
 
-function loadQuestions() {
+function loadQuestions(questionList = challenges) {
 
     questionsGrid.innerHTML = "";
 
-    challenges.forEach(function (challenge) {
+    questionList.forEach(function (challenge) {
 
         const card = document.createElement("div");
 
