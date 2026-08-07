@@ -273,6 +273,53 @@ const expertFill = document.getElementById(
     "expert-fill"
 );
 
+const filterAll =
+    document.getElementById("filter-all");
+
+const filterBeginner =
+    document.getElementById("filter-beginner");
+
+const filterIntermediate =
+    document.getElementById("filter-intermediate");
+
+const filterExpert =
+    document.getElementById("filter-expert");
+
+function filterQuestions(difficulty) {
+
+    let filteredQuestions;
+
+    if (difficulty === "All") {
+
+        filteredQuestions = allChallenges;
+
+    } else {
+
+        filteredQuestions = allChallenges.filter(
+            function (challenge) {
+
+                return challenge.difficulty === difficulty;
+
+            }
+        );
+
+    }
+
+    loadQuestions(filteredQuestions);
+
+}
+
+filterAll.addEventListener("click", function () {
+
+    loadQuestions(allChallenges);
+
+});
+
+filterBeginner.addEventListener("click", function () {
+
+    filterQuestions("Beginner");
+
+});
 
 function updateScoreBoard(data = allChallenges) {
 console.log(data);
