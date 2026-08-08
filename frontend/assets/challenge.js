@@ -140,7 +140,7 @@ const tableName = document.getElementById("table-name");
 
 const questionText = document.getElementById("question-text");
 let currentQuestion = null;
-
+let currentQuestionList = [];
 function showQuestion(question) {
 
     currentQuestion = question;
