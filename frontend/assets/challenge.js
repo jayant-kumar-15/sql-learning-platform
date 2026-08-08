@@ -290,13 +290,24 @@ previousQuestionButton.addEventListener("click", function () {
 
 });
 
-
 nextQuestionButton.addEventListener("click", function () {
 
     const questionList =
         currentQuestionList.length > 0
             ? currentQuestionList
-            : challenges;
+            : allChallenges.length > 0
+                ? allChallenges
+                : challenges;
+
+    if (questionList.length === 0) {
+        return;
+    }
+
+    if (currentQuestion === null) {
+
+        currentQuestion = questionList[0];
+
+    }
 
     const currentIndex =
         questionList.findIndex(function (challenge) {
@@ -306,6 +317,7 @@ nextQuestionButton.addEventListener("click", function () {
         });
 
     if (
+        currentIndex >= 0 &&
         currentIndex < questionList.length - 1
     ) {
 
