@@ -145,6 +145,8 @@ let currentQuestion = null;
 function showQuestion(question) {
 
     currentQuestion = question;
+    console.log("CURRENT QUESTION:", currentQuestion);
+console.log("CURRENT QUESTION LIST:", currentQuestionList);
 
     questionTitle.textContent =
         "Question " + question.id;
