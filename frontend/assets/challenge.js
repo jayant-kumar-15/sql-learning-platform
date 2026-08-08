@@ -317,6 +317,8 @@ filterAll.addEventListener("click", function () {
 
 filterBeginner.addEventListener("click", function () {
 
+    console.log("ALL QUESTIONS:", allChallenges);
+
     filterQuestions("Beginner");
 
 });
