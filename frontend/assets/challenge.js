@@ -314,7 +314,6 @@ nextQuestionButton.addEventListener("click", function () {
 
 });
 
-});
 
 const beginnerProgress = document.getElementById(
     "easy-progress"
