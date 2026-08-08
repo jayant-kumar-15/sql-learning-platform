@@ -292,27 +292,43 @@ previousQuestionButton.addEventListener("click", function () {
 
 nextQuestionButton.addEventListener("click", function () {
 
-    console.log("===== NEXT CLICKED =====");
+    const questionList =
+        currentQuestionList.length > 0
+            ? currentQuestionList
+            : allChallenges;
 
-    console.log(
-        "currentQuestion:",
-        currentQuestion
-    );
+    if (questionList.length === 0) {
+        return;
+    }
 
-    console.log(
-        "currentQuestionList:",
-        currentQuestionList
-    );
+    /*
+     * After page refresh, Question 1 is displayed
+     * from the HTML, but currentQuestion is still null.
+     * Treat the first question as the current question.
+     */
+    if (currentQuestion === null) {
 
-    console.log(
-        "challenges:",
-        challenges
-    );
+        currentQuestion = questionList[0];
 
-    console.log(
-        "allChallenges:",
-        allChallenges
-    );
+    }
+
+    const currentIndex =
+        questionList.findIndex(function (challenge) {
+
+            return challenge.id === currentQuestion.id;
+
+        });
+
+    if (
+        currentIndex >= 0 &&
+        currentIndex < questionList.length - 1
+    ) {
+
+        showQuestion(
+            questionList[currentIndex + 1]
+        );
+
+    }
 
 });
 
