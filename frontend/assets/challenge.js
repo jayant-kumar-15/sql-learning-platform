@@ -109,13 +109,13 @@ const overlay = document.getElementById("overlay");
 
 allQuestionsButton.addEventListener("click", function () {
 
-    questionFilters.style.display = "flex";
-
     loadQuestions(allChallenges);
 
     questionsPopup.style.display = "block";
 
     overlay.style.display = "block";
+
+    questionFilters.style.display = "flex";
 
 });
 
