@@ -232,12 +232,11 @@ function loadQuestions(questionList = challenges) {
 
     });
 
-    if (challenges.length > 0 && currentQuestion === null) {
+    if (questionList.length > 0 && currentQuestion === null) {
 
-        showQuestion(challenges[0]);
+    showQuestion(questionList[0]);
 
     }
-
 }
 console.log("loadQuestions function ended");
 
