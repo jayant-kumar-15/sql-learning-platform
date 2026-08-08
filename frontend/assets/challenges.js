@@ -54,6 +54,8 @@ function loadDifficulty(level) {
 
             challenges.push(...data);
 
+            currentQuestionList = challenges;
+
             const savedChallenges =
                 JSON.parse(
                     localStorage.getItem(
