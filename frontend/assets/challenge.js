@@ -319,21 +319,41 @@ function filterQuestions(difficulty) {
 
 }
 
+function setActiveFilter(activeButton) {
+
+    filterAll.classList.remove("active");
+
+    filterBeginner.classList.remove("active");
+
+    filterIntermediate.classList.remove("active");
+
+    filterExpert.classList.remove("active");
+
+    activeButton.classList.add("active");
+
+}
+
 filterAll.addEventListener("click", function () {
+
+    setActiveFilter(filterAll);
 
     loadQuestions(allChallenges);
 
 });
 
+
 filterBeginner.addEventListener("click", function () {
 
-    console.log("ALL QUESTIONS:", allChallenges);
+    setActiveFilter(filterBeginner);
 
     filterQuestions("Beginner");
 
 });
 
+
 filterIntermediate.addEventListener("click", function () {
+
+    setActiveFilter(filterIntermediate);
 
     filterQuestions("Intermediate");
 
@@ -341,6 +361,8 @@ filterIntermediate.addEventListener("click", function () {
 
 
 filterExpert.addEventListener("click", function () {
+
+    setActiveFilter(filterExpert);
 
     filterQuestions("Expert");
 
