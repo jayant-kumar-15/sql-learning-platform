@@ -114,8 +114,7 @@ const overlay = document.getElementById("overlay");
 allQuestionsButton.addEventListener("click", function () {
 
     loadQuestions(allChallenges);
-    currentQuestionList = allChallenges;
-
+    
     questionsPopup.style.display = "block";
 
     overlay.style.display = "block";
