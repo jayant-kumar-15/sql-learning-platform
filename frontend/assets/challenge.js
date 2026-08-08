@@ -266,7 +266,7 @@ const previousQuestionButton =
 const nextQuestionButton =
     document.getElementById("next-question-btn");
 
-previousQuestionButton.addEventListener("click", function () {
+
 previousQuestionButton.addEventListener("click", function () {
 
     const questionList =
