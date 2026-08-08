@@ -139,8 +139,9 @@ const databaseName = document.getElementById("database-name");
 const tableName = document.getElementById("table-name");
 
 const questionText = document.getElementById("question-text");
-let currentQuestion = null;
 let currentQuestionList = [];
+let currentQuestion = null;
+
 function showQuestion(question) {
 
     currentQuestion = question;
