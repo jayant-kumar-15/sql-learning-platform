@@ -178,6 +178,7 @@ function showQuestion(question) {
 function loadQuestions(questionList = challenges) {
 
     questionsGrid.innerHTML = "";
+    currentQuestionList = questionList;
 
     questionList.forEach(function (challenge) {
 
