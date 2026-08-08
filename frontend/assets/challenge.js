@@ -267,27 +267,21 @@ const nextQuestionButton =
     document.getElementById("next-question-btn");
 
 previousQuestionButton.addEventListener("click", function () {
-
-    console.log("===== PREVIOUS CLICKED =====");
-
-    console.log("currentQuestion:", currentQuestion);
-
-    console.log("currentQuestionList:", currentQuestionList);
-
-    console.log("challenges:", challenges);
-
-    console.log("allChallenges:", allChallenges);
+previousQuestionButton.addEventListener("click", function () {
 
     const questionList =
         currentQuestionList.length > 0
             ? currentQuestionList
             : allChallenges;
 
-    console.log("questionList used:", questionList);
+    if (questionList.length === 0) {
+        return;
+    }
 
     if (currentQuestion === null) {
-        console.log("CURRENT QUESTION IS NULL");
-        return;
+
+        currentQuestion = questionList[0];
+
     }
 
     const currentIndex =
@@ -297,22 +291,11 @@ previousQuestionButton.addEventListener("click", function () {
 
         });
 
-    console.log("currentIndex:", currentIndex);
-
     if (currentIndex > 0) {
-
-        console.log(
-            "Going previous to:",
-            questionList[currentIndex - 1]
-        );
 
         showQuestion(
             questionList[currentIndex - 1]
         );
-
-    } else {
-
-        console.log("Already at first question");
 
     }
 
