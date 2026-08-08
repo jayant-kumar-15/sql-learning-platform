@@ -333,6 +333,19 @@ filterBeginner.addEventListener("click", function () {
 
 });
 
+filterIntermediate.addEventListener("click", function () {
+
+    filterQuestions("Intermediate");
+
+});
+
+
+filterExpert.addEventListener("click", function () {
+
+    filterQuestions("Expert");
+
+});
+
 function updateScoreBoard(data = allChallenges) {
 console.log(data);
     let score = 0;
