@@ -236,11 +236,15 @@
 
 .filter-btn.active {
 
-    background: #2563eb;
+    background: #3b82f6;
 
     color: white;
 
-    border-color: #2563eb;
+    border: 2px solid #93c5fd;
+
+    font-weight: 600;
+
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.45);
 
 }
 
