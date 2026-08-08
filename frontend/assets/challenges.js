@@ -111,7 +111,7 @@ function loadDifficulty(level) {
 
             }
 
-            loadQuestions();
+            loadQuestions(challenges);
 
             updateScoreBoard(allChallenges);
 
