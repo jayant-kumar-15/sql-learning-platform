@@ -256,6 +256,59 @@ const skippedCount = document.getElementById("skipped-count");
 
 const remainingCount = document.getElementById("remaining-count");
 
+const previousQuestionButton =
+    document.getElementById("previous-question-btn");
+
+const nextQuestionButton =
+    document.getElementById("next-question-btn");
+
+previousQuestionButton.addEventListener("click", function () {
+
+    const questionList =
+        currentQuestionList || challenges;
+
+    const currentIndex =
+        questionList.findIndex(function (challenge) {
+
+            return challenge.id === currentQuestion.id;
+
+        });
+
+    if (currentIndex > 0) {
+
+        showQuestion(
+            questionList[currentIndex - 1]
+        );
+
+    }
+
+});
+
+
+nextQuestionButton.addEventListener("click", function () {
+
+    const questionList =
+        currentQuestionList || challenges;
+
+    const currentIndex =
+        questionList.findIndex(function (challenge) {
+
+            return challenge.id === currentQuestion.id;
+
+        });
+
+    if (
+        currentIndex < questionList.length - 1
+    ) {
+
+        showQuestion(
+            questionList[currentIndex + 1]
+        );
+
+    }
+
+});
+
 const beginnerProgress = document.getElementById(
     "easy-progress"
 );
