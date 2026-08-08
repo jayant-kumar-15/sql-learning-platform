@@ -178,6 +178,10 @@ async function loadAllProgress() {
 
         allChallenges.push(...data);
 
+        window.dispatchEvent(
+    new Event("allQuestionsLoaded")
+);
+
     }
 
     updateScoreBoard(allChallenges);
