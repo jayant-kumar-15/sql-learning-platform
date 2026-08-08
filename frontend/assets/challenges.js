@@ -22,27 +22,14 @@ function loadAllDifficultyQuestions() {
 
             results.forEach(function (questions) {
 
-                allChallenges.push(...questions);
+    allChallenges.push(...questions);
 
-            });
+});
 
-            console.log(
-                "All questions loaded:",
-                allChallenges.length
-            );
-
-            if (
-    allChallenges.length > 0 &&
-    currentQuestion === null
-) {
-
-    currentQuestionList = allChallenges;
-
-    currentQuestion = allChallenges[0];
-
-    showQuestion(currentQuestion);
-
-            }
+console.log(
+    "All questions loaded:",
+    allChallenges.length
+);
 
         })
         .catch(function (error) {
