@@ -269,10 +269,20 @@ const nextQuestionButton =
 previousQuestionButton.addEventListener("click", function () {
 
     const questionList =
-    currentQuestionList.length > 0
-        ? currentQuestionList
-        : challenges;
-    
+        currentQuestionList.length > 0
+            ? currentQuestionList
+            : allChallenges;
+
+    if (questionList.length === 0) {
+        return;
+    }
+
+    if (currentQuestion === null) {
+
+        currentQuestion = questionList[0];
+
+    }
+
     const currentIndex =
         questionList.findIndex(function (challenge) {
 
