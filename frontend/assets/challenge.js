@@ -88,6 +88,8 @@ document
 
         loadDifficulty("expert");
 
+        questionFilters.style.display = "none";
+
         questionsPopup.style.display = "block";
 
         overlay.style.display = "block";
