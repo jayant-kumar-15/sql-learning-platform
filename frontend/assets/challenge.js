@@ -292,43 +292,29 @@ previousQuestionButton.addEventListener("click", function () {
 
 nextQuestionButton.addEventListener("click", function () {
 
-    const questionList =
-        currentQuestionList.length > 0
-            ? currentQuestionList
-            : allChallenges.length > 0
-                ? allChallenges
-                : challenges;
+    console.log("===== NEXT CLICKED =====");
 
-    if (questionList.length === 0) {
-        return;
-    }
+    console.log(
+        "currentQuestion:",
+        currentQuestion
+    );
 
-    if (currentQuestion === null) {
+    console.log(
+        "currentQuestionList:",
+        currentQuestionList
+    );
 
-        currentQuestion = questionList[0];
+    console.log(
+        "challenges:",
+        challenges
+    );
 
-    }
-
-    const currentIndex =
-        questionList.findIndex(function (challenge) {
-
-            return challenge.id === currentQuestion.id;
-
-        });
-
-    if (
-        currentIndex >= 0 &&
-        currentIndex < questionList.length - 1
-    ) {
-
-        showQuestion(
-            questionList[currentIndex + 1]
-        );
-
-    }
+    console.log(
+        "allChallenges:",
+        allChallenges
+    );
 
 });
-
 
 const beginnerProgress = document.getElementById(
     "easy-progress"
