@@ -60,6 +60,8 @@ document
 
         loadDifficulty("beginner");
 
+        questionFilters.style.display = "none";
+
         questionsPopup.style.display = "block";
 
         overlay.style.display = "block";
@@ -283,6 +285,9 @@ const filterIntermediate =
 
 const filterExpert =
     document.getElementById("filter-expert");
+
+const questionFilters =
+    document.getElementById("question-filters");
 
 function filterQuestions(difficulty) {
 
