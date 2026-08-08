@@ -31,6 +31,19 @@ function loadAllDifficultyQuestions() {
                 allChallenges.length
             );
 
+            if (
+    allChallenges.length > 0 &&
+    currentQuestion === null
+) {
+
+    currentQuestionList = allChallenges;
+
+    currentQuestion = allChallenges[0];
+
+    showQuestion(currentQuestion);
+
+            }
+
         })
         .catch(function (error) {
 
