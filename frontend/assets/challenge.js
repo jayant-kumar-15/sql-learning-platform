@@ -37,11 +37,22 @@ solutionButton.addEventListener("click", function () {
 
     currentQuestion.status = "skipped";
 
-    localStorage.setItem(
+const progressList =
+    challenges.length > 0
+        ? challenges
+        : allChallenges.filter(function (question) {
+
+            return question.difficulty ===
+                currentQuestion.difficulty;
+
+        });
+
+localStorage.setItem(
     "sqlChallenges_" +
     currentQuestion.difficulty,
-    JSON.stringify(challenges)
+    JSON.stringify(progressList)
 );
+        
 loadQuestions();
 
 loadAllProgress();
@@ -141,6 +152,26 @@ const tableName = document.getElementById("table-name");
 const questionText = document.getElementById("question-text");
 let currentQuestionList = [];
 let currentQuestion = null;
+
+window.addEventListener(
+    "allQuestionsLoaded",
+    function () {
+
+        if (
+            allChallenges.length > 0 &&
+            currentQuestion === null
+        ) {
+
+            currentQuestionList = allChallenges;
+
+            currentQuestion = allChallenges[0];
+
+            showQuestion(currentQuestion);
+
+        }
+
+    }
+);
 
 function showQuestion(question) {
 
@@ -632,17 +663,22 @@ const expectedQuery = currentQuestion
 
     currentQuestion.status = "completed";
 
-    localStorage.setItem(
+const progressList =
+    challenges.length > 0
+        ? challenges
+        : allChallenges.filter(function (question) {
+
+            return question.difficulty ===
+                currentQuestion.difficulty;
+
+        });
+
+localStorage.setItem(
     "sqlChallenges_" +
     currentQuestion.difficulty,
-    JSON.stringify(challenges)
+    JSON.stringify(progressList)
 );
-        console.log(
-    localStorage.getItem(
-        "sqlChallenges_" +
-        currentQuestion.difficulty
-    )
-);
+    
 
     resultMessage.textContent =
         "✅ Correct answer! +" +
