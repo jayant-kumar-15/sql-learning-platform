@@ -74,6 +74,8 @@ document
 
         loadDifficulty("intermediate");
 
+        questionFilters.style.display = "none";
+
         questionsPopup.style.display = "block";
 
         overlay.style.display = "block";
