@@ -105,17 +105,19 @@ function loadDifficulty(level) {
 
             });
 
-            if (challenges.length > 0) {
+      if (challenges.length > 0) {
 
-                currentQuestion = challenges[0];
+    currentQuestionList = challenges;
 
-                showQuestion(currentQuestion);
+    currentQuestion = challenges[0];
 
-            }
+    showQuestion(currentQuestion);
 
-            loadQuestions(challenges);
+}
 
-            updateScoreBoard(allChallenges);
+loadQuestions(challenges);
+
+updateScoreBoard(allChallenges);
 
         })
 
