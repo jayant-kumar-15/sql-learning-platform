@@ -1,58 +1,79 @@
 const db = require("../config/db");
 
+const queryValidator =
+    require("./queryValidator");
+
 function executeQuery(query) {
 
     return new Promise(function (resolve, reject) {
 
-        const trimmedQuery = query.trim();
+        const validation =
+            queryValidator.validateQuery(query);
 
-        if (
-            !trimmedQuery
-                .toLowerCase()
-                .startsWith("select")
-        ) {
+        if (!validation.valid) {
 
             return reject(
-                new Error(
-                    "Only SELECT queries are supported in the shared database."
-                )
+                new Error(validation.message)
             );
 
         }
+
+        const trimmedQuery =
+            query.trim();
+
+        const startTime = Date.now();
 
         db.all(
             trimmedQuery,
             function (error, rows) {
 
+                const executionTime =
+                    Date.now() - startTime;
+
                 if (error) {
 
-                    return reject(error);
+                    const queryError =
+                        new Error(error.message);
+
+                    queryError.executionTime =
+                        executionTime;
+
+                    return reject(queryError);
 
                 }
 
-                const resultRows = rows || [];
+                const resultRows =
+                    rows || [];
 
                 let columns = [];
 
                 if (resultRows.length > 0) {
 
-                    columns = Object.keys(
-                        resultRows[0]
-                    );
+                    columns =
+                        Object.keys(
+                            resultRows[0]
+                        );
 
                 }
 
                 resolve({
 
+                    status: "success",
+
                     columns: columns,
 
                     rows: resultRows,
 
-                    rowCount: resultRows.length
+                    rowCount:
+                        resultRows.length,
+
+                    executionTime:
+                        executionTime
 
                 });
 
             }
+
         );
 
     });
