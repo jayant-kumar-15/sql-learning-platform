@@ -9,18 +9,17 @@ const app = express();
 const corsOptions = {
     origin: "https://jayant-kumar-15.github.io",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: false
+    allowedHeaders: ["Content-Type", "Authorization"]
 };
 
+// CORS
 app.use(cors(corsOptions));
 
 // Explicitly handle browser preflight requests
 app.options(/.*/, cors(corsOptions));
 
-const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
+
 app.use("/api", queryRoutes);
 
 app.get("/api/health", function (req, res) {
@@ -104,10 +103,10 @@ app.get("/api/data-test", function (req, res) {
 
 });
 
-app.listen(PORT, function () {
+const PORT = process.env.PORT || 10000;
 
-    console.log(
-        `🚀 Server running on port ${PORT}`
-    );
-
+app.listen(PORT, "0.0.0.0", function () {
+    console.log(`🚀 Server running on port ${PORT}`);
 });
+
+
