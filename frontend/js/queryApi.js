@@ -1,4 +1,7 @@
-async function executeSqlQuery(query) {
+async function executeSqlQuery(
+    query,
+    expectedOutput = null
+) {
 
     const response = await fetch(
         "/api/query",
@@ -11,22 +14,32 @@ async function executeSqlQuery(query) {
             },
 
             body: JSON.stringify({
-                query: query
+
+                query: query,
+
+                expectedOutput:
+                    expectedOutput
+
             })
         }
     );
 
+
     const data =
         await response.json();
+
 
     if (!response.ok) {
 
         throw new Error(
+
             data.message ||
             "Query execution failed."
+
         );
 
     }
+
 
     return data;
 
