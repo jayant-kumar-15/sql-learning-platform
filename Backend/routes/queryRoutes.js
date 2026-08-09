@@ -37,15 +37,19 @@ router.post("/query", async function (req, res) {
 
         res.json({
 
-            success: true,
+    success: true,
 
-            columns: result.columns,
+    status: result.status,
 
-            rows: result.rows,
+    columns: result.columns,
 
-            rowCount: result.rowCount
+    rows: result.rows,
 
-        });
+    rowCount: result.rowCount,
+
+    executionTime: result.executionTime
+
+});
 
     } catch (error) {
 
@@ -56,11 +60,16 @@ router.post("/query", async function (req, res) {
 
         res.status(400).json({
 
-            success: false,
+    success: false,
 
-            message: error.message
+    status: "error",
 
-        });
+    message: error.message,
+
+    executionTime:
+        error.executionTime || 0
+
+});
 
     }
 
