@@ -1,8 +1,10 @@
 const express = require("express");
 
+const queryService = require("../services/queryService");
+
 const router = express.Router();
 
-router.post("/query", function (req, res) {
+router.post("/query", async function (req, res) {
 
     const query = req.body.query;
 
@@ -26,11 +28,41 @@ router.post("/query", function (req, res) {
 
     }
 
-    res.json({
-        success: true,
-        message: "Query received successfully.",
-        query: trimmedQuery
-    });
+    try {
+
+        const result =
+            await queryService.executeQuery(
+                trimmedQuery
+            );
+
+        res.json({
+
+            success: true,
+
+            columns: result.columns,
+
+            rows: result.rows,
+
+            rowCount: result.rowCount
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "❌ Query execution error:",
+            error.message
+        );
+
+        res.status(400).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
 
 });
 
