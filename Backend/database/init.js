@@ -8,25 +8,63 @@ const schemaPath = path.join(
     "schema.sql"
 );
 
+const seedPath = path.join(
+    __dirname,
+    "seed.sql"
+);
+
 const schema = fs.readFileSync(
     schemaPath,
     "utf8"
 );
 
-db.exec(schema, function (error) {
+const seed = fs.readFileSync(
+    seedPath,
+    "utf8"
+);
 
-    if (error) {
+db.serialize(function () {
 
-        console.error(
-            "❌ Database initialization failed:",
-            error.message
+    console.log("🔄 Initializing database...");
+
+    db.exec(schema, function (error) {
+
+        if (error) {
+
+            console.error(
+                "❌ Schema initialization failed:",
+                error.message
+            );
+
+            return;
+        }
+
+        console.log(
+            "✅ Database schema initialized"
         );
 
-        return;
-    }
+        db.exec(seed, function (error) {
 
-    console.log(
-        "✅ Database schema initialized"
-    );
+            if (error) {
+
+                console.error(
+                    "❌ Seed data initialization failed:",
+                    error.message
+                );
+
+                return;
+            }
+
+            console.log(
+                "✅ Seed data initialized"
+            );
+
+            console.log(
+                "🎉 Database setup completed successfully"
+            );
+
+        });
+
+    });
 
 });
