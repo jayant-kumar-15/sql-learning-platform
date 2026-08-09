@@ -1,5 +1,7 @@
 const sqlEngine = {
 
+    mode: "backend",
+
     async execute(query, options = {}) {
 
         if (!query || typeof query !== "string") {
@@ -11,14 +13,23 @@ const sqlEngine = {
         }
 
         /*
-         * Temporary implementation
-         *
-         * For now SQL execution still goes
-         * through our backend API.
-         *
-         * Later this will be replaced by
-         * SQLite WASM for fixed practice
-         * databases.
+         * Browser SQLite will eventually handle
+         * fixed practice databases.
+         */
+
+        if (
+            this.mode === "browser" &&
+            window.browserSqlEngine
+        ) {
+
+            return await browserSqlEngine.execute(
+                query
+            );
+
+        }
+
+        /*
+         * Current backend implementation.
          */
 
         if (typeof executeSqlQuery !== "function") {
