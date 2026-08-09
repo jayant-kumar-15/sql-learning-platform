@@ -47,25 +47,5 @@
         "hint": "Use SELECT *.",
 
         "solution": "SELECT * FROM patients;"
-    },
-    {
-    "id": 3,
-    "difficulty": "Beginner",
-    "database": "Banking",
-    "table": "customers",
-    "points": 10,
-    "status": "incomplete",
-
-    "question": "TEST - Dynamic Question 3",
-
-    "expectedOutput": [
-        {
-            "customer_name": "Test Customer"
-        }
-    ],
-
-    "hint": "This is a temporary test.",
-
-    "solution": "SELECT customer_name FROM customers;"
     }
 ]
