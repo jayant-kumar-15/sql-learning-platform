@@ -405,13 +405,15 @@ CREATE TABLE accounts (
 
     balance REAL,
 
+    account_open_date DATE,
+
+    account_status TEXT,
+
     FOREIGN KEY (customer_id)
         REFERENCES customers(customer_id),
 
     FOREIGN KEY (branch_id)
-        REFERENCES branches(branch_id),
-    account_open_date DATE,
-account_status TEXT
+        REFERENCES branches(branch_id)
 
 );
 
@@ -431,12 +433,12 @@ CREATE TABLE transactions (
 
     transaction_date DATE,
 
+    description TEXT,
+
     FOREIGN KEY (account_id)
-        REFERENCES accounts(account_id),
-    description TEXT
+        REFERENCES accounts(account_id)
 
 );
-
 -- ==========================================
 -- LOANS
 -- ==========================================
