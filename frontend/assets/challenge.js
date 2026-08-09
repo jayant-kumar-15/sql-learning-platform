@@ -696,17 +696,158 @@ runButton.addEventListener("click", function () {
 
         displayQueryResults(data);
 
-        /*
-         * Query executed successfully
-         */
+runButton.addEventListener("click", async function () {
+
+    const sqlEditor =
+        document.getElementById("sql-editor");
+
+    const resultMessage =
+        document.getElementById("result-message");
+
+    const queryResultStatus =
+        document.getElementById(
+            "query-result-status"
+        );
+
+    const userQuery =
+        sqlEditor.value.trim();
+
+
+    /*
+     * Clear previous messages
+     */
+
+    resultMessage.textContent = "";
+
+    queryResultStatus.textContent = "";
+
+
+    /*
+     * Validate empty query
+     */
+
+    if (userQuery === "") {
 
         queryResultStatus.textContent =
-            "✅ Query executed successfully.";
+            "❌ Please enter a SQL query.";
+
+        return;
+
+    }
+
+
+    /*
+     * Disable button while query is running
+     */
+
+    runButton.disabled = true;
+
+    runButton.textContent =
+        "⏳ Running...";
+
+
+    try {
 
         /*
-         * Challenge checking will be
-         * connected in the next step.
+         * Send query + expected output
+         * to backend
          */
+
+        const data =
+            await executeSqlQuery(
+
+                userQuery,
+
+                currentQuestion.expectedOutput
+
+            );
+
+
+        /*
+         * Display actual SQL results
+         */
+
+        displayQueryResults(data);
+
+
+        /*
+         * Check challenge correctness
+         */
+
+        if (data.isCorrect === true) {
+
+            currentQuestion.status =
+                "completed";
+
+
+            /*
+             * Save progress
+             */
+
+            const progressList =
+                challenges.length > 0
+                    ? challenges
+                    : allChallenges.filter(
+                        function (question) {
+
+                            return question.difficulty ===
+                                currentQuestion.difficulty;
+
+                        }
+                    );
+
+
+            localStorage.setItem(
+
+                "sqlChallenges_" +
+                currentQuestion.difficulty,
+
+                JSON.stringify(
+                    progressList
+                )
+
+            );
+
+
+            /*
+             * Correct answer message
+             */
+
+            queryResultStatus.textContent =
+                "✅ Correct answer! +" +
+                currentQuestion.points +
+                " points";
+
+
+            queryResultStatus.className =
+                "query-result-status success";
+
+
+            /*
+             * Refresh question status
+             */
+
+            loadQuestions();
+
+            loadAllProgress();
+
+
+        } else {
+
+            /*
+             * SQL executed successfully,
+             * but result is logically incorrect
+             */
+
+            queryResultStatus.textContent =
+                "❌ Query executed successfully, but the result is incorrect. Try again.";
+
+
+            queryResultStatus.className =
+                "query-result-status error";
+
+        }
+
 
     } catch (error) {
 
@@ -719,16 +860,22 @@ runButton.addEventListener("click", function () {
                 "query-results-container"
             );
 
+
         resultsContainer.style.display =
             "none";
 
+
         /*
-         * Display SQL error beside
-         * the Run Query button
+         * Display SQL error
+         * beside Run Query button
          */
 
         queryResultStatus.textContent =
             "❌ " + error.message;
+
+
+        queryResultStatus.className =
+            "query-result-status error";
 
     } finally {
 
@@ -744,7 +891,6 @@ runButton.addEventListener("click", function () {
     }
 
 });
-
 
 
 const resetButton = document.getElementById(
