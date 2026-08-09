@@ -1,9 +1,22 @@
 const express = require("express");
+const cors = require("cors");
 
 const db = require("../config/db");
 const queryRoutes = require("../routes/queryRoutes");
 
 const app = express();
+
+const corsOptions = {
+    origin: "https://jayant-kumar-15.github.io",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: false
+};
+
+app.use(cors(corsOptions));
+
+// Explicitly handle browser preflight requests
+app.options(/.*/, cors(corsOptions));
 
 const PORT = process.env.PORT || 3000;
 
