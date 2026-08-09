@@ -43,7 +43,18 @@ function executeQuery(query) {
                 }
 
                 const resultRows =
-                    rows || [];
+    rows || [];
+
+const MAX_RESULT_ROWS = 1000;
+
+const limitedRows =
+    resultRows.slice(
+        0,
+        MAX_RESULT_ROWS
+    );
+
+const resultsTruncated =
+    resultRows.length > MAX_RESULT_ROWS;
 
                 let columns = [];
 
@@ -62,13 +73,16 @@ function executeQuery(query) {
 
                     columns: columns,
 
-                    rows: resultRows,
+rows: limitedRows,
 
-                    rowCount:
-                        resultRows.length,
+rowCount:
+    limitedRows.length,
 
-                    executionTime:
-                        executionTime
+resultsTruncated:
+    resultsTruncated,
+
+executionTime:
+    executionTime
 
                 });
 
