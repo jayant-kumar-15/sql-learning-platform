@@ -14,14 +14,7 @@ function normalizeValue(value) {
 
     if (typeof value === "string") {
 
-        const trimmed =
-            value.trim();
-
-        /*
-         * Convert numeric strings into numbers.
-         * Example:
-         * "75000" → 75000
-         */
+        const trimmed = value.trim();
 
         if (
             trimmed !== "" &&
