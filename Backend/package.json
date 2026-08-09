@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Backend for SQL Learning Platform",
   "main": "api/server.js",
-"scripts": {
-  "start": "node api/server.js",
-  "init-db": "node database/init.js"
-},
+  "scripts": {
+    "start": "node api/server.js",
+    "init-db": "node database/init.js"
+  },
   "dependencies": {
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
     "express": "^5.1.0",
     "sqlite3": "^5.1.7"
   }
