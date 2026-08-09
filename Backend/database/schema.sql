@@ -43,6 +43,7 @@ CREATE TABLE user_workspaces (
 -- QUERY HISTORY
 -- ==========================================
 
+
 CREATE TABLE query_history (
 
     history_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,9 +56,12 @@ CREATE TABLE query_history (
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
     database_name TEXT,
-query_status TEXT
+
+    query_status TEXT,
+
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
 
 );
 
@@ -566,4 +570,4 @@ CREATE TABLE comment_reports (
         REFERENCES users(user_id)
 
 );
-    ;
+    
