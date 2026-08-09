@@ -1,0 +1,13 @@
+{
+  "name": "sql-learning-backend",
+  "version": "1.0.0",
+  "description": "Backend for SQL Learning Platform",
+  "main": "api/server.js",
+  "scripts": {
+    "start": "node api/server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}
