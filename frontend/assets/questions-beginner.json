@@ -7,7 +7,7 @@
         "points": 10,
         "status": "incomplete",
 
-        "question": "Find all customers whose balance is greater than 50000.",
+        "question": "TEST QUESTIONS - Find all customers whose balance is greater than 50000.",
 
         "expectedOutput": [
             {
