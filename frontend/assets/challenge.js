@@ -635,70 +635,115 @@ const resultMessage = document.getElementById("result-message");
 
 runButton.addEventListener("click", function () {
 
-    const userQuery = document
-    .getElementById("sql-editor")
-    .value
-    .replace(/\s+/g, " ")
-    .replace(/;+$/, "")
-    .trim()
-    .toLowerCase();
+    runButton.addEventListener("click", async function () {
 
-const expectedQuery = currentQuestion
-    .solution
-    .replace(/\s+/g, " ")
-    .replace(/;+$/, "")
-    .trim()
-    .toLowerCase();
+    const sqlEditor =
+        document.getElementById("sql-editor");
+
+    const resultMessage =
+        document.getElementById("result-message");
+
+    const queryResultStatus =
+        document.getElementById(
+            "query-result-status"
+        );
+
+    const userQuery =
+        sqlEditor.value.trim();
+
+    /*
+     * Clear previous messages
+     */
+
+    resultMessage.textContent = "";
+
+    queryResultStatus.textContent = "";
+
+    /*
+     * Validate empty query
+     */
 
     if (userQuery === "") {
 
-        resultMessage.textContent =
-            "❌ Please enter a query.";
+        queryResultStatus.textContent =
+            "❌ Please enter a SQL query.";
 
         return;
+
     }
 
-    
-    if (userQuery === expectedQuery) {
+    /*
+     * Disable button while query is running
+     */
 
-    currentQuestion.status = "completed";
+    runButton.disabled = true;
 
-const progressList =
-    challenges.length > 0
-        ? challenges
-        : allChallenges.filter(function (question) {
+    runButton.textContent =
+        "⏳ Running...";
 
-            return question.difficulty ===
-                currentQuestion.difficulty;
+    try {
 
-        });
+        /*
+         * Send query to backend
+         */
 
-localStorage.setItem(
-    "sqlChallenges_" +
-    currentQuestion.difficulty,
-    JSON.stringify(progressList)
-);
-    
+        const data =
+            await executeSqlQuery(userQuery);
 
-    resultMessage.textContent =
-        "✅ Correct answer! +" +
-        currentQuestion.points +
-        " points";
+        /*
+         * Display actual SQL results
+         */
 
-    loadQuestions();
+        displayQueryResults(data);
 
-loadAllProgress();
+        /*
+         * Query executed successfully
+         */
 
-} else {
+        queryResultStatus.textContent =
+            "✅ Query executed successfully.";
 
-    resultMessage.textContent =
-        "❌ Wrong answer. Try again.";
+        /*
+         * Challenge checking will be
+         * connected in the next step.
+         */
+
+    } catch (error) {
+
+        /*
+         * Hide old results when query fails
+         */
+
+        const resultsContainer =
+            document.getElementById(
+                "query-results-container"
+            );
+
+        resultsContainer.style.display =
+            "none";
+
+        /*
+         * Display SQL error beside
+         * the Run Query button
+         */
+
+        queryResultStatus.textContent =
+            "❌ " + error.message;
+
+    } finally {
+
+        /*
+         * Enable button again
+         */
+
+        runButton.disabled = false;
+
+        runButton.textContent =
+            "▶️ Run Query";
 
     }
 
 });
-
-
 
 
 
