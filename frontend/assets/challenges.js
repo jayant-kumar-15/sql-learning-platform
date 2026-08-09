@@ -50,7 +50,9 @@ function loadDifficulty(level) {
         .then(response => response.json())
         .then(data => {
 
-            challenges = [];
+    console.log("BEGINNER JSON LOADED:", data);
+
+    challenges = [];
 
             challenges.push(...data);
 
