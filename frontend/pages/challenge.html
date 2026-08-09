@@ -159,99 +159,49 @@
 
     <section class="sample-question">
 
-    <h2 id="question-title">Question 1: Find all customers</h2>
+    <h2 id="question-title"></h2>
 
-    <p>
-        <strong>Database:</strong>
-        <span id="database-name">Banking</span>
-    </p>
+<p>
+    <strong>Database:</strong>
+    <span id="database-name"></span>
+</p>
 
-    <p>
-        <strong>Table:</strong>
-        <span id="table-name">customers</span>
-    </p>
+<p>
+    <strong>Table:</strong>
+    <span id="table-name"></span>
+</p>
 
-    <p id="question-text">
+        <p id="question-text"></p>
 
-        Find all customers whose balance is greater than 50,000.
+<h3>Query Results</h3>
 
-    </p>
+<table id="expected-output"></table>
 
-    <h3>Expected Output</h3>
+<div class="question-buttons">
 
-    <table id="expected-output">
+    <button id="previous-question-btn">
+        ⬅️ Previous
+    </button>
 
-        <tr>
+    <button id="next-question-btn">
+        Next ➡️
+    </button>
 
-            <th>customer_name</th>
+    <button id="hint-btn">
+        🔒 Show Hint
+    </button>
 
-            <th>balance</th>
+    <p id="hint-text" style="display: none;"></p>
 
-        </tr>
+    <button id="solution-btn">
+        🔒 View Solution
+    </button>
 
-        <tr>
+    <p id="solution-text" style="display: none;"></p>
 
-            <td>Rahul</td>
-
-            <td>75000</td>
-
-        </tr>
-
-        <tr>
-
-            <td>Priya</td>
-
-            <td>90000</td>
-
-        </tr>
-
-    </table>
-
-    <div class="question-buttons">
-
-        <button id="previous-question-btn">
-
-    ⬅️ Previous
-
-</button>
-
-<button id="next-question-btn">
-
-    Next ➡️
-
-</button>
-
-        <button id="hint-btn">
-
-            🔒 Show Hint
-
-        </button>
-
-        <p id="hint-text" style="display: none;">
-
-            Use the WHERE clause with balance > 50000.
-
-        </p>
-
-        <button id="solution-btn">
-
-            🔒 View Solution
-
-        </button>
-
-        <p id="solution-text" style="display: none;">
-
-            SELECT *
-            FROM customers
-            WHERE balance > 50000;
-
-        </p>
-
-        <button id="all-questions-btn">
-
-    📋 View All Questions
-
-</button>
+    <button id="all-questions-btn">
+        📋 View All Questions
+    </button>
 
 </div>
 
