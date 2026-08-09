@@ -633,70 +633,8 @@ const runButton = document.getElementById("run-query-btn");
 
 const resultMessage = document.getElementById("result-message");
 
-runButton.addEventListener("click", function () {
 
-    runButton.addEventListener("click", async function () {
-
-    const sqlEditor =
-        document.getElementById("sql-editor");
-
-    const resultMessage =
-        document.getElementById("result-message");
-
-    const queryResultStatus =
-        document.getElementById(
-            "query-result-status"
-        );
-
-    const userQuery =
-        sqlEditor.value.trim();
-
-    /*
-     * Clear previous messages
-     */
-
-    resultMessage.textContent = "";
-
-    queryResultStatus.textContent = "";
-
-    /*
-     * Validate empty query
-     */
-
-    if (userQuery === "") {
-
-        queryResultStatus.textContent =
-            "❌ Please enter a SQL query.";
-
-        return;
-
-    }
-
-    /*
-     * Disable button while query is running
-     */
-
-    runButton.disabled = true;
-
-    runButton.textContent =
-        "⏳ Running...";
-
-    try {
-
-        /*
-         * Send query to backend
-         */
-
-        const data =
-            await executeSqlQuery(userQuery);
-
-        /*
-         * Display actual SQL results
-         */
-
-        displayQueryResults(data);
-
-runButton.addEventListener("click", async function () {
+   runButton.addEventListener("click", async function () {
 
     const sqlEditor =
         document.getElementById("sql-editor");
@@ -750,7 +688,6 @@ runButton.addEventListener("click", async function () {
 
         /*
          * Send query + expected output
-         * to backend
          */
 
         const data =
@@ -866,8 +803,8 @@ runButton.addEventListener("click", async function () {
 
 
         /*
-         * Display SQL error
-         * beside Run Query button
+         * Display SQL error beside
+         * Run Query button
          */
 
         queryResultStatus.textContent =
@@ -890,7 +827,7 @@ runButton.addEventListener("click", async function () {
 
     }
 
-});
+});             
 
 
 const resetButton = document.getElementById(
