@@ -494,7 +494,7 @@ CREATE TABLE payments (
     FOREIGN KEY (account_id)
         REFERENCES accounts(account_id)
 
-)
+);
     
 
 -- ==========================================
