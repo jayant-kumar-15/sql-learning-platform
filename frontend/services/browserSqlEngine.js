@@ -1,11 +1,14 @@
+/*
+ * ============================================================
+ * QUERY RESULT COMPARISON
+ * ============================================================
+ */
+
 function compareQueryResults(
     actualRows,
     expectedRows
 ) {
 
-    /*
-     * Both must be arrays.
-     */
     if (
         !Array.isArray(actualRows) ||
         !Array.isArray(expectedRows)
@@ -15,10 +18,6 @@ function compareQueryResults(
 
     }
 
-    /*
-     * Different number of rows
-     * means the answer is incorrect.
-     */
     if (
         actualRows.length !==
         expectedRows.length
@@ -28,9 +27,6 @@ function compareQueryResults(
 
     }
 
-    /*
-     * Compare each row.
-     */
     for (
         let i = 0;
         i < expectedRows.length;
@@ -43,18 +39,11 @@ function compareQueryResults(
         const expectedRow =
             expectedRows[i];
 
-        /*
-         * Compare column count.
-         */
         const actualColumns =
-            Object.keys(
-                actualRow
-            );
+            Object.keys(actualRow);
 
         const expectedColumns =
-            Object.keys(
-                expectedRow
-            );
+            Object.keys(expectedRow);
 
         if (
             actualColumns.length !==
@@ -65,9 +54,6 @@ function compareQueryResults(
 
         }
 
-        /*
-         * Compare every expected column.
-         */
         for (
             let j = 0;
             j < expectedColumns.length;
@@ -77,9 +63,6 @@ function compareQueryResults(
             const column =
                 expectedColumns[j];
 
-            /*
-             * Column must exist.
-             */
             if (
                 !Object.prototype.hasOwnProperty.call(
                     actualRow,
@@ -92,27 +75,18 @@ function compareQueryResults(
             }
 
             const actualValue =
-                actualRow[column];
-
-            const expectedValue =
-                expectedRow[column];
-
-            /*
-             * Normalize values before comparison.
-             */
-            const actualNormalized =
                 normalizeValue(
-                    actualValue
+                    actualRow[column]
                 );
 
-            const expectedNormalized =
+            const expectedValue =
                 normalizeValue(
-                    expectedValue
+                    expectedRow[column]
                 );
 
             if (
-                actualNormalized !==
-                expectedNormalized
+                actualValue !==
+                expectedValue
             ) {
 
                 return false;
@@ -129,9 +103,11 @@ function compareQueryResults(
 
 
 /*
- * Normalize SQL values before
- * comparing expected output.
+ * ============================================================
+ * VALUE NORMALIZATION
+ * ============================================================
  */
+
 function normalizeValue(value) {
 
     if (
@@ -143,24 +119,24 @@ function normalizeValue(value) {
 
     }
 
-    /*
-     * Numbers
-     */
     if (
-        typeof value ===
-        "number"
+        typeof value === "number"
     ) {
 
         return value;
 
     }
 
-    /*
-     * Strings
-     */
     return String(value).trim();
 
 }
+
+
+/*
+ * ============================================================
+ * BROWSER SQLITE ENGINE
+ * ============================================================
+ */
 
 const browserSqlEngine = {
 
@@ -170,16 +146,27 @@ const browserSqlEngine = {
 
     currentDatabase: null,
 
+    /*
+     * IMPORTANT:
+     *
+     * Prevents multiple initialize()
+     * calls from creating multiple SQLite
+     * databases at the same time.
+     */
+    initializationPromise: null,
 
-    /* ============================================================
-     * INITIALIZE BROWSER SQLITE
-     * ============================================================
+
+    /* ========================================================
+     * INITIALIZE DATABASE
+     * ========================================================
      */
 
-    async initialize(databaseName = "Banking") {
+    async initialize(
+        databaseName = "Banking"
+    ) {
 
         /*
-         * Already initialized for this database.
+         * Already initialized.
          */
         if (
             this.initialized &&
@@ -192,6 +179,66 @@ const browserSqlEngine = {
         }
 
 
+        /*
+         * If another initialization is
+         * already running, wait for it.
+         */
+        if (
+            this.initializationPromise
+        ) {
+
+            await this.initializationPromise;
+
+            /*
+             * After waiting, check again.
+             */
+            if (
+                this.initialized &&
+                this.db &&
+                this.currentDatabase === databaseName
+            ) {
+
+                return this.db;
+
+            }
+
+        }
+
+
+        /*
+         * Create one initialization lock.
+         */
+        this.initializationPromise =
+            this._initializeDatabase(
+                databaseName
+            );
+
+
+        try {
+
+            return await this.initializationPromise;
+
+        }
+
+        finally {
+
+            this.initializationPromise =
+                null;
+
+        }
+
+    },
+
+
+    /* ========================================================
+     * ACTUAL DATABASE INITIALIZATION
+     * ========================================================
+     */
+
+    async _initializeDatabase(
+        databaseName
+    ) {
+
         try {
 
             console.log(
@@ -201,17 +248,48 @@ const browserSqlEngine = {
 
 
             /*
+             * If another database is already loaded,
+             * close it before creating a new one.
+             */
+            if (this.db) {
+
+                try {
+
+                    this.db.close();
+
+                } catch (closeError) {
+
+                    console.warn(
+                        "Previous SQLite database could not be closed:",
+                        closeError
+                    );
+
+                }
+
+            }
+
+
+            this.db = null;
+
+            this.initialized = false;
+
+            this.currentDatabase = null;
+
+
+            /*
              * Load SQLite WASM.
              */
             const sqlite3 =
                 await initializeSQLite();
 
 
+            console.log(
+                "SQLite WASM ready."
+            );
+
+
             /*
-             * Create an in-memory SQLite database.
-             *
-             * This database exists only
-             * inside the user's browser.
+             * Create in-memory database.
              */
             this.db =
                 new sqlite3.oo1.DB(
@@ -219,9 +297,17 @@ const browserSqlEngine = {
                 );
 
 
+            if (!this.db) {
+
+                throw new Error(
+                    "Unable to create browser SQLite database."
+                );
+
+            }
+
+
             /*
-             * Determine the correct schema
-             * and seed files.
+             * Determine database files.
              */
             let schemaFile;
             let seedFile;
@@ -240,7 +326,6 @@ const browserSqlEngine = {
 
             }
 
-
             else if (
                 databaseName.toLowerCase() ===
                 "healthcare"
@@ -254,7 +339,6 @@ const browserSqlEngine = {
 
             }
 
-
             else {
 
                 throw new Error(
@@ -266,17 +350,17 @@ const browserSqlEngine = {
 
 
             /*
-             * Temporarily disable foreign-key
-             * enforcement while loading seed data.
+             * Disable foreign keys while
+             * loading seed data.
              */
             this.db.exec(
                 "PRAGMA foreign_keys = OFF;"
             );
 
 
-            /* ====================================================
+            /* =================================================
              * LOAD SCHEMA
-             * ====================================================
+             * =================================================
              */
 
             console.log(
@@ -305,6 +389,18 @@ const browserSqlEngine = {
                 await schemaResponse.text();
 
 
+            if (
+                !schemaSql.trim()
+            ) {
+
+                throw new Error(
+                    "Schema file is empty: " +
+                    schemaFile
+                );
+
+            }
+
+
             this.db.exec(
                 schemaSql
             );
@@ -315,9 +411,9 @@ const browserSqlEngine = {
             );
 
 
-            /* ====================================================
-             * LOAD SEED DATA
-             * ====================================================
+            /* =================================================
+             * LOAD SEED
+             * =================================================
              */
 
             console.log(
@@ -346,6 +442,18 @@ const browserSqlEngine = {
                 await seedResponse.text();
 
 
+            if (
+                !seedSql.trim()
+            ) {
+
+                throw new Error(
+                    "Seed file is empty: " +
+                    seedFile
+                );
+
+            }
+
+
             this.db.exec(
                 seedSql
             );
@@ -357,7 +465,7 @@ const browserSqlEngine = {
 
 
             /*
-             * Re-enable foreign-key enforcement.
+             * Re-enable foreign keys.
              */
             this.db.exec(
                 "PRAGMA foreign_keys = ON;"
@@ -365,12 +473,11 @@ const browserSqlEngine = {
 
 
             /*
-             * Remember which database
-             * is currently loaded.
+             * Mark database as ready ONLY
+             * after everything succeeds.
              */
             this.currentDatabase =
                 databaseName;
-
 
             this.initialized =
                 true;
@@ -384,31 +491,42 @@ const browserSqlEngine = {
 
             return this.db;
 
-
         }
-
 
         catch (error) {
 
             console.error(
-                "❌ Browser SQLite initialization failed:",
+                "❌ SQLite initialization failed:",
                 error
             );
 
 
             /*
-             * Clean up failed database.
+             * Close failed database.
              */
-            this.db =
-                null;
+            if (this.db) {
+
+                try {
+
+                    this.db.close();
+
+                } catch (closeError) {
+
+                    console.warn(
+                        "Failed to close SQLite database:",
+                        closeError
+                    );
+
+                }
+
+            }
 
 
-            this.initialized =
-                false;
+            this.db = null;
 
+            this.initialized = false;
 
-            this.currentDatabase =
-                null;
+            this.currentDatabase = null;
 
 
             throw error;
@@ -418,9 +536,9 @@ const browserSqlEngine = {
     },
 
 
-    /* ============================================================
-     * EXECUTE SQL QUERY
-     * ============================================================
+    /* ========================================================
+     * EXECUTE SQL
+     * ========================================================
      */
 
     async execute(
@@ -428,9 +546,6 @@ const browserSqlEngine = {
         options = {}
     ) {
 
-        /*
-         * Validate query.
-         */
         if (
             !query ||
             typeof query !== "string"
@@ -443,25 +558,27 @@ const browserSqlEngine = {
         }
 
 
-        /*
-         * Determine which database
-         * should be used.
-         *
-         * Default = Banking.
-         */
         const databaseName =
             options.database ||
             "Banking";
 
 
         /*
-         * Initialize the correct
-         * browser database.
+         * Initialize database if required.
          */
         const db =
             await this.initialize(
                 databaseName
             );
+
+
+        if (!db) {
+
+            throw new Error(
+                "Browser SQLite database is not available."
+            );
+
+        }
 
 
         const startTime =
@@ -471,10 +588,7 @@ const browserSqlEngine = {
         try {
 
             /*
-             * Execute SQL.
-             *
-             * rowMode: object means each
-             * result row becomes a JS object.
+             * Execute query.
              */
             const result =
                 db.exec({
@@ -488,6 +602,10 @@ const browserSqlEngine = {
                 });
 
 
+            const rows =
+                result || [];
+
+
             const executionTime =
                 Math.round(
                     performance.now() -
@@ -495,22 +613,12 @@ const browserSqlEngine = {
                 );
 
 
-            const rows =
-                result || [];
-
-
-            /* ====================================================
-             * DETERMINE COLUMNS
-             * ====================================================
+            /*
+             * Determine columns.
              */
-
             let columns = [];
 
 
-            /*
-             * If rows exist, obtain
-             * column names from first row.
-             */
             if (
                 rows.length > 0
             ) {
@@ -522,11 +630,6 @@ const browserSqlEngine = {
 
             }
 
-
-            /*
-             * If query returned zero rows,
-             * still try to obtain column names.
-             */
             else {
 
                 const statement =
@@ -534,15 +637,12 @@ const browserSqlEngine = {
                         query
                     );
 
-
                 try {
 
                     columns =
-                        statement
-                            .getColumnNames();
+                        statement.getColumnNames();
 
                 }
-
 
                 finally {
 
@@ -553,22 +653,41 @@ const browserSqlEngine = {
             }
 
 
+            /*
+             * Compare with expected output
+             * when supplied.
+             */
+            let isCorrect = null;
+
+
+            if (
+                Array.isArray(
+                    options.expectedOutput
+                )
+            ) {
+
+                isCorrect =
+                    compareQueryResults(
+                        rows,
+                        options.expectedOutput
+                    );
+
+            }
+
+
             console.log(
                 "🟢 Browser SQL executed successfully."
             );
-
 
             console.log(
                 "Database:",
                 databaseName
             );
 
-
             console.log(
                 "Rows:",
                 rows.length
             );
-
 
             console.log(
                 "Execution time:",
@@ -576,47 +695,35 @@ const browserSqlEngine = {
                 "ms"
             );
 
+            console.log(
+                "Correct:",
+                isCorrect
+            );
 
-            /*
-             * Return the same basic structure
-             * expected by queryResults.js.
-             */
-            const expectedOutput =
-    options.expectedOutput || null;
 
-let isCorrect = null;
+            return {
 
-if (expectedOutput !== null) {
+                success: true,
 
-    isCorrect =
-        compareQueryResults(
-            rows,
-            expectedOutput
-        );
+                columns: columns,
 
-}
+                rows: rows,
 
-return {
+                rowCount:
+                    rows.length,
 
-    success: true,
+                executionTime:
+                    executionTime,
 
-    columns: columns,
+                resultsTruncated:
+                    false,
 
-    rows: rows,
+                isCorrect:
+                    isCorrect
 
-    rowCount: rows.length,
+            };
 
-    executionTime:
-        executionTime,
-
-    resultsTruncated: false,
-
-    isCorrect:
-        isCorrect
-
-};
         }
-
 
         catch (error) {
 
@@ -638,9 +745,9 @@ return {
 };
 
 
-/* ================================================================
- * GLOBAL AVAILABILITY
- * ================================================================
+/* ============================================================
+ * PRELOAD CHALLENGE DATABASE
+ * ============================================================
  */
 
 async function preloadChallengeDatabase(
@@ -654,23 +761,29 @@ async function preloadChallengeDatabase(
             databaseName
         );
 
+
         await browserSqlEngine.initialize(
             databaseName
         );
+
 
         console.log(
             "✅ Challenge database ready:",
             databaseName
         );
 
+
         return true;
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "❌ Challenge database preload failed:",
             error
         );
+
 
         return false;
 
@@ -678,11 +791,14 @@ async function preloadChallengeDatabase(
 
 }
 
+
+/* ============================================================
+ * GLOBAL AVAILABILITY
+ * ============================================================
+ */
+
 window.browserSqlEngine =
     browserSqlEngine;
 
 window.preloadChallengeDatabase =
     preloadChallengeDatabase;
-
-
-
