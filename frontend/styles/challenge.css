@@ -510,3 +510,299 @@
     font-size: 16px;
 
 }
+
+/* ============================================================
+ * VIEW TABLE SCHEMA
+ * ============================================================
+ */
+
+.view-schema-btn {
+
+    margin: 10px 0 15px 0;
+
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    background: #e8f1ff;
+
+    color: #1d4ed8;
+
+    transition: 0.2s;
+
+}
+
+.view-schema-btn:hover {
+
+    background: #dbeafe;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* ============================================================
+ * SCHEMA OVERLAY
+ * ============================================================
+ */
+
+.schema-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    z-index: 9998;
+
+}
+
+
+/* ============================================================
+ * SCHEMA POPUP
+ * ============================================================
+ */
+
+.schema-popup {
+
+    position: fixed;
+
+    top: 50%;
+
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: min(900px, 92vw);
+
+    max-height: 85vh;
+
+    overflow-y: auto;
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.3);
+
+    z-index: 9999;
+
+}
+
+
+/* ============================================================
+ * SCHEMA HEADER
+ * ============================================================
+ */
+
+.schema-popup-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 15px;
+
+}
+
+.schema-popup-header h2 {
+
+    margin: 0;
+
+}
+
+.close-schema-btn {
+
+    border: none;
+
+    background: transparent;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+}
+
+
+/* ============================================================
+ * DATABASE NAME
+ * ============================================================
+ */
+
+.schema-database-name {
+
+    margin-bottom: 20px;
+
+    padding: 10px;
+
+    background: #f3f4f6;
+
+    border-radius: 8px;
+
+}
+
+
+/* ============================================================
+ * TABLE CARD
+ * ============================================================
+ */
+
+.schema-table-card {
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    margin-bottom: 20px;
+
+    overflow: hidden;
+
+}
+
+.schema-table-title {
+
+    padding: 12px 15px;
+
+    background: #eef2ff;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+ * SCHEMA TABLE
+ * ============================================================
+ */
+
+.schema-columns-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+.schema-columns-table th,
+.schema-columns-table td {
+
+    padding: 10px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+.schema-columns-table th {
+
+    background: #f9fafb;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+ * PRIMARY KEY
+ * ============================================================
+ */
+
+.schema-primary-key {
+
+    color: #b45309;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+ * FOREIGN KEY
+ * ============================================================
+ */
+
+.schema-foreign-key {
+
+    color: #2563eb;
+
+    font-weight: 600;
+
+}
+
+
+/* ============================================================
+ * RELATIONSHIPS
+ * ============================================================
+ */
+
+.schema-relationships {
+
+    margin-top: 12px;
+
+    padding: 12px;
+
+    background: #eff6ff;
+
+    border-radius: 8px;
+
+}
+
+.schema-relationships h4 {
+
+    margin-top: 0;
+
+}
+
+.schema-relationship-item {
+
+    padding: 6px 0;
+
+    font-family: monospace;
+
+}
+
+
+/* ============================================================
+ * MOBILE
+ * ============================================================
+ */
+
+@media (max-width: 700px) {
+
+    .schema-popup {
+
+        width: 94vw;
+
+        padding: 12px;
+
+    }
+
+    .schema-columns-table {
+
+        font-size: 13px;
+
+    }
+
+    .schema-columns-table th,
+    .schema-columns-table td {
+
+        padding: 7px;
+
+    }
+
+}
