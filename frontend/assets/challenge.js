@@ -481,7 +481,9 @@ function showQuestion(question) {
 
 
     tableName.textContent =
-        question.table || "";
+    question.tables
+        ? question.tables.join(", ")
+        : "";
 
 
     questionText.textContent =
