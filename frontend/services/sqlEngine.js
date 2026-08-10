@@ -9,7 +9,11 @@ const sqlEngine = {
      */
     mode: "browser",
 
-    async execute(query, options = {}) {
+
+    async execute(
+        query,
+        options = {}
+    ) {
 
         if (
             !query ||
@@ -21,6 +25,7 @@ const sqlEngine = {
             );
 
         }
+
 
         /*
          * =========================================
@@ -40,7 +45,17 @@ const sqlEngine = {
                     {
                         database:
                             options.database ||
-                            "Banking"
+                            "Banking",
+
+                        /*
+                         * IMPORTANT:
+                         * Pass expected output to the
+                         * browser engine so it can
+                         * validate the answer.
+                         */
+                        expectedOutput:
+                            options.expectedOutput ||
+                            null
                     }
                 );
 
@@ -52,22 +67,15 @@ const sqlEngine = {
                 );
 
                 /*
-                 * IMPORTANT:
-                 *
-                 * We do NOT automatically send the
-                 * query to Render here.
-                 *
-                 * If browser execution fails, we
-                 * want to know why rather than
-                 * silently moving the workload back
-                 * to the backend.
+                 * Do NOT automatically fall back
+                 * to Render.
                  */
-
                 throw error;
 
             }
 
         }
+
 
         /*
          * =========================================
@@ -85,9 +93,11 @@ const sqlEngine = {
 
         }
 
+
         return await executeSqlQuery(
             query,
-            options.expectedOutput || null
+            options.expectedOutput ||
+            null
         );
 
     }
