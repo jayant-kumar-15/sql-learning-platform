@@ -1,6 +1,5 @@
-/*
- * ============================================================
- * SQL LEARNING PLATFORM - CHALLENGE ENGINE
+/* ============================================================
+ * CHALLENGE CONFIGURATION
  * ============================================================
  */
 
@@ -15,12 +14,14 @@ const EXPERT_FILE =
 
 
 /* ============================================================
- * GLOBAL STATE
+ * IMPORTANT
+ *
+ * allChallenges and challenges are created by challenges.js.
+ * DO NOT declare them again here.
  * ============================================================
  */
 
 let currentQuestionList = [];
-
 let currentQuestion = null;
 
 
@@ -41,6 +42,18 @@ const solutionButton =
 const solutionText =
     document.getElementById("solution-text");
 
+const beginnerButton =
+    document.getElementById("beginner-btn");
+
+const intermediateButton =
+    document.getElementById("intermediate-btn");
+
+const expertButton =
+    document.getElementById("expert-btn");
+
+const allQuestionsButton =
+    document.getElementById("all-questions-btn");
+
 const questionsPopup =
     document.getElementById("questions-popup");
 
@@ -52,6 +65,27 @@ const overlay =
 
 const questionsGrid =
     document.getElementById("questions-grid");
+
+const questionFilters =
+    document.getElementById("question-filters");
+
+const filterAll =
+    document.getElementById("filter-all");
+
+const filterBeginner =
+    document.getElementById("filter-beginner");
+
+const filterIntermediate =
+    document.getElementById("filter-intermediate");
+
+const filterExpert =
+    document.getElementById("filter-expert");
+
+
+/* ============================================================
+ * QUESTION DETAILS
+ * ============================================================
+ */
 
 const questionTitle =
     document.getElementById("question-title");
@@ -65,20 +99,14 @@ const tableName =
 const questionText =
     document.getElementById("question-text");
 
-const questionFilters =
-    document.getElementById("question-filters");
+const expectedOutputTable =
+    document.getElementById("expected-output");
 
-const allQuestionsButton =
-    document.getElementById("all-questions-btn");
 
-const previousQuestionButton =
-    document.getElementById("previous-question-btn");
-
-const nextQuestionButton =
-    document.getElementById("next-question-btn");
-
-const runButton =
-    document.getElementById("run-query-btn");
+/* ============================================================
+ * SCORE BOARD
+ * ============================================================
+ */
 
 const totalScore =
     document.getElementById("total-score");
@@ -92,8 +120,11 @@ const skippedCount =
 const remainingCount =
     document.getElementById("remaining-count");
 
-const resultMessage =
-    document.getElementById("result-message");
+
+/* ============================================================
+ * PROGRESS
+ * ============================================================
+ */
 
 const beginnerProgress =
     document.getElementById("easy-progress");
@@ -113,269 +144,63 @@ const intermediateFill =
 const expertFill =
     document.getElementById("expert-fill");
 
-const filterAll =
-    document.getElementById("filter-all");
-
-const filterBeginner =
-    document.getElementById("filter-beginner");
-
-const filterIntermediate =
-    document.getElementById("filter-intermediate");
-
-const filterExpert =
-    document.getElementById("filter-expert");
-
-const resetButton =
-    document.getElementById("reset-progress-btn");
-
-const searchBox =
-    document.getElementById("question-search");
-
-function updateScoreBoard(data = allChallenges) {
-
-    let score = 0;
-    let completed = 0;
-    let skipped = 0;
-    let remaining = 0;
-
-    let beginnerTotal = 0;
-    let beginnerCompleted = 0;
-
-    let intermediateTotal = 0;
-    let intermediateCompleted = 0;
-
-    let expertTotal = 0;
-    let expertCompleted = 0;
-
-    data.forEach(function (challenge) {
-
-        if (challenge.difficulty === "Beginner") {
-
-            beginnerTotal++;
-
-            if (challenge.status === "completed") {
-                beginnerCompleted++;
-            }
-
-        }
-
-        if (challenge.difficulty === "Intermediate") {
-
-            intermediateTotal++;
-
-            if (challenge.status === "completed") {
-                intermediateCompleted++;
-            }
-
-        }
-
-        if (challenge.difficulty === "Expert") {
-
-            expertTotal++;
-
-            if (challenge.status === "completed") {
-                expertCompleted++;
-            }
-
-        }
-
-        if (challenge.status === "completed") {
-
-            completed++;
-            score += challenge.points || 0;
-
-        } else if (challenge.status === "skipped") {
-
-            skipped++;
-
-        } else {
-
-            remaining++;
-
-        }
-
-    });
-
-    totalScore.textContent = score;
-
-    completedCount.textContent = completed;
-
-    skippedCount.textContent = skipped;
-
-    remainingCount.textContent = remaining;
-
-
-    const beginnerPercentage =
-        beginnerTotal === 0
-            ? 0
-            : Math.round(
-                (beginnerCompleted / beginnerTotal) * 100
-            );
-
-    const intermediatePercentage =
-        intermediateTotal === 0
-            ? 0
-            : Math.round(
-                (intermediateCompleted / intermediateTotal) * 100
-            );
-
-    const expertPercentage =
-        expertTotal === 0
-            ? 0
-            : Math.round(
-                (expertCompleted / expertTotal) * 100
-            );
-
-
-    beginnerProgress.textContent =
-        beginnerPercentage + "%";
-
-    intermediateProgress.textContent =
-        intermediatePercentage + "%";
-
-    expertProgress.textContent =
-        expertPercentage + "%";
-
-
-    beginnerFill.style.width =
-        beginnerPercentage + "%";
-
-    intermediateFill.style.width =
-        intermediatePercentage + "%";
-
-    expertFill.style.width =
-        expertPercentage + "%";
-
-}
-
 
 /* ============================================================
- * LOAD JSON QUESTION BANKS
+ * NAVIGATION
  * ============================================================
  */
 
-async function loadQuestionBanks() {
+const previousQuestionButton =
+    document.getElementById(
+        "previous-question-btn"
+    );
 
-    try {
-
-        const responses =
-            await Promise.all([
-
-                fetch(BEGINNER_FILE),
-
-                fetch(INTERMEDIATE_FILE),
-
-                fetch(EXPERT_FILE)
-
-            ]);
-
-
-        for (const response of responses) {
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Unable to load question bank: " +
-                    response.status
-                );
-
-            }
-
-        }
-
-
-        const beginnerQuestions =
-            await responses[0].json();
-
-        const intermediateQuestions =
-            await responses[1].json();
-
-        const expertQuestions =
-            await responses[2].json();
-
-
-        allChallenges = [
-
-            ...beginnerQuestions,
-
-            ...intermediateQuestions,
-
-            ...expertQuestions
-
-        ];
-
-
-        /*
-         * Restore saved progress.
-         */
-        restoreProgress();
-
-
-        /*
-         * Default state = Beginner.
-         *
-         * This means refreshing the page automatically
-         * starts with Beginner Question #1.
-         */
-        currentQuestionList =
-            getQuestionsByDifficulty("Beginner");
-
-        challenges =
-            currentQuestionList;
-
-
-        if (currentQuestionList.length > 0) {
-
-            currentQuestion =
-                currentQuestionList[0];
-
-            showQuestion(currentQuestion);
-
-        }
-
-
-        updateScoreBoard();
-
-
-        /*
-         * Notify other scripts if they depend on this event.
-         */
-        window.dispatchEvent(
-            new Event("allQuestionsLoaded")
-        );
-
-
-        console.log(
-            "✅ Question banks loaded:",
-            allChallenges
-        );
-
-    } catch (error) {
-
-        console.error(
-            "❌ Question bank loading failed:",
-            error
-        );
-
-        questionText.textContent =
-            "Unable to load SQL challenges.";
-
-    }
-
-}
+const nextQuestionButton =
+    document.getElementById(
+        "next-question-btn"
+    );
 
 
 /* ============================================================
- * GET QUESTIONS BY DIFFICULTY
+ * QUERY
  * ============================================================
  */
 
-function getQuestionsByDifficulty(difficulty) {
+const runButton =
+    document.getElementById("run-query-btn");
 
-    return allChallenges.filter(
-        function (question) {
 
-            return question.difficulty === difficulty;
+/* ============================================================
+ * HINT
+ * ============================================================
+ */
+
+if (hintButton) {
+
+    hintButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                hintText.style.display ===
+                "none"
+            ) {
+
+                hintText.style.display =
+                    "block";
+
+                hintButton.textContent =
+                    "🙈 Hide Hint";
+
+            } else {
+
+                hintText.style.display =
+                    "none";
+
+                hintButton.textContent =
+                    "🔒 Show Hint";
+
+            }
 
         }
     );
@@ -384,104 +209,192 @@ function getQuestionsByDifficulty(difficulty) {
 
 
 /* ============================================================
- * RESTORE PROGRESS
+ * SOLUTION
  * ============================================================
  */
 
-function restoreProgress() {
+if (solutionButton) {
 
-    allChallenges.forEach(
-        function (question) {
+    solutionButton.addEventListener(
+        "click",
+        function () {
 
-            const storageKey =
-                "sqlChallenges_" +
-                question.difficulty;
-
-            const saved =
-                localStorage.getItem(storageKey);
-
-
-            if (!saved) {
-
+            if (!currentQuestion) {
                 return;
-
             }
 
+            const confirmAnswer =
+                confirm(
+                    "⚠️ Viewing the solution will make this question ineligible for points.\n\nDo you want to continue?"
+                );
 
-            try {
+            if (!confirmAnswer) {
+                return;
+            }
 
-                const savedQuestions =
-                    JSON.parse(saved);
+            currentQuestion.status =
+                "skipped";
+
+            saveDifficultyProgress(
+                currentQuestion.difficulty
+            );
+
+            solutionText.textContent =
+                currentQuestion.solution || "";
+
+            solutionText.style.display =
+                "block";
+
+            solutionButton.textContent =
+                "👀 Solution Viewed";
+
+            updateScoreBoard(
+                allChallenges
+            );
+
+            loadQuestions(
+                currentQuestionList
+            );
+
+        }
+    );
+
+}
 
 
-                const savedQuestion =
-                    savedQuestions.find(
-                        function (item) {
+/* ============================================================
+ * EXPECTED OUTPUT
+ * ============================================================
+ */
 
-                            return item.id ===
-                                question.id;
+function renderExpectedOutput(question) {
 
-                        }
-                    );
+    if (!expectedOutputTable) {
+        return;
+    }
+
+    expectedOutputTable.innerHTML = "";
+
+    const output =
+        question.expectedOutput;
+
+    if (
+        !Array.isArray(output) ||
+        output.length === 0
+    ) {
+
+        const row =
+            document.createElement("tr");
+
+        const cell =
+            document.createElement("td");
+
+        cell.textContent =
+            "No expected output available.";
+
+        row.appendChild(cell);
+
+        expectedOutputTable.appendChild(row);
+
+        return;
+    }
 
 
-                if (savedQuestion) {
+    /*
+     * Get all columns from all rows.
+     */
 
-                    question.status =
-                        savedQuestion.status ||
-                        "incomplete";
+    const columns = [];
+
+    output.forEach(function (row) {
+
+        Object.keys(row).forEach(
+            function (column) {
+
+                if (
+                    !columns.includes(column)
+                ) {
+
+                    columns.push(column);
 
                 }
 
-            } catch (error) {
+            }
+        );
 
-                console.error(
-                    "Progress restore error:",
-                    error
-                );
+    });
+
+
+    /*
+     * Header
+     */
+
+    const thead =
+        document.createElement("thead");
+
+    const headerRow =
+        document.createElement("tr");
+
+    columns.forEach(function (column) {
+
+        const th =
+            document.createElement("th");
+
+        th.textContent = column;
+
+        headerRow.appendChild(th);
+
+    });
+
+    thead.appendChild(headerRow);
+
+
+    /*
+     * Body
+     */
+
+    const tbody =
+        document.createElement("tbody");
+
+    output.forEach(function (row) {
+
+        const tr =
+            document.createElement("tr");
+
+        columns.forEach(function (column) {
+
+            const td =
+                document.createElement("td");
+
+            const value =
+                row[column];
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                td.textContent = "";
+
+            } else {
+
+                td.textContent =
+                    String(value);
 
             }
 
-        }
-    );
+            tr.appendChild(td);
 
-}
+        });
 
+        tbody.appendChild(tr);
 
-/* ============================================================
- * SAVE PROGRESS
- * ============================================================
- */
-
-function saveProgress() {
-
-    const difficulties = [
-        "Beginner",
-        "Intermediate",
-        "Expert"
-    ];
+    });
 
 
-    difficulties.forEach(
-        function (difficulty) {
+    expectedOutputTable.appendChild(thead);
 
-            const questions =
-                getQuestionsByDifficulty(
-                    difficulty
-                );
-
-
-            localStorage.setItem(
-
-                "sqlChallenges_" +
-                difficulty,
-
-                JSON.stringify(questions)
-
-            );
-
-        }
-    );
+    expectedOutputTable.appendChild(tbody);
 
 }
 
@@ -494,43 +407,59 @@ function saveProgress() {
 function showQuestion(question) {
 
     if (!question) {
-
         return;
-
     }
-
 
     currentQuestion =
         question;
 
 
+    console.log(
+        "CURRENT QUESTION:",
+        currentQuestion
+    );
+
+
     questionTitle.textContent =
-        "Question " + question.id;
+        "Question " +
+        question.id;
 
 
     databaseName.textContent =
-        question.database;
+        question.database || "";
 
 
     tableName.textContent =
-        question.table;
+        question.table || "";
 
 
     questionText.textContent =
-        question.question;
+        question.question || "";
 
 
     hintText.textContent =
-        question.hint;
+        question.hint || "";
 
 
     solutionText.textContent =
-        question.solution;
+        question.solution || "";
 
+
+    /*
+     * Expected output
+     */
+
+    renderExpectedOutput(
+        question
+    );
+
+
+    /*
+     * Reset hint/solution visibility
+     */
 
     hintText.style.display =
         "none";
-
 
     solutionText.style.display =
         "none";
@@ -540,16 +469,63 @@ function showQuestion(question) {
         "🔒 Show Hint";
 
 
-    solutionButton.textContent =
-        "🔒 View Solution";
+    if (
+        question.status ===
+        "skipped"
+    ) {
+
+        solutionButton.textContent =
+            "👀 Solution Viewed";
+
+    } else {
+
+        solutionButton.textContent =
+            "🔒 View Solution";
+
+    }
 
 
     /*
-     * Clear previous SQL result message.
+     * Clear previous query
      */
-    if (resultMessage) {
 
-        resultMessage.textContent = "";
+    const sqlEditor =
+        document.getElementById(
+            "sql-editor"
+        );
+
+    if (sqlEditor) {
+
+        sqlEditor.value = "";
+
+    }
+
+
+    /*
+     * Hide previous results
+     */
+
+    const resultsContainer =
+        document.getElementById(
+            "query-results-container"
+        );
+
+    if (resultsContainer) {
+
+        resultsContainer.style.display =
+            "none";
+
+    }
+
+
+    const queryResultStatus =
+        document.getElementById(
+            "query-result-status"
+        );
+
+    if (queryResultStatus) {
+
+        queryResultStatus.textContent = "";
 
     }
 
@@ -557,16 +533,96 @@ function showQuestion(question) {
 
 
 /* ============================================================
- * LOAD QUESTION POPUP
+ * OPEN / CLOSE POPUP
  * ============================================================
  */
 
-function loadQuestions(questionList) {
+function openQuestionsPopup() {
 
-    if (!questionList) {
+    if (!questionsPopup) {
+        return;
+    }
+
+    questionsPopup.style.display =
+        "block";
+
+    overlay.style.display =
+        "block";
+
+}
+
+
+function closeQuestionsPopup() {
+
+    if (!questionsPopup) {
+        return;
+    }
+
+    questionsPopup.style.display =
+        "none";
+
+    overlay.style.display =
+        "none";
+
+}
+
+
+/* ============================================================
+ * ACTIVE FILTER
+ * ============================================================
+ */
+
+function setActiveFilter(
+    activeButton
+) {
+
+    [
+        filterAll,
+        filterBeginner,
+        filterIntermediate,
+        filterExpert
+    ].forEach(function (button) {
+
+        if (button) {
+
+            button.classList.remove(
+                "active"
+            );
+
+        }
+
+    });
+
+
+    if (activeButton) {
+
+        activeButton.classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+ * LOAD QUESTIONS INTO POPUP
+ * ============================================================
+ */
+
+function loadQuestions(
+    questionList
+) {
+
+    if (!questionsGrid) {
+        return;
+    }
+
+
+    if (!Array.isArray(questionList)) {
 
         questionList =
-            currentQuestionList;
+            [];
 
     }
 
@@ -575,18 +631,17 @@ function loadQuestions(questionList) {
         questionList;
 
 
-    challenges =
-        questionList;
-
-
-    questionsGrid.innerHTML = "";
+    questionsGrid.innerHTML =
+        "";
 
 
     questionList.forEach(
         function (challenge) {
 
             const card =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
 
             card.className =
@@ -655,241 +710,88 @@ function loadQuestions(questionList) {
                 "click",
                 function () {
 
-                    showQuestion(challenge);
+                    showQuestion(
+                        challenge
+                    );
 
-                    questionsPopup.style.display =
-                        "none";
-
-                    overlay.style.display =
-                        "none";
+                    closeQuestionsPopup();
 
                 }
             );
 
 
-            questionsGrid.appendChild(card);
+            questionsGrid.appendChild(
+                card
+            );
 
         }
     );
 
-
-    applySearchFilter();
-
 }
 
 
 /* ============================================================
- * DIFFICULTY LOADING
+ * DIFFICULTY POPUP
  * ============================================================
  */
 
-function loadDifficulty(difficulty) {
+function openDifficultyQuestions(
+    difficulty
+) {
 
-    const questions =
-        getQuestionsByDifficulty(
-            difficulty
+    const filtered =
+        allChallenges.filter(
+            function (question) {
+
+                return (
+                    question.difficulty
+                        .toLowerCase() ===
+                    difficulty.toLowerCase()
+                );
+
+            }
         );
-
-
-    currentQuestionList =
-        questions;
-
-
-    challenges =
-        questions;
-
-
-    /*
-     * IMPORTANT:
-     * Always reset to the first question
-     * when changing difficulty.
-     */
-    currentQuestion =
-        questions.length > 0
-            ? questions[0]
-            : null;
-
-
-    if (currentQuestion) {
-
-        showQuestion(
-            currentQuestion
-        );
-
-    }
-
-
-    loadQuestions(questions);
-
-
-    updateScoreBoard();
-
-}
-
-
-/* ============================================================
- * FILTER QUESTIONS
- * ============================================================
- */
-
-function filterQuestions(difficulty) {
-
-    if (difficulty === "All") {
-
-        currentQuestionList =
-            allChallenges;
-
-    } else {
-
-        currentQuestionList =
-            getQuestionsByDifficulty(
-                difficulty
-            );
-
-    }
-
-
-    challenges =
-        currentQuestionList;
-
-
-    /*
-     * Filtering also starts from
-     * the first question in that filter.
-     */
-    currentQuestion =
-        currentQuestionList.length > 0
-            ? currentQuestionList[0]
-            : null;
-
-
-    if (currentQuestion) {
-
-        showQuestion(
-            currentQuestion
-        );
-
-    }
 
 
     loadQuestions(
-        currentQuestionList
-    );
-
-}
-
-
-/* ============================================================
- * FILTER BUTTON STATE
- * ============================================================
- */
-
-function setActiveFilter(activeButton) {
-
-    [
-        filterAll,
-        filterBeginner,
-        filterIntermediate,
-        filterExpert
-
-    ].forEach(
-        function (button) {
-
-            if (button) {
-
-                button.classList.remove(
-                    "active"
-                );
-
-            }
-
-        }
+        filtered
     );
 
 
-    if (activeButton) {
+    if (difficulty === "Beginner") {
 
-        activeButton.classList.add(
-            "active"
+        setActiveFilter(
+            filterBeginner
+        );
+
+    } else if (
+        difficulty === "Intermediate"
+    ) {
+
+        setActiveFilter(
+            filterIntermediate
+        );
+
+    } else if (
+        difficulty === "Expert"
+    ) {
+
+        setActiveFilter(
+            filterExpert
         );
 
     }
 
-}
+
+    if (questionFilters) {
+
+        questionFilters.style.display =
+            "flex";
+
+    }
 
 
-/* ============================================================
- * POPUP BUTTONS
- * ============================================================
- */
-
-if (allQuestionsButton) {
-
-    allQuestionsButton.addEventListener(
-        "click",
-        function () {
-
-            currentQuestionList =
-                allChallenges;
-
-            challenges =
-                allChallenges;
-
-
-            currentQuestion =
-                allChallenges.length > 0
-                    ? allChallenges[0]
-                    : null;
-
-
-            if (currentQuestion) {
-
-                showQuestion(
-                    currentQuestion
-                );
-
-            }
-
-
-            loadQuestions(
-                allChallenges
-            );
-
-
-            questionsPopup.style.display =
-                "block";
-
-            overlay.style.display =
-                "block";
-
-            questionFilters.style.display =
-                "flex";
-
-
-            setActiveFilter(
-                filterAll
-            );
-
-        }
-    );
-
-}
-
-
-if (closePopupButton) {
-
-    closePopupButton.addEventListener(
-        "click",
-        function () {
-
-            questionsPopup.style.display =
-                "none";
-
-            overlay.style.display =
-                "none";
-
-        }
-    );
+    openQuestionsPopup();
 
 }
 
@@ -899,50 +801,15 @@ if (closePopupButton) {
  * ============================================================
  */
 
-const beginnerButton =
-    document.getElementById(
-        "beginner-btn"
-    );
-
-
-const intermediateButton =
-    document.getElementById(
-        "intermediate-btn"
-    );
-
-
-const expertButton =
-    document.getElementById(
-        "expert-btn"
-    );
-
-
 if (beginnerButton) {
 
     beginnerButton.addEventListener(
         "click",
         function () {
 
-            loadDifficulty(
+            openDifficultyQuestions(
                 "Beginner"
             );
-
-
-            setActiveFilter(
-                filterBeginner
-            );
-
-
-            questionFilters.style.display =
-                "none";
-
-
-            questionsPopup.style.display =
-                "block";
-
-
-            overlay.style.display =
-                "block";
 
         }
     );
@@ -956,26 +823,9 @@ if (intermediateButton) {
         "click",
         function () {
 
-            loadDifficulty(
+            openDifficultyQuestions(
                 "Intermediate"
             );
-
-
-            setActiveFilter(
-                filterIntermediate
-            );
-
-
-            questionFilters.style.display =
-                "none";
-
-
-            questionsPopup.style.display =
-                "block";
-
-
-            overlay.style.display =
-                "block";
 
         }
     );
@@ -989,26 +839,9 @@ if (expertButton) {
         "click",
         function () {
 
-            loadDifficulty(
+            openDifficultyQuestions(
                 "Expert"
             );
-
-
-            setActiveFilter(
-                filterExpert
-            );
-
-
-            questionFilters.style.display =
-                "none";
-
-
-            questionsPopup.style.display =
-                "block";
-
-
-            overlay.style.display =
-                "block";
 
         }
     );
@@ -1017,9 +850,112 @@ if (expertButton) {
 
 
 /* ============================================================
- * FILTER EVENTS
+ * VIEW ALL QUESTIONS
  * ============================================================
  */
+
+if (allQuestionsButton) {
+
+    allQuestionsButton.addEventListener(
+        "click",
+        function () {
+
+            loadQuestions(
+                allChallenges
+            );
+
+            setActiveFilter(
+                filterAll
+            );
+
+            if (questionFilters) {
+
+                questionFilters.style.display =
+                    "flex";
+
+            }
+
+            openQuestionsPopup();
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * CLOSE POPUP
+ * ============================================================
+ */
+
+if (closePopupButton) {
+
+    closePopupButton.addEventListener(
+        "click",
+        function () {
+
+            closeQuestionsPopup();
+
+        }
+    );
+
+}
+
+
+if (overlay) {
+
+    overlay.addEventListener(
+        "click",
+        function () {
+
+            closeQuestionsPopup();
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * FILTERS
+ * ============================================================
+ */
+
+function filterQuestions(
+    difficulty
+) {
+
+    let filteredQuestions;
+
+
+    if (difficulty === "All") {
+
+        filteredQuestions =
+            allChallenges;
+
+    } else {
+
+        filteredQuestions =
+            allChallenges.filter(
+                function (question) {
+
+                    return (
+                        question.difficulty ===
+                        difficulty
+                    );
+
+                }
+            );
+
+    }
+
+
+    loadQuestions(
+        filteredQuestions
+    );
+
+}
+
 
 if (filterAll) {
 
@@ -1102,9 +1038,54 @@ if (filterExpert) {
 
 
 /* ============================================================
- * NEXT QUESTION
+ * NAVIGATION
  * ============================================================
  */
+
+if (previousQuestionButton) {
+
+    previousQuestionButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                currentQuestionList.length ===
+                0
+            ) {
+
+                return;
+
+            }
+
+
+            const currentIndex =
+                currentQuestionList.findIndex(
+                    function (question) {
+
+                        return (
+                            question.id ===
+                            currentQuestion.id
+                        );
+
+                    }
+                );
+
+
+            if (currentIndex > 0) {
+
+                showQuestion(
+                    currentQuestionList[
+                        currentIndex - 1
+                    ]
+                );
+
+            }
+
+        }
+    );
+
+}
+
 
 if (nextQuestionButton) {
 
@@ -1126,8 +1107,10 @@ if (nextQuestionButton) {
                 currentQuestionList.findIndex(
                     function (question) {
 
-                        return question.id ===
-                            currentQuestion.id;
+                        return (
+                            question.id ===
+                            currentQuestion.id
+                        );
 
                     }
                 );
@@ -1154,44 +1137,436 @@ if (nextQuestionButton) {
 
 
 /* ============================================================
- * PREVIOUS QUESTION
+ * SAVE PROGRESS
  * ============================================================
  */
 
-if (previousQuestionButton) {
+function saveDifficultyProgress(
+    difficulty
+) {
 
-    previousQuestionButton.addEventListener(
+    const questions =
+        allChallenges.filter(
+            function (question) {
+
+                return (
+                    question.difficulty ===
+                    difficulty
+                );
+
+            }
+        );
+
+
+    localStorage.setItem(
+        "sqlChallenges_" +
+        difficulty,
+        JSON.stringify(
+            questions
+        )
+    );
+
+}
+
+
+/* ============================================================
+ * SCORE BOARD
+ *
+ * Exposed on window so challenges.js can call it.
+ * ============================================================
+ */
+
+window.updateScoreBoard =
+    function updateScoreBoard(
+        data = allChallenges
+    ) {
+
+        if (!Array.isArray(data)) {
+            return;
+        }
+
+
+        let score = 0;
+
+        let completed = 0;
+
+        let skipped = 0;
+
+        let remaining = 0;
+
+
+        let beginnerTotal = 0;
+        let beginnerCompleted = 0;
+
+
+        let intermediateTotal = 0;
+        let intermediateCompleted = 0;
+
+
+        let expertTotal = 0;
+        let expertCompleted = 0;
+
+
+        data.forEach(
+            function (challenge) {
+
+                if (
+                    challenge.difficulty ===
+                    "Beginner"
+                ) {
+
+                    beginnerTotal++;
+
+                    if (
+                        challenge.status ===
+                        "completed"
+                    ) {
+
+                        beginnerCompleted++;
+
+                    }
+
+                }
+
+
+                if (
+                    challenge.difficulty ===
+                    "Intermediate"
+                ) {
+
+                    intermediateTotal++;
+
+                    if (
+                        challenge.status ===
+                        "completed"
+                    ) {
+
+                        intermediateCompleted++;
+
+                    }
+
+                }
+
+
+                if (
+                    challenge.difficulty ===
+                    "Expert"
+                ) {
+
+                    expertTotal++;
+
+                    if (
+                        challenge.status ===
+                        "completed"
+                    ) {
+
+                        expertCompleted++;
+
+                    }
+
+                }
+
+
+                if (
+                    challenge.status ===
+                    "completed"
+                ) {
+
+                    completed++;
+
+                    score +=
+                        Number(
+                            challenge.points
+                        ) || 0;
+
+                } else if (
+                    challenge.status ===
+                    "skipped"
+                ) {
+
+                    skipped++;
+
+                } else {
+
+                    remaining++;
+
+                }
+
+            }
+        );
+
+
+        if (totalScore) {
+
+            totalScore.textContent =
+                score;
+
+        }
+
+
+        if (completedCount) {
+
+            completedCount.textContent =
+                completed;
+
+        }
+
+
+        if (skippedCount) {
+
+            skippedCount.textContent =
+                skipped;
+
+        }
+
+
+        if (remainingCount) {
+
+            remainingCount.textContent =
+                remaining;
+
+        }
+
+
+        const beginnerPercentage =
+            beginnerTotal === 0
+                ? 0
+                : Math.round(
+                    (
+                        beginnerCompleted /
+                        beginnerTotal
+                    ) * 100
+                );
+
+
+        const intermediatePercentage =
+            intermediateTotal === 0
+                ? 0
+                : Math.round(
+                    (
+                        intermediateCompleted /
+                        intermediateTotal
+                    ) * 100
+                );
+
+
+        const expertPercentage =
+            expertTotal === 0
+                ? 0
+                : Math.round(
+                    (
+                        expertCompleted /
+                        expertTotal
+                    ) * 100
+                );
+
+
+        if (beginnerProgress) {
+
+            beginnerProgress.textContent =
+                beginnerPercentage +
+                "%";
+
+        }
+
+
+        if (intermediateProgress) {
+
+            intermediateProgress.textContent =
+                intermediatePercentage +
+                "%";
+
+        }
+
+
+        if (expertProgress) {
+
+            expertProgress.textContent =
+                expertPercentage +
+                "%";
+
+        }
+
+
+        if (beginnerFill) {
+
+            beginnerFill.style.width =
+                beginnerPercentage +
+                "%";
+
+        }
+
+
+        if (intermediateFill) {
+
+            intermediateFill.style.width =
+                intermediatePercentage +
+                "%";
+
+        }
+
+
+        if (expertFill) {
+
+            expertFill.style.width =
+                expertPercentage +
+                "%";
+
+        }
+
+    };
+
+
+/* ============================================================
+ * QUERY EXECUTION
+ * ============================================================
+ */
+
+if (runButton) {
+
+    runButton.addEventListener(
         "click",
-        function () {
+        async function () {
 
-            if (
-                currentQuestionList.length ===
-                0
-            ) {
+            if (!currentQuestion) {
 
                 return;
 
             }
 
 
-            const currentIndex =
-                currentQuestionList.findIndex(
-                    function (question) {
-
-                        return question.id ===
-                            currentQuestion.id;
-
-                    }
+            const sqlEditor =
+                document.getElementById(
+                    "sql-editor"
                 );
 
 
-            if (currentIndex > 0) {
-
-                showQuestion(
-                    currentQuestionList[
-                        currentIndex - 1
-                    ]
+            const queryResultStatus =
+                document.getElementById(
+                    "query-result-status"
                 );
+
+
+            const userQuery =
+                sqlEditor.value.trim();
+
+
+            queryResultStatus.textContent =
+                "";
+
+
+            if (
+                userQuery === ""
+            ) {
+
+                queryResultStatus.textContent =
+                    "❌ Please enter a SQL query.";
+
+                return;
+
+            }
+
+
+            runButton.disabled =
+                true;
+
+
+            runButton.textContent =
+                "⏳ Running...";
+
+
+            try {
+
+                const data =
+                    await executeSqlQuery(
+                        userQuery,
+                        currentQuestion.expectedOutput
+                    );
+
+
+                displayQueryResults(
+                    data
+                );
+
+
+                if (
+                    data.isCorrect ===
+                    true
+                ) {
+
+                    currentQuestion.status =
+                        "completed";
+
+
+                    saveDifficultyProgress(
+                        currentQuestion.difficulty
+                    );
+
+
+                    queryResultStatus.textContent =
+                        "✅ Correct answer! +" +
+                        currentQuestion.points +
+                        " points";
+
+
+                    queryResultStatus.className =
+                        "query-result-status success";
+
+
+                    window.updateScoreBoard(
+                        allChallenges
+                    );
+
+
+                    loadQuestions(
+                        currentQuestionList
+                    );
+
+
+                } else {
+
+                    queryResultStatus.textContent =
+                        "❌ Query executed successfully, but the result is incorrect. Try again.";
+
+
+                    queryResultStatus.className =
+                        "query-result-status error";
+
+                }
+
+
+            } catch (error) {
+
+                const resultsContainer =
+                    document.getElementById(
+                        "query-results-container"
+                    );
+
+
+                if (resultsContainer) {
+
+                    resultsContainer.style.display =
+                        "none";
+
+                }
+
+
+                queryResultStatus.textContent =
+                    "❌ " +
+                    error.message;
+
+
+                queryResultStatus.className =
+                    "query-result-status error";
+
+            } finally {
+
+                runButton.disabled =
+                    false;
+
+
+                runButton.textContent =
+                    "▶️ Run Query";
 
             }
 
@@ -1202,36 +1577,77 @@ if (previousQuestionButton) {
 
 
 /* ============================================================
- * HINT
+ * RESET PROGRESS
  * ============================================================
  */
 
-if (hintButton) {
+const resetButton =
+    document.getElementById(
+        "reset-progress-btn"
+    );
 
-    hintButton.addEventListener(
+
+if (resetButton) {
+
+    resetButton.addEventListener(
         "click",
         function () {
 
-            if (
-                hintText.style.display ===
-                "none"
-            ) {
+            const confirmReset =
+                confirm(
+                    "⚠️ Are you sure you want to reset your progress?"
+                );
 
-                hintText.style.display =
-                    "block";
 
-                hintButton.textContent =
-                    "🙈 Hide Hint";
+            if (!confirmReset) {
 
-            } else {
-
-                hintText.style.display =
-                    "none";
-
-                hintButton.textContent =
-                    "🔒 Show Hint";
+                return;
 
             }
+
+
+            allChallenges.forEach(
+                function (question) {
+
+                    question.status =
+                        "incomplete";
+
+                }
+            );
+
+
+            localStorage.removeItem(
+                "sqlChallenges_Beginner"
+            );
+
+            localStorage.removeItem(
+                "sqlChallenges_Intermediate"
+            );
+
+            localStorage.removeItem(
+                "sqlChallenges_Expert"
+            );
+
+
+            window.updateScoreBoard(
+                allChallenges
+            );
+
+
+            if (
+                currentQuestion
+            ) {
+
+                showQuestion(
+                    currentQuestion
+                );
+
+            }
+
+
+            alert(
+                "✅ Progress has been reset."
+            );
 
         }
     );
@@ -1239,3 +1655,129 @@ if (hintButton) {
 }
 
 
+/* ============================================================
+ * SEARCH QUESTIONS
+ * ============================================================
+ */
+
+const searchBox =
+    document.getElementById(
+        "question-search"
+    );
+
+
+if (searchBox) {
+
+    searchBox.addEventListener(
+        "input",
+        function () {
+
+            const searchText =
+                searchBox.value
+                    .toLowerCase()
+                    .trim();
+
+
+            const cards =
+                document.querySelectorAll(
+                    "#questions-grid .question-popup-card"
+                );
+
+
+            cards.forEach(
+                function (card) {
+
+                    const text =
+                        card.textContent
+                            .toLowerCase();
+
+
+                    card.style.display =
+                        text.includes(
+                            searchText
+                        )
+                            ? ""
+                            : "none";
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * INITIAL QUESTION
+ *
+ * When challenges.js finishes loading all
+ * 9 questions, automatically show Beginner #1.
+ * ============================================================
+ */
+
+window.addEventListener(
+    "allQuestionsLoaded",
+    function () {
+
+        if (
+            Array.isArray(
+                allChallenges
+            ) &&
+            allChallenges.length > 0
+        ) {
+
+            const beginnerQuestions =
+                allChallenges.filter(
+                    function (question) {
+
+                        return (
+                            question.difficulty ===
+                            "Beginner"
+                        );
+
+                    }
+                );
+
+
+            if (
+                beginnerQuestions.length > 0
+            ) {
+
+                currentQuestionList =
+                    beginnerQuestions;
+
+                showQuestion(
+                    beginnerQuestions[0]
+                );
+
+            } else {
+
+                currentQuestionList =
+                    allChallenges;
+
+                showQuestion(
+                    allChallenges[0]
+                );
+
+            }
+
+
+            window.updateScoreBoard(
+                allChallenges
+            );
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+ * INITIAL LOG
+ * ============================================================
+ */
+
+console.log(
+    "✅ challenge.js loaded successfully"
+);
