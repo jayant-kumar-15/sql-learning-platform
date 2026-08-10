@@ -45,3 +45,62 @@
 - Performance optimization
 - Documentation
 - Release v1.0
+
+- current scope 10 Aug 2026
+-                  CURRENT
+                    │
+                    ▼
+        ┌─────────────────────┐
+        │ Challenge UI        │ ✅
+        │ 9 questions         │ ✅
+        │ Difficulty system   │ ✅
+        │ Expected output     │ ✅
+        │ Schema viewer       │ ✅
+        │ Result tables       │ ✅
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ SQLite WASM         │ 🚀 NEXT
+        │ Browser SQL engine  │
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ Schema caching      │
+        │ + faster loading    │
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ Better result       │
+        │ comparison/validation│
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ Expand questions    │
+        │ 3 → 20/30 per level │
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ Query history       │
+        │ Saved queries       │
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ Login + user        │
+        │ progress            │
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ User Sandbox        │
+        └──────────┬──────────┘
+                   │
+                   ▼
+        ┌─────────────────────┐
+        │ Admin + security    │
+        └─────────────────────┘
