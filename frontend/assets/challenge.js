@@ -470,6 +470,18 @@ function showQuestion(question) {
         currentQuestion
     );
 
+    if (
+    currentQuestion &&
+    typeof preloadChallengeDatabase ===
+        "function"
+) {
+
+    preloadChallengeDatabase(
+        currentQuestion.database
+    );
+
+    }
+
 
     questionTitle.textContent =
         "Question " +
