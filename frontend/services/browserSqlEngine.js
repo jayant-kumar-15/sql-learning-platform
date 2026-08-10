@@ -114,43 +114,181 @@ const browserSqlEngine = {
                 "PRAGMA foreign_keys = ON;"
             );
 
-            /*
-             * Remember current database
-             */
-            this.currentDatabase =
-                databaseName;
+            async initialize(databaseName = "Banking") {
 
-            this.initialized = true;
+    /*
+     * Already initialized for this database
+     */
+    if (
+        this.initialized &&
+        this.db &&
+        this.currentDatabase === databaseName
+    ) {
 
-            console.log(
-                "✅ Browser SQLite database initialized:",
+        return this.db;
+
+    }
+
+    try {
+
+        console.log(
+            "⏳ Initializing browser SQLite database:",
+            databaseName
+        );
+
+        /*
+         * Load SQLite WASM
+         */
+        const sqlite3 =
+            await initializeSQLite();
+
+        /*
+         * Create an in-memory SQLite database.
+         */
+        this.db =
+            new sqlite3.oo1.DB(
+                ":memory:"
+            );
+
+        /*
+         * Determine database-specific
+         * schema and seed files.
+         */
+        let schemaFile;
+        let seedFile;
+
+        if (
+            databaseName.toLowerCase() ===
+            "banking"
+        ) {
+
+            schemaFile =
+                "../assets/banking-schema.sql";
+
+            seedFile =
+                "../assets/banking-seed.sql";
+
+        } else if (
+            databaseName.toLowerCase() ===
+            "healthcare"
+        ) {
+
+            schemaFile =
+                "../assets/healthcare-schema.sql";
+
+            seedFile =
+                "../assets/healthcare-seed.sql";
+
+        } else {
+
+            throw new Error(
+                "Unsupported database: " +
                 databaseName
             );
 
-            return this.db;
+        }
 
-        } catch (error) {
+        /*
+         * Temporarily disable foreign keys
+         * during seed loading.
+         */
+        this.db.exec(
+            "PRAGMA foreign_keys = OFF;"
+        );
 
-            console.error(
-                "❌ Browser SQLite initialization failed:",
-                error
+        /*
+         * Load schema.
+         */
+        console.log(
+            "📐 Loading schema:",
+            schemaFile
+        );
+
+        const schemaResponse =
+            await fetch(schemaFile);
+
+        if (!schemaResponse.ok) {
+
+            throw new Error(
+                "Unable to load schema file: " +
+                schemaFile
             );
-
-            /*
-             * Clean up failed database
-             */
-            this.db = null;
-
-            this.initialized = false;
-
-            this.currentDatabase = null;
-
-            throw error;
 
         }
 
-    },
+        const schemaSql =
+            await schemaResponse.text();
 
+        this.db.exec(schemaSql);
+
+        /*
+         * Load seed data.
+         */
+        console.log(
+            "🌱 Loading seed data:",
+            seedFile
+        );
+
+        const seedResponse =
+            await fetch(seedFile);
+
+        if (!seedResponse.ok) {
+
+            throw new Error(
+                "Unable to load seed file: " +
+                seedFile
+            );
+
+        }
+
+        const seedSql =
+            await seedResponse.text();
+
+        this.db.exec(seedSql);
+
+        /*
+         * Re-enable foreign keys.
+         */
+        this.db.exec(
+            "PRAGMA foreign_keys = ON;"
+        );
+
+        /*
+         * Remember current database.
+         */
+        this.currentDatabase =
+            databaseName;
+
+        this.initialized = true;
+
+        console.log(
+            "✅ Browser SQLite database initialized:",
+            databaseName
+        );
+
+        return this.db;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Browser SQLite initialization failed:",
+            error
+        );
+
+        /*
+         * Clean up failed database.
+         */
+        this.db = null;
+
+        this.initialized = false;
+
+        this.currentDatabase = null;
+
+        throw error;
+
+    }
+
+},
 
     async execute(
         query,
