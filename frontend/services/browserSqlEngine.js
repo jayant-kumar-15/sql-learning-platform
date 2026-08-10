@@ -23,75 +23,220 @@ function compareQueryResults(actualRows, expectedRows) {
     /*
      * Convert each row into a normalized
      * representation.
-     *
-     * This makes comparison independent
-     * of row order.
+/*
+ * ============================================================
+ * QUERY RESULT COMPARISON
+ * ============================================================
+ */
+
+function compareQueryResults(actualRows, expectedRows) {
+
+    /*
+     * Both results must be arrays.
      */
-    function normalizeRow(row) {
+    if (
+        !Array.isArray(actualRows) ||
+        !Array.isArray(expectedRows)
+    ) {
 
-        const values = Object.values(row);
-
-        return values.map(function (value) {
-
-            if (
-                value === null ||
-                value === undefined
-            ) {
-                return null;
-            }
-
-            if (typeof value === "number") {
-                return Number(value);
-            }
-
-            return String(value)
-                .trim()
-                .toLowerCase();
-
-        });
+        return false;
 
     }
 
+
+    /*
+     * Same number of rows required.
+     */
+    if (
+        actualRows.length !==
+        expectedRows.length
+    ) {
+
+        return false;
+
+    }
+
+
+    /*
+     * Convert a value into a
+     * comparison-friendly format.
+     */
+    function normalizeValue(value) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return null;
+
+        }
+
+
+        /*
+         * Numbers:
+         *
+         * 50000
+         * 50000.0
+         *
+         * are treated as the same.
+         */
+        if (
+            typeof value === "number"
+        ) {
+
+            return Number(value);
+
+        }
+
+
+        /*
+         * Strings:
+         *
+         * Remove unnecessary spaces
+         * and ignore capitalization.
+         */
+        return String(value)
+            .trim()
+            .toLowerCase();
+
+    }
+
+
+    /*
+     * Normalize a complete row.
+     *
+     * IMPORTANT:
+     * Column names are included so that
+     * different aliases do not accidentally
+     * produce a false match.
+     */
+    function normalizeRow(row) {
+
+        return Object.keys(row)
+            .map(function (column) {
+
+                return {
+                    column:
+                        String(column)
+                            .trim()
+                            .toLowerCase(),
+
+                    value:
+                        normalizeValue(
+                            row[column]
+                        )
+
+                };
+
+            })
+            .sort(function (a, b) {
+
+                return a.column.localeCompare(
+                    b.column
+                );
+
+            });
+
+    }
+
+
+    /*
+     * Normalize all rows.
+     */
     const actualNormalized =
-        actualRows.map(normalizeRow);
+        actualRows.map(
+            normalizeRow
+        );
 
     const expectedNormalized =
-        expectedRows.map(normalizeRow);
+        expectedRows.map(
+            normalizeRow
+        );
+
 
     /*
-     * Sort rows so that:
+     * Sort rows.
      *
-     * A,B,C
+     * This makes row order irrelevant.
      *
-     * and
+     * Example:
      *
-     * C,A,B
+     * Rahul
+     * Priya
      *
-     * are treated as the same result.
+     * is considered the same as:
+     *
+     * Priya
+     * Rahul
      */
-    actualNormalized.sort(function (a, b) {
+    function rowSort(a, b) {
 
         return JSON.stringify(a)
             .localeCompare(
                 JSON.stringify(b)
             );
 
-    });
+    }
 
-    expectedNormalized.sort(function (a, b) {
 
-        return JSON.stringify(a)
-            .localeCompare(
-                JSON.stringify(b)
-            );
+    actualNormalized.sort(
+        rowSort
+    );
 
-    });
+    expectedNormalized.sort(
+        rowSort
+    );
+
 
     /*
-     * Compare normalized results.
+     * Final comparison.
      */
-    return JSON.stringify(actualNormalized) ===
-           JSON.stringify(expectedNormalized);
+    const actualJson =
+        JSON.stringify(
+            actualNormalized
+        );
+
+    const expectedJson =
+        JSON.stringify(
+            expectedNormalized
+        );
+
+
+    const result =
+        actualJson === expectedJson;
+
+
+    /*
+     * Debug information.
+     *
+     * We can remove this later.
+     */
+    console.log(
+        "========== QUERY VALIDATION =========="
+    );
+
+    console.log(
+        "Actual normalized:",
+        actualJson
+    );
+
+    console.log(
+        "Expected normalized:",
+        expectedJson
+    );
+
+    console.log(
+        "Validation result:",
+        result
+    );
+
+    console.log(
+        "======================================="
+    );
+
+
+    return result;
 
 }
 
