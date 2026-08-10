@@ -1,3 +1,167 @@
+function compareQueryResults(
+    actualRows,
+    expectedRows
+) {
+
+    /*
+     * Both must be arrays.
+     */
+    if (
+        !Array.isArray(actualRows) ||
+        !Array.isArray(expectedRows)
+    ) {
+
+        return false;
+
+    }
+
+    /*
+     * Different number of rows
+     * means the answer is incorrect.
+     */
+    if (
+        actualRows.length !==
+        expectedRows.length
+    ) {
+
+        return false;
+
+    }
+
+    /*
+     * Compare each row.
+     */
+    for (
+        let i = 0;
+        i < expectedRows.length;
+        i++
+    ) {
+
+        const actualRow =
+            actualRows[i];
+
+        const expectedRow =
+            expectedRows[i];
+
+        /*
+         * Compare column count.
+         */
+        const actualColumns =
+            Object.keys(
+                actualRow
+            );
+
+        const expectedColumns =
+            Object.keys(
+                expectedRow
+            );
+
+        if (
+            actualColumns.length !==
+            expectedColumns.length
+        ) {
+
+            return false;
+
+        }
+
+        /*
+         * Compare every expected column.
+         */
+        for (
+            let j = 0;
+            j < expectedColumns.length;
+            j++
+        ) {
+
+            const column =
+                expectedColumns[j];
+
+            /*
+             * Column must exist.
+             */
+            if (
+                !Object.prototype.hasOwnProperty.call(
+                    actualRow,
+                    column
+                )
+            ) {
+
+                return false;
+
+            }
+
+            const actualValue =
+                actualRow[column];
+
+            const expectedValue =
+                expectedRow[column];
+
+            /*
+             * Normalize values before comparison.
+             */
+            const actualNormalized =
+                normalizeValue(
+                    actualValue
+                );
+
+            const expectedNormalized =
+                normalizeValue(
+                    expectedValue
+                );
+
+            if (
+                actualNormalized !==
+                expectedNormalized
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+    }
+
+    return true;
+
+}
+
+
+/*
+ * Normalize SQL values before
+ * comparing expected output.
+ */
+function normalizeValue(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return null;
+
+    }
+
+    /*
+     * Numbers
+     */
+    if (
+        typeof value ===
+        "number"
+    ) {
+
+        return value;
+
+    }
+
+    /*
+     * Strings
+     */
+    return String(value).trim();
+
+}
+
 const browserSqlEngine = {
 
     db: null,
@@ -417,27 +581,40 @@ const browserSqlEngine = {
              * Return the same basic structure
              * expected by queryResults.js.
              */
-            return {
+            const expectedOutput =
+    options.expectedOutput || null;
 
-                success: true,
+let isCorrect = null;
 
-                columns:
-                    columns,
+if (expectedOutput !== null) {
 
-                rows:
-                    rows,
+    isCorrect =
+        compareQueryResults(
+            rows,
+            expectedOutput
+        );
 
-                rowCount:
-                    rows.length,
+}
 
-                executionTime:
-                    executionTime,
+return {
 
-                resultsTruncated:
-                    false
+    success: true,
 
-            };
+    columns: columns,
 
+    rows: rows,
+
+    rowCount: rows.length,
+
+    executionTime:
+        executionTime,
+
+    resultsTruncated: false,
+
+    isCorrect:
+        isCorrect
+
+};
         }
 
 
