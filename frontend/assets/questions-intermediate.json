@@ -3,11 +3,83 @@
         "id": 101,
         "difficulty": "Intermediate",
         "database": "Banking",
-        "table": "customers",
+        "table": "customers, accounts",
         "points": 20,
         "status": "incomplete",
-        "question": "Find all customers whose balance is greater than 50000 and sort them by balance in descending order.",
-        "hint": "Use WHERE and ORDER BY.",
-        "solution": "SELECT * FROM customers WHERE balance > 50000 ORDER BY balance DESC;"
+        "question": "Find all customers whose account balance is greater than 50000 and display their name and balance.",
+        "expectedOutput": [
+            {
+                "customer_name": "Rohit Verma",
+                "balance": 120000
+            },
+            {
+                "customer_name": "Priya Singh",
+                "balance": 90000
+            },
+            {
+                "customer_name": "Rahul Sharma",
+                "balance": 75000
+            }
+        ],
+        "hint": "Join customers with accounts using customer_id.",
+        "solution": "SELECT c.customer_name, a.balance FROM customers c JOIN accounts a ON c.customer_id = a.customer_id WHERE a.balance > 50000 ORDER BY a.balance DESC;"
+    },
+    {
+        "id": 102,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "table": "accounts",
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the total account balance for each branch.",
+        "expectedOutput": [
+            {
+                "branch_id": 1,
+                "total_balance": 75000
+            },
+            {
+                "branch_id": 2,
+                "total_balance": 90000
+            },
+            {
+                "branch_id": 3,
+                "total_balance": 25000
+            },
+            {
+                "branch_id": 4,
+                "total_balance": 45000
+            },
+            {
+                "branch_id": 5,
+                "total_balance": 120000
+            }
+        ],
+        "hint": "Use GROUP BY with branch_id and SUM(balance).",
+        "solution": "SELECT branch_id, SUM(balance) AS total_balance FROM accounts GROUP BY branch_id ORDER BY branch_id;"
+    },
+    {
+        "id": 103,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "table": "customers, accounts",
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers whose account balance is greater than the average account balance.",
+        "expectedOutput": [
+            {
+                "customer_name": "Rahul Sharma",
+                "balance": 75000
+            },
+            {
+                "customer_name": "Priya Singh",
+                "balance": 90000
+            },
+            {
+                "customer_name": "Rohit Verma",
+                "balance": 120000
+            }
+        ],
+        "hint": "Calculate the average balance in a subquery and compare each account against it.",
+        "solution": "SELECT c.customer_name, a.balance FROM customers c JOIN accounts a ON c.customer_id = a.customer_id WHERE a.balance > (SELECT AVG(balance) FROM accounts) ORDER BY a.balance;"
     }
 ]
