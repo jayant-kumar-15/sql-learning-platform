@@ -643,5 +643,46 @@ return {
  * ================================================================
  */
 
+async function preloadChallengeDatabase(
+    databaseName = "Banking"
+) {
+
+    try {
+
+        console.log(
+            "🚀 Preloading challenge database:",
+            databaseName
+        );
+
+        await browserSqlEngine.initialize(
+            databaseName
+        );
+
+        console.log(
+            "✅ Challenge database ready:",
+            databaseName
+        );
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Challenge database preload failed:",
+            error
+        );
+
+        return false;
+
+    }
+
+}
+
 window.browserSqlEngine =
     browserSqlEngine;
+
+window.preloadChallengeDatabase =
+    preloadChallengeDatabase;
+
+
+
