@@ -5,6 +5,7 @@ const path = require("path");
 
 const db = require("../config/db");
 const queryRoutes = require("../routes/queryRoutes");
+const schemaRoutes = require("../routes/schemaRoutes");
 
 const app = express();
 
@@ -149,6 +150,7 @@ app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 
 app.use("/api", queryRoutes);
+app.use("/api/schema", schemaRoutes);
 
 app.get("/api/health", function (req, res) {
 
