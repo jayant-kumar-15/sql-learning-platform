@@ -768,32 +768,9 @@ function openDifficultyQuestions(difficulty) {
         filteredQuestions
     );
 
-    if (difficulty === "Beginner") {
-
-        setActiveFilter(
-            filterBeginner
-        );
-
-    } else if (
-        difficulty === "Intermediate"
-    ) {
-
-        setActiveFilter(
-            filterIntermediate
-        );
-
-    } else if (
-        difficulty === "Expert"
-    ) {
-
-        setActiveFilter(
-            filterExpert
-        );
-
-    }
 
     questionFilters.style.display =
-        "flex";
+    "flex";
 
     openQuestionsPopup();
 
