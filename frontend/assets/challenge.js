@@ -1822,3 +1822,520 @@ window.addEventListener(
 console.log(
     "✅ challenge.js loaded successfully"
 );
+
+/* ============================================================
+ * VIEW TABLE SCHEMA
+ * ============================================================
+ */
+
+const viewSchemaButton =
+    document.getElementById("view-schema-btn");
+
+const schemaPopup =
+    document.getElementById("schema-popup");
+
+const schemaOverlay =
+    document.getElementById("schema-overlay");
+
+const closeSchemaButton =
+    document.getElementById("close-schema-btn");
+
+const schemaDatabaseName =
+    document.getElementById("schema-database-name");
+
+const schemaContent =
+    document.getElementById("schema-content");
+
+
+/*
+ * Open schema popup
+ */
+
+function openSchemaPopup() {
+
+    if (!schemaPopup || !schemaOverlay) {
+
+        return;
+
+    }
+
+    schemaPopup.style.display =
+        "block";
+
+    schemaOverlay.style.display =
+        "block";
+
+}
+
+
+/*
+ * Close schema popup
+ */
+
+function closeSchemaPopup() {
+
+    if (!schemaPopup || !schemaOverlay) {
+
+        return;
+
+    }
+
+    schemaPopup.style.display =
+        "none";
+
+    schemaOverlay.style.display =
+        "none";
+
+}
+
+
+/*
+ * Render schema
+ */
+
+function renderTableSchema(schemaData) {
+
+    if (!schemaContent) {
+
+        return;
+
+    }
+
+
+    schemaContent.innerHTML = "";
+
+
+    if (
+        !schemaData ||
+        !schemaData.tables ||
+        schemaData.tables.length === 0
+    ) {
+
+        schemaContent.innerHTML = `
+
+            <p>
+                ❌ No schema information found.
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+    schemaData.tables.forEach(
+        function (table) {
+
+            const tableCard =
+                document.createElement("div");
+
+            tableCard.className =
+                "schema-table-card";
+
+
+            /*
+             * Table title
+             */
+
+            const tableTitle =
+                document.createElement("div");
+
+            tableTitle.className =
+                "schema-table-title";
+
+            tableTitle.textContent =
+                "📋 " + table.tableName;
+
+
+            tableCard.appendChild(
+                tableTitle
+            );
+
+
+            /*
+             * Columns table
+             */
+
+            const columnsTable =
+    document.createElement("table");
+
+columnsTable.className =
+    "schema-columns-table";
+            
+            table.className =
+                "schema-columns-table";
+
+
+            const thead =
+                document.createElement("thead");
+
+            thead.innerHTML = `
+
+                <tr>
+
+                    <th>Column</th>
+
+                    <th>Type</th>
+
+                    <th>Key</th>
+
+                    <th>Required</th>
+
+                </tr>
+
+            `;
+
+
+            columnsTable.appendChild(thead);
+
+
+            const tbody =
+                document.createElement("tbody");
+
+
+            const columns =
+    table.columns || [];
+
+
+            columns.forEach(
+                function (column) {
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    let keyText = "";
+
+                    let keyClass = "";
+
+
+                    if (column.pk === 1) {
+
+                        keyText =
+                            "🔑 Primary Key";
+
+                        keyClass =
+                            "schema-primary-key";
+
+                    }
+
+
+                    /*
+                     * Check whether this column
+                     * is used as a foreign key.
+                     */
+
+                    const foreignKey =
+                        (
+                            table.foreignKeys ||
+                            []
+                        ).find(
+                            function (foreignKey) {
+
+                                return (
+                                    foreignKey.from ===
+                                    column.name
+                                );
+
+                            }
+                        );
+
+
+                    if (foreignKey) {
+
+                        keyText =
+                            "🔗 Foreign Key";
+
+                        keyClass =
+                            "schema-foreign-key";
+
+                    }
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${column.name}
+                        </td>
+
+                        <td>
+                            ${column.type || "—"}
+                        </td>
+
+                        <td class="${keyClass}">
+                            ${keyText || "—"}
+                        </td>
+
+                        <td>
+                            ${
+                                column.notnull === 1
+                                    ? "Yes"
+                                    : "No"
+                            }
+                        </td>
+
+                    `;
+
+
+                    tbody.appendChild(row);
+
+                }
+            );
+
+            columnsTable.appendChild(tbody);
+
+tableCard.appendChild(columnsTable);
+
+
+
+
+            /*
+             * Relationships
+             */
+
+            const foreignKeys =
+                table.foreignKeys || [];
+
+
+            if (foreignKeys.length > 0) {
+
+                const relationships =
+                    document.createElement("div");
+
+                relationships.className =
+                    "schema-relationships";
+
+
+                const relationshipTitle =
+                    document.createElement("h4");
+
+                relationshipTitle.textContent =
+                    "🔗 Relationships";
+
+                relationships.appendChild(
+                    relationshipTitle
+                );
+
+
+                foreignKeys.forEach(
+                    function (foreignKey) {
+
+                        const relationship =
+                            document.createElement("div");
+
+                        relationship.className =
+                            "schema-relationship-item";
+
+
+                        relationship.textContent =
+                            `${table.tableName}.${foreignKey.from} → ${foreignKey.table}.${foreignKey.to}`;
+
+
+                        relationships.appendChild(
+                            relationship
+                        );
+
+                    }
+                );
+
+
+                tableCard.appendChild(
+                    relationships
+                );
+
+            }
+
+
+            schemaContent.appendChild(
+                tableCard
+            );
+
+        }
+    );
+
+}
+
+
+/*
+ * Fetch schema from backend
+ */
+
+async function loadTableSchema() {
+
+    if (
+        !currentQuestion ||
+        !currentQuestion.tables ||
+        currentQuestion.tables.length === 0
+    ) {
+
+        if (schemaContent) {
+
+            schemaContent.innerHTML = `
+
+                <p>
+                    ❌ No table information available
+                    for this question.
+                </p>
+
+            `;
+
+        }
+
+        openSchemaPopup();
+
+        return;
+
+    }
+
+
+    const database =
+        currentQuestion.database;
+
+
+    const tables =
+        currentQuestion.tables.join(",");
+
+
+    /*
+     * Display database name
+     */
+
+    if (schemaDatabaseName) {
+
+        schemaDatabaseName.textContent =
+            database;
+
+    }
+
+
+    /*
+     * Show loading state
+     */
+
+    if (schemaContent) {
+
+        schemaContent.innerHTML = `
+
+            <p>
+                ⏳ Loading table schema...
+            </p>
+
+        `;
+
+    }
+
+
+    openSchemaPopup();
+
+
+    try {
+
+        const response =
+            await fetch(
+
+                `https://sql-learning-platform-5fu8.onrender.com/api/schema/${encodeURIComponent(database)}/${encodeURIComponent(tables)}`
+
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+
+                data.message ||
+                "Unable to load table schema."
+
+            );
+
+        }
+
+
+        renderTableSchema(data);
+
+
+    } catch (error) {
+
+        console.error(
+            "Schema loading failed:",
+            error
+        );
+
+
+        if (schemaContent) {
+
+            schemaContent.innerHTML = `
+
+                <p>
+                    ❌ Unable to load schema.
+                </p>
+
+                <p>
+                    ${error.message}
+                </p>
+
+            `;
+
+        }
+
+    }
+
+}
+
+
+/*
+ * Button
+ */
+
+if (viewSchemaButton) {
+
+    viewSchemaButton.addEventListener(
+        "click",
+        function () {
+
+            loadTableSchema();
+
+        }
+    );
+
+}
+
+
+/*
+ * Close button
+ */
+
+if (closeSchemaButton) {
+
+    closeSchemaButton.addEventListener(
+        "click",
+        function () {
+
+            closeSchemaPopup();
+
+        }
+    );
+
+}
+
+
+/*
+ * Close when clicking overlay
+ */
+
+if (schemaOverlay) {
+
+    schemaOverlay.addEventListener(
+        "click",
+        function () {
+
+            closeSchemaPopup();
+
+        }
+    );
+
+}
