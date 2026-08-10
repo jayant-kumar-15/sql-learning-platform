@@ -806,3 +806,83 @@
     }
 
 }
+
+/* ============================================================
+ * SCHEMA POPUP - VISIBILITY FIX
+ * ============================================================
+ */
+
+.schema-popup {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+.schema-popup-header {
+    background: #ffffff !important;
+    color: #111827 !important;
+}
+
+.schema-popup-header h2 {
+    color: #111827 !important;
+}
+
+.close-schema-btn {
+    color: #111827 !important;
+}
+
+.schema-database-name {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+.schema-content {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+.schema-table-card {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.schema-table-title {
+    background: #e0e7ff !important;
+    color: #111827 !important;
+}
+
+.schema-columns-table {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+.schema-columns-table th {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+.schema-columns-table td {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.schema-primary-key {
+    color: #b45309 !important;
+}
+
+.schema-foreign-key {
+    color: #2563eb !important;
+}
+
+.schema-relationships {
+    background: #eff6ff !important;
+    color: #1e3a8a !important;
+}
+
+.schema-relationships h4 {
+    color: #1e3a8a !important;
+}
+
+.schema-relationship-item {
+    color: #1e3a8a !important;
+}
