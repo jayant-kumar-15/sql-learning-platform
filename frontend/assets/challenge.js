@@ -83,6 +83,57 @@ const filterExpert =
 
 
 /* ============================================================
+ * DIFFICULTY START BUTTONS
+ * ============================================================
+ */
+
+if (beginnerButton) {
+
+    beginnerButton.addEventListener(
+        "click",
+        function () {
+
+            openDifficultyQuestions(
+                "Beginner"
+            );
+
+        }
+    );
+
+}
+
+if (intermediateButton) {
+
+    intermediateButton.addEventListener(
+        "click",
+        function () {
+
+            openDifficultyQuestions(
+                "Intermediate"
+            );
+
+        }
+    );
+
+}
+
+if (expertButton) {
+
+    expertButton.addEventListener(
+        "click",
+        function () {
+
+            openDifficultyQuestions(
+                "Expert"
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
  * QUESTION DETAILS
  * ============================================================
  */
@@ -737,7 +788,10 @@ function loadQuestions(
 
 function openDifficultyQuestions(difficulty) {
 
-    console.log("Opening difficulty:", difficulty);
+    console.log(
+        "Opening difficulty:",
+        difficulty
+    );
 
     const filteredQuestions =
         allChallenges.filter(function (question) {
@@ -756,19 +810,30 @@ function openDifficultyQuestions(difficulty) {
         filteredQuestions
     );
 
+    console.log(
+        "Number of questions:",
+        filteredQuestions.length
+    );
+
     currentQuestionList =
         filteredQuestions;
 
-    // Populate ONLY this difficulty's questions
-    loadQuestions(filteredQuestions);
+    // Populate only this difficulty
+    loadQuestions(
+        filteredQuestions
+    );
 
-    // IMPORTANT:
-    // Hide filters for Beginner / Intermediate / Expert
-    questionFilters.style.display = "none";
+    // Hide filters for specific difficulty
+    if (questionFilters) {
+
+        questionFilters.style.display =
+            "none";
+
+    }
 
     // Open popup
-    questionsPopup.style.display = "block";
-    overlay.style.display = "block";
+    openQuestionsPopup();
+
 }
 
 
