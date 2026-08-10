@@ -20,9 +20,7 @@ function compareQueryResults(actualRows, expectedRows) {
         return false;
     }
 
-    /*
-     * Convert each row into a normalized
-     * representation.
+    
 /*
  * ============================================================
  * QUERY RESULT COMPARISON
