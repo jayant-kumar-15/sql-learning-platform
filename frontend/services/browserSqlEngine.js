@@ -6,10 +6,16 @@ const browserSqlEngine = {
 
     currentDatabase: null,
 
+
+    /* ============================================================
+     * INITIALIZE BROWSER SQLITE
+     * ============================================================
+     */
+
     async initialize(databaseName = "Banking") {
 
         /*
-         * Already initialized for this database
+         * Already initialized for this database.
          */
         if (
             this.initialized &&
@@ -21,6 +27,7 @@ const browserSqlEngine = {
 
         }
 
+
         try {
 
             console.log(
@@ -28,273 +35,238 @@ const browserSqlEngine = {
                 databaseName
             );
 
+
             /*
-             * Load SQLite WASM
+             * Load SQLite WASM.
              */
             const sqlite3 =
                 await initializeSQLite();
 
+
             /*
              * Create an in-memory SQLite database.
              *
-             * The database exists only inside
-             * the user's browser.
+             * This database exists only
+             * inside the user's browser.
              */
             this.db =
                 new sqlite3.oo1.DB(
                     ":memory:"
                 );
 
+
             /*
-             * During seed loading we temporarily
-             * disable foreign-key enforcement.
-             *
-             * This is required because the current
-             * seed.sql inserts some child records
-             * before their parent records.
+             * Determine the correct schema
+             * and seed files.
+             */
+            let schemaFile;
+            let seedFile;
+
+
+            if (
+                databaseName.toLowerCase() ===
+                "banking"
+            ) {
+
+                schemaFile =
+                    "../assets/banking-schema.sql";
+
+                seedFile =
+                    "../assets/banking-seed.sql";
+
+            }
+
+
+            else if (
+                databaseName.toLowerCase() ===
+                "healthcare"
+            ) {
+
+                schemaFile =
+                    "../assets/healthcare-schema.sql";
+
+                seedFile =
+                    "../assets/healthcare-seed.sql";
+
+            }
+
+
+            else {
+
+                throw new Error(
+                    "Unsupported database: " +
+                    databaseName
+                );
+
+            }
+
+
+            /*
+             * Temporarily disable foreign-key
+             * enforcement while loading seed data.
              */
             this.db.exec(
                 "PRAGMA foreign_keys = OFF;"
             );
 
-            /*
-             * Load schema.sql
+
+            /* ====================================================
+             * LOAD SCHEMA
+             * ====================================================
              */
+
+            console.log(
+                "📐 Loading schema:",
+                schemaFile
+            );
+
+
             const schemaResponse =
                 await fetch(
-                    "../database/schema.sql"
+                    schemaFile
                 );
+
 
             if (!schemaResponse.ok) {
 
                 throw new Error(
-                    "Unable to load schema.sql"
+                    "Unable to load schema file: " +
+                    schemaFile
                 );
 
             }
+
 
             const schemaSql =
                 await schemaResponse.text();
 
-            console.log(
-                "📐 Loading database schema..."
+
+            this.db.exec(
+                schemaSql
             );
 
-            this.db.exec(schemaSql);
 
-            /*
-             * Load seed.sql
+            console.log(
+                "✅ Schema loaded successfully."
+            );
+
+
+            /* ====================================================
+             * LOAD SEED DATA
+             * ====================================================
              */
+
+            console.log(
+                "🌱 Loading seed data:",
+                seedFile
+            );
+
+
             const seedResponse =
                 await fetch(
-                    "../database/seed.sql"
+                    seedFile
                 );
+
 
             if (!seedResponse.ok) {
 
                 throw new Error(
-                    "Unable to load seed.sql"
+                    "Unable to load seed file: " +
+                    seedFile
                 );
 
             }
 
+
             const seedSql =
                 await seedResponse.text();
 
-            console.log(
-                "🌱 Loading sample data..."
+
+            this.db.exec(
+                seedSql
             );
 
-            this.db.exec(seedSql);
+
+            console.log(
+                "✅ Seed data loaded successfully."
+            );
+
 
             /*
-             * Re-enable foreign-key enforcement
+             * Re-enable foreign-key enforcement.
              */
             this.db.exec(
                 "PRAGMA foreign_keys = ON;"
             );
 
-            async initialize(databaseName = "Banking") {
 
-    /*
-     * Already initialized for this database
-     */
-    if (
-        this.initialized &&
-        this.db &&
-        this.currentDatabase === databaseName
-    ) {
+            /*
+             * Remember which database
+             * is currently loaded.
+             */
+            this.currentDatabase =
+                databaseName;
 
-        return this.db;
 
-    }
+            this.initialized =
+                true;
 
-    try {
 
-        console.log(
-            "⏳ Initializing browser SQLite database:",
-            databaseName
-        );
-
-        /*
-         * Load SQLite WASM
-         */
-        const sqlite3 =
-            await initializeSQLite();
-
-        /*
-         * Create an in-memory SQLite database.
-         */
-        this.db =
-            new sqlite3.oo1.DB(
-                ":memory:"
-            );
-
-        /*
-         * Determine database-specific
-         * schema and seed files.
-         */
-        let schemaFile;
-        let seedFile;
-
-        if (
-            databaseName.toLowerCase() ===
-            "banking"
-        ) {
-
-            schemaFile =
-                "../assets/banking-schema.sql";
-
-            seedFile =
-                "../assets/banking-seed.sql";
-
-        } else if (
-            databaseName.toLowerCase() ===
-            "healthcare"
-        ) {
-
-            schemaFile =
-                "../assets/healthcare-schema.sql";
-
-            seedFile =
-                "../assets/healthcare-seed.sql";
-
-        } else {
-
-            throw new Error(
-                "Unsupported database: " +
+            console.log(
+                "✅ Browser SQLite database initialized:",
                 databaseName
             );
 
+
+            return this.db;
+
+
         }
 
-        /*
-         * Temporarily disable foreign keys
-         * during seed loading.
-         */
-        this.db.exec(
-            "PRAGMA foreign_keys = OFF;"
-        );
 
-        /*
-         * Load schema.
-         */
-        console.log(
-            "📐 Loading schema:",
-            schemaFile
-        );
+        catch (error) {
 
-        const schemaResponse =
-            await fetch(schemaFile);
-
-        if (!schemaResponse.ok) {
-
-            throw new Error(
-                "Unable to load schema file: " +
-                schemaFile
+            console.error(
+                "❌ Browser SQLite initialization failed:",
+                error
             );
 
-        }
 
-        const schemaSql =
-            await schemaResponse.text();
+            /*
+             * Clean up failed database.
+             */
+            this.db =
+                null;
 
-        this.db.exec(schemaSql);
 
-        /*
-         * Load seed data.
-         */
-        console.log(
-            "🌱 Loading seed data:",
-            seedFile
-        );
+            this.initialized =
+                false;
 
-        const seedResponse =
-            await fetch(seedFile);
 
-        if (!seedResponse.ok) {
+            this.currentDatabase =
+                null;
 
-            throw new Error(
-                "Unable to load seed file: " +
-                seedFile
-            );
+
+            throw error;
 
         }
 
-        const seedSql =
-            await seedResponse.text();
+    },
 
-        this.db.exec(seedSql);
 
-        /*
-         * Re-enable foreign keys.
-         */
-        this.db.exec(
-            "PRAGMA foreign_keys = ON;"
-        );
-
-        /*
-         * Remember current database.
-         */
-        this.currentDatabase =
-            databaseName;
-
-        this.initialized = true;
-
-        console.log(
-            "✅ Browser SQLite database initialized:",
-            databaseName
-        );
-
-        return this.db;
-
-    } catch (error) {
-
-        console.error(
-            "❌ Browser SQLite initialization failed:",
-            error
-        );
-
-        /*
-         * Clean up failed database.
-         */
-        this.db = null;
-
-        this.initialized = false;
-
-        this.currentDatabase = null;
-
-        throw error;
-
-    }
-
-},
+    /* ============================================================
+     * EXECUTE SQL QUERY
+     * ============================================================
+     */
 
     async execute(
         query,
         options = {}
     ) {
 
+        /*
+         * Validate query.
+         */
         if (
             !query ||
             typeof query !== "string"
@@ -306,41 +278,51 @@ const browserSqlEngine = {
 
         }
 
+
         /*
-         * For now Banking is the default.
+         * Determine which database
+         * should be used.
          *
-         * Later challenge.js will pass:
-         *
-         * database: "Banking"
-         *
-         * or
-         *
-         * database: "Healthcare"
+         * Default = Banking.
          */
         const databaseName =
             options.database ||
             "Banking";
 
+
+        /*
+         * Initialize the correct
+         * browser database.
+         */
         const db =
             await this.initialize(
                 databaseName
             );
 
+
         const startTime =
             performance.now();
+
 
         try {
 
             /*
-             * Execute query and obtain
-             * rows as JavaScript objects.
+             * Execute SQL.
+             *
+             * rowMode: object means each
+             * result row becomes a JS object.
              */
             const result =
                 db.exec({
+
                     sql: query,
+
                     rowMode: "object",
+
                     returnValue: "resultRows"
+
                 });
+
 
             const executionTime =
                 Math.round(
@@ -348,30 +330,46 @@ const browserSqlEngine = {
                     startTime
                 );
 
+
             const rows =
                 result || [];
 
-            /*
-             * Determine columns.
+
+            /* ====================================================
+             * DETERMINE COLUMNS
+             * ====================================================
              */
+
             let columns = [];
 
-            if (rows.length > 0) {
+
+            /*
+             * If rows exist, obtain
+             * column names from first row.
+             */
+            if (
+                rows.length > 0
+            ) {
 
                 columns =
                     Object.keys(
                         rows[0]
                     );
 
-            } else {
+            }
 
-                /*
-                 * For SELECT queries that
-                 * return zero rows, we need
-                 * SQLite to provide column names.
-                 */
+
+            /*
+             * If query returned zero rows,
+             * still try to obtain column names.
+             */
+            else {
+
                 const statement =
-                    db.prepare(query);
+                    db.prepare(
+                        query
+                    );
+
 
                 try {
 
@@ -379,7 +377,10 @@ const browserSqlEngine = {
                         statement
                             .getColumnNames();
 
-                } finally {
+                }
+
+
+                finally {
 
                     statement.finalize();
 
@@ -387,14 +388,23 @@ const browserSqlEngine = {
 
             }
 
+
             console.log(
-                "🟢 Browser SQL executed successfully"
+                "🟢 Browser SQL executed successfully."
             );
+
+
+            console.log(
+                "Database:",
+                databaseName
+            );
+
 
             console.log(
                 "Rows:",
                 rows.length
             );
+
 
             console.log(
                 "Execution time:",
@@ -402,29 +412,42 @@ const browserSqlEngine = {
                 "ms"
             );
 
+
+            /*
+             * Return the same basic structure
+             * expected by queryResults.js.
+             */
             return {
 
                 success: true,
 
-                columns: columns,
+                columns:
+                    columns,
 
-                rows: rows,
+                rows:
+                    rows,
 
-                rowCount: rows.length,
+                rowCount:
+                    rows.length,
 
                 executionTime:
                     executionTime,
 
-                resultsTruncated: false
+                resultsTruncated:
+                    false
 
             };
 
-        } catch (error) {
+        }
+
+
+        catch (error) {
 
             console.error(
                 "❌ Browser SQL execution failed:",
                 error
             );
+
 
             throw new Error(
                 error.message ||
@@ -438,8 +461,10 @@ const browserSqlEngine = {
 };
 
 
-/*
- * Make browser SQL engine globally available.
+/* ================================================================
+ * GLOBAL AVAILABILITY
+ * ================================================================
  */
+
 window.browserSqlEngine =
     browserSqlEngine;
