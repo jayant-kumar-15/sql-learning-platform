@@ -1521,10 +1521,16 @@ if (runButton) {
             try {
 
                 const data =
-                    await executeSqlQuery(
-                        userQuery,
-                        currentQuestion.expectedOutput
-                    );
+    await sqlEngine.execute(
+        userQuery,
+        {
+            database:
+                currentQuestion.database,
+
+            expectedOutput:
+                currentQuestion.expectedOutput
+        }
+    );
 
 
                 displayQueryResults(
