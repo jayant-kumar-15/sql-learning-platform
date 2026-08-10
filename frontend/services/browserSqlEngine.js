@@ -939,4 +939,4 @@ window.browserSqlEngine =
     browserSqlEngine;
 
 window.preloadChallengeDatabase =
-    preloadChallengeDatabase;
+    preloadChallengeDatabase ;
