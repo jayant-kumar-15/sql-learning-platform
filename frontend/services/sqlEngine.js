@@ -1,10 +1,20 @@
 const sqlEngine = {
 
-    mode: "backend",
+    /*
+     * Fixed challenge questions should run
+     * inside the browser.
+     *
+     * Backend remains available for operations
+     * that require server-side persistence.
+     */
+    mode: "browser",
 
     async execute(query, options = {}) {
 
-        if (!query || typeof query !== "string") {
+        if (
+            !query ||
+            typeof query !== "string"
+        ) {
 
             throw new Error(
                 "SQL query is required."
@@ -13,8 +23,9 @@ const sqlEngine = {
         }
 
         /*
-         * Browser SQLite will eventually handle
-         * fixed practice databases.
+         * =========================================
+         * BROWSER SQL ENGINE
+         * =========================================
          */
 
         if (
@@ -22,17 +33,51 @@ const sqlEngine = {
             window.browserSqlEngine
         ) {
 
-            return await browserSqlEngine.execute(
-                query
-            );
+            try {
+
+                return await window.browserSqlEngine.execute(
+                    query,
+                    {
+                        database:
+                            options.database ||
+                            "Banking"
+                    }
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Browser SQL execution failed:",
+                    error
+                );
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * We do NOT automatically send the
+                 * query to Render here.
+                 *
+                 * If browser execution fails, we
+                 * want to know why rather than
+                 * silently moving the workload back
+                 * to the backend.
+                 */
+
+                throw error;
+
+            }
 
         }
 
         /*
-         * Current backend implementation.
+         * =========================================
+         * BACKEND FALLBACK
+         * =========================================
          */
 
-        if (typeof executeSqlQuery !== "function") {
+        if (
+            typeof executeSqlQuery !== "function"
+        ) {
 
             throw new Error(
                 "SQL execution service is unavailable."
@@ -49,4 +94,10 @@ const sqlEngine = {
 
 };
 
-window.sqlEngine = sqlEngine;
+
+/*
+ * Make SQL engine globally available.
+ */
+
+window.sqlEngine =
+    sqlEngine;
