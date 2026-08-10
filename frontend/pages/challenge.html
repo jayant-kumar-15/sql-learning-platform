@@ -173,6 +173,14 @@
 
         <p id="question-text"></p>
 
+        <button
+    type="button"
+    id="view-schema-btn"
+    class="view-schema-btn"
+>
+    🗂️ View Table Schema
+        </button>
+
 <h3>Expected Output</h3>
 
 <table id="expected-output"></table>
@@ -315,7 +323,59 @@
     </div>
 
 </div>
-        
+
+                <!-- ============================================================
+     TABLE SCHEMA POPUP
+     ============================================================ -->
+
+<div
+    id="schema-overlay"
+    class="schema-overlay"
+    style="display: none;"
+>
+</div>
+
+<div
+    id="schema-popup"
+    class="schema-popup"
+    style="display: none;"
+>
+
+    <div class="schema-popup-header">
+
+        <h2>🗂️ Database Schema</h2>
+
+        <button
+            type="button"
+            id="close-schema-btn"
+            class="close-schema-btn"
+        >
+            ✖
+        </button>
+
+    </div>
+
+    <div class="schema-database-name">
+
+        <strong>Database:</strong>
+
+        <span id="schema-database-name"></span>
+
+    </div>
+
+    <div
+        id="schema-content"
+        class="schema-content"
+    >
+
+        <p>
+            Loading schema...
+        </p>
+
+    </div>
+
+</div>
+                
     </main>
 
 <script src="../js/queryApi.js?v=2"></script>
