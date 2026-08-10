@@ -985,3 +985,70 @@
     }
 
 }
+
+/* ============================================================
+   EXPECTED OUTPUT - HORIZONTAL SCROLL
+   ============================================================ */
+
+.expected-output-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    margin-top: 10px;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/*
+ * Keep the table wide enough to display all columns.
+ * The wrapper above will provide horizontal scrolling.
+ */
+#expected-output {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+#expected-output th,
+#expected-output td {
+    padding: 11px 14px;
+    border: 1px solid #d1d5db;
+    text-align: left;
+}
+
+#expected-output th {
+    background: #e5e7eb;
+    color: #111827;
+    font-weight: 700;
+}
+
+#expected-output td {
+    background: #ffffff;
+    color: #1f2937;
+}
+
+#expected-output tbody tr:nth-child(even) td {
+    background: #f9fafb;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .expected-output-wrapper {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    #expected-output {
+        min-width: max-content;
+    }
+
+    #expected-output th,
+    #expected-output td {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+
+}
