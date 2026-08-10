@@ -735,28 +735,38 @@ function loadQuestions(
  * ============================================================
  */
 
-function openDifficultyQuestions(
-    difficulty
-) {
+function openDifficultyQuestions(difficulty) {
 
-    const filtered =
-        allChallenges.filter(
-            function (question) {
+    console.log("Opening difficulty:", difficulty);
 
-                return (
-                    question.difficulty
-                        .toLowerCase() ===
-                    difficulty.toLowerCase()
-                );
+    const filteredQuestions =
+        allChallenges.filter(function (question) {
 
-            }
-        );
+            return question.difficulty
+                .trim()
+                .toLowerCase() ===
+                difficulty
+                    .trim()
+                    .toLowerCase();
 
+        });
 
-    loadQuestions(
-        filtered
+    console.log(
+        "Filtered questions:",
+        filteredQuestions
     );
 
+    console.log(
+        "Filtered count:",
+        filteredQuestions.length
+    );
+
+    currentQuestionList =
+        filteredQuestions;
+
+    loadQuestions(
+        filteredQuestions
+    );
 
     if (difficulty === "Beginner") {
 
@@ -782,14 +792,8 @@ function openDifficultyQuestions(
 
     }
 
-
-    if (questionFilters) {
-
-        questionFilters.style.display =
-            "flex";
-
-    }
-
+    questionFilters.style.display =
+        "flex";
 
     openQuestionsPopup();
 
