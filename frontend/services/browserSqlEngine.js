@@ -4,103 +4,96 @@
  * ============================================================
  */
 
-function compareQueryResults(
-    actualRows,
-    expectedRows
-) {
+function compareQueryResults(actualRows, expectedRows) {
 
     if (
         !Array.isArray(actualRows) ||
         !Array.isArray(expectedRows)
     ) {
-
         return false;
-
     }
 
-    if (
-        actualRows.length !==
-        expectedRows.length
-    ) {
-
+    /*
+     * Different number of rows = incorrect
+     */
+    if (actualRows.length !== expectedRows.length) {
         return false;
-
     }
 
-    for (
-        let i = 0;
-        i < expectedRows.length;
-        i++
-    ) {
+    /*
+     * Convert each row into a normalized
+     * representation.
+     *
+     * This makes comparison independent
+     * of row order.
+     */
+    function normalizeRow(row) {
 
-        const actualRow =
-            actualRows[i];
+        const values = Object.values(row);
 
-        const expectedRow =
-            expectedRows[i];
-
-        const actualColumns =
-            Object.keys(actualRow);
-
-        const expectedColumns =
-            Object.keys(expectedRow);
-
-        if (
-            actualColumns.length !==
-            expectedColumns.length
-        ) {
-
-            return false;
-
-        }
-
-        for (
-            let j = 0;
-            j < expectedColumns.length;
-            j++
-        ) {
-
-            const column =
-                expectedColumns[j];
+        return values.map(function (value) {
 
             if (
-                !Object.prototype.hasOwnProperty.call(
-                    actualRow,
-                    column
-                )
+                value === null ||
+                value === undefined
             ) {
-
-                return false;
-
+                return null;
             }
 
-            const actualValue =
-                normalizeValue(
-                    actualRow[column]
-                );
-
-            const expectedValue =
-                normalizeValue(
-                    expectedRow[column]
-                );
-
-            if (
-                actualValue !==
-                expectedValue
-            ) {
-
-                return false;
-
+            if (typeof value === "number") {
+                return Number(value);
             }
 
-        }
+            return String(value)
+                .trim()
+                .toLowerCase();
+
+        });
 
     }
 
-    return true;
+    const actualNormalized =
+        actualRows.map(normalizeRow);
+
+    const expectedNormalized =
+        expectedRows.map(normalizeRow);
+
+    /*
+     * Sort rows so that:
+     *
+     * A,B,C
+     *
+     * and
+     *
+     * C,A,B
+     *
+     * are treated as the same result.
+     */
+    actualNormalized.sort(function (a, b) {
+
+        return JSON.stringify(a)
+            .localeCompare(
+                JSON.stringify(b)
+            );
+
+    });
+
+    expectedNormalized.sort(function (a, b) {
+
+        return JSON.stringify(a)
+            .localeCompare(
+                JSON.stringify(b)
+            );
+
+    });
+
+    /*
+     * Compare normalized results.
+     */
+    return JSON.stringify(actualNormalized) ===
+           JSON.stringify(expectedNormalized);
 
 }
-
 
 /*
  * ============================================================
