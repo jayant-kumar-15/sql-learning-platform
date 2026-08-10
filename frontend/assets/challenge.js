@@ -131,6 +131,123 @@ const resetButton =
 const searchBox =
     document.getElementById("question-search");
 
+function updateScoreBoard(data = allChallenges) {
+
+    let score = 0;
+    let completed = 0;
+    let skipped = 0;
+    let remaining = 0;
+
+    let beginnerTotal = 0;
+    let beginnerCompleted = 0;
+
+    let intermediateTotal = 0;
+    let intermediateCompleted = 0;
+
+    let expertTotal = 0;
+    let expertCompleted = 0;
+
+    data.forEach(function (challenge) {
+
+        if (challenge.difficulty === "Beginner") {
+
+            beginnerTotal++;
+
+            if (challenge.status === "completed") {
+                beginnerCompleted++;
+            }
+
+        }
+
+        if (challenge.difficulty === "Intermediate") {
+
+            intermediateTotal++;
+
+            if (challenge.status === "completed") {
+                intermediateCompleted++;
+            }
+
+        }
+
+        if (challenge.difficulty === "Expert") {
+
+            expertTotal++;
+
+            if (challenge.status === "completed") {
+                expertCompleted++;
+            }
+
+        }
+
+        if (challenge.status === "completed") {
+
+            completed++;
+            score += challenge.points || 0;
+
+        } else if (challenge.status === "skipped") {
+
+            skipped++;
+
+        } else {
+
+            remaining++;
+
+        }
+
+    });
+
+    totalScore.textContent = score;
+
+    completedCount.textContent = completed;
+
+    skippedCount.textContent = skipped;
+
+    remainingCount.textContent = remaining;
+
+
+    const beginnerPercentage =
+        beginnerTotal === 0
+            ? 0
+            : Math.round(
+                (beginnerCompleted / beginnerTotal) * 100
+            );
+
+    const intermediatePercentage =
+        intermediateTotal === 0
+            ? 0
+            : Math.round(
+                (intermediateCompleted / intermediateTotal) * 100
+            );
+
+    const expertPercentage =
+        expertTotal === 0
+            ? 0
+            : Math.round(
+                (expertCompleted / expertTotal) * 100
+            );
+
+
+    beginnerProgress.textContent =
+        beginnerPercentage + "%";
+
+    intermediateProgress.textContent =
+        intermediatePercentage + "%";
+
+    expertProgress.textContent =
+        expertPercentage + "%";
+
+
+    beginnerFill.style.width =
+        beginnerPercentage + "%";
+
+    intermediateFill.style.width =
+        intermediatePercentage + "%";
+
+    expertFill.style.width =
+        expertPercentage + "%";
+
+}
+
 
 /* ============================================================
  * LOAD JSON QUESTION BANKS
