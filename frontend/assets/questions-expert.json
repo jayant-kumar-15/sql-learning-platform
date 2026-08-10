@@ -3,11 +3,124 @@
         "id": 201,
         "difficulty": "Expert",
         "database": "Banking",
-        "table": "customers",
+        "table": "accounts",
         "points": 50,
         "status": "incomplete",
-        "question": "Find the top 3 customers with the highest balance.",
-        "hint": "Use ORDER BY and LIMIT.",
-        "solution": "SELECT * FROM customers ORDER BY balance DESC LIMIT 3;"
+        "question": "Rank all accounts by balance from highest to lowest using DENSE_RANK(). Display account_id, customer_id, balance and rank.",
+        "expectedOutput": [
+            {
+                "account_id": 5,
+                "customer_id": 5,
+                "balance": 120000,
+                "balance_rank": 1
+            },
+            {
+                "account_id": 2,
+                "customer_id": 2,
+                "balance": 90000,
+                "balance_rank": 2
+            },
+            {
+                "account_id": 1,
+                "customer_id": 1,
+                "balance": 75000,
+                "balance_rank": 3
+            },
+            {
+                "account_id": 4,
+                "customer_id": 4,
+                "balance": 45000,
+                "balance_rank": 4
+            },
+            {
+                "account_id": 3,
+                "customer_id": 3,
+                "balance": 25000,
+                "balance_rank": 5
+            }
+        ],
+        "hint": "Use DENSE_RANK() OVER (ORDER BY balance DESC).",
+        "solution": "SELECT account_id, customer_id, balance, DENSE_RANK() OVER (ORDER BY balance DESC) AS balance_rank FROM accounts ORDER BY balance DESC;"
+    },
+    {
+        "id": 202,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "table": "customers, accounts",
+        "points": 50,
+        "status": "incomplete",
+        "question": "Assign a row number to every customer based on account balance from highest to lowest. Display customer name, balance and row number.",
+        "expectedOutput": [
+            {
+                "customer_name": "Rohit Verma",
+                "balance": 120000,
+                "row_number": 1
+            },
+            {
+                "customer_name": "Priya Singh",
+                "balance": 90000,
+                "row_number": 2
+            },
+            {
+                "customer_name": "Rahul Sharma",
+                "balance": 75000,
+                "row_number": 3
+            },
+            {
+                "customer_name": "Sneha Patel",
+                "balance": 45000,
+                "row_number": 4
+            },
+            {
+                "customer_name": "Amit Kumar",
+                "balance": 25000,
+                "row_number": 5
+            }
+        ],
+        "hint": "Join customers and accounts, then use ROW_NUMBER() OVER (ORDER BY balance DESC).",
+        "solution": "SELECT c.customer_name, a.balance, ROW_NUMBER() OVER (ORDER BY a.balance DESC) AS row_number FROM customers c JOIN accounts a ON c.customer_id = a.customer_id ORDER BY a.balance DESC;"
+    },
+    {
+        "id": 203,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "table": "accounts",
+        "points": 50,
+        "status": "incomplete",
+        "question": "Display each account's balance along with the overall average account balance and the difference between its balance and the overall average.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "balance": 75000,
+                "average_balance": 71000,
+                "difference_from_average": 4000
+            },
+            {
+                "account_id": 2,
+                "balance": 90000,
+                "average_balance": 71000,
+                "difference_from_average": 19000
+            },
+            {
+                "account_id": 3,
+                "balance": 25000,
+                "average_balance": 71000,
+                "difference_from_average": -46000
+            },
+            {
+                "account_id": 4,
+                "balance": 45000,
+                "average_balance": 71000,
+                "difference_from_average": -26000
+            },
+            {
+                "account_id": 5,
+                "balance": 120000,
+                "average_balance": 71000,
+                "difference_from_average": 49000
+            }
+        ],
+        "hint": "Use AVG(balance) OVER () to calculate the overall average for every row.",
+        "solution": "SELECT account_id, balance, AVG(balance) OVER () AS average_balance, balance - AVG(balance) OVER () AS difference_from_average FROM accounts ORDER BY account_id;"
     }
 ]
