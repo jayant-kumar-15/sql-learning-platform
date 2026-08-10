@@ -1,3 +1,4 @@
+
 [
     {
         "id": 1,
@@ -6,46 +7,81 @@
         "table": "customers",
         "points": 10,
         "status": "incomplete",
-
-        "question": "Find all customers whose balance is greater than 50000.",
-
+        "question": "Display the names of all customers.",
         "expectedOutput": [
             {
-                "customer_name": "Rahul",
-                "balance": 75000
+                "customer_name": "Rahul Sharma"
             },
             {
-                "customer_name": "Priya",
-                "balance": 90000
+                "customer_name": "Priya Singh"
+            },
+            {
+                "customer_name": "Amit Kumar"
+            },
+            {
+                "customer_name": "Sneha Patel"
+            },
+            {
+                "customer_name": "Rohit Verma"
             }
         ],
-
-        "hint": "Use the WHERE clause.",
-
-        "solution": "SELECT * FROM customers WHERE balance > 50000;"
+        "hint": "Select the customer_name column from the customers table.",
+        "solution": "SELECT customer_name FROM customers;"
     },
-
     {
         "id": 2,
         "difficulty": "Beginner",
-        "database": "Healthcare",
-        "table": "patients",
+        "database": "Banking",
+        "table": "customers",
         "points": 10,
         "status": "incomplete",
-
-        "question": "Display all patients.",
-
+        "question": "Find all customers who live in Mumbai.",
         "expectedOutput": [
             {
-                "patient_name": "John"
-            },
-            {
-                "patient_name": "Emma"
+                "customer_name": "Rahul Sharma"
             }
         ],
-
-        "hint": "Use SELECT *.",
-
-        "solution": "SELECT * FROM patients;"
+        "hint": "Use the WHERE clause to filter the city.",
+        "solution": "SELECT customer_name FROM customers WHERE city = 'Mumbai';"
+    },
+    {
+        "id": 3,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "table": "accounts",
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find all accounts whose balance is greater than 50000.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "customer_id": 1,
+                "branch_id": 1,
+                "account_type": "Savings",
+                "balance": 75000,
+                "account_open_date": "2024-01-15",
+                "account_status": "Active"
+            },
+            {
+                "account_id": 2,
+                "customer_id": 2,
+                "branch_id": 2,
+                "account_type": "Savings",
+                "balance": 90000,
+                "account_open_date": "2024-02-10",
+                "account_status": "Active"
+            },
+            {
+                "account_id": 5,
+                "customer_id": 5,
+                "branch_id": 5,
+                "account_type": "Current",
+                "balance": 120000,
+                "account_open_date": "2024-05-12",
+                "account_status": "Active"
+            }
+        ],
+        "hint": "Use WHERE with the balance column.",
+        "solution": "SELECT * FROM accounts WHERE balance > 50000;"
     }
 ]
