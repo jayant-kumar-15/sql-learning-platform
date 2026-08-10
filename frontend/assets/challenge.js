@@ -19,17 +19,9 @@ const EXPERT_FILE =
  * ============================================================
  */
 
-let allChallenges = [];
-
 let currentQuestionList = [];
 
 let currentQuestion = null;
-
-
-/*
- * This is kept for compatibility with existing code.
- */
-let challenges = [];
 
 
 /* ============================================================
