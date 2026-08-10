@@ -1,11 +1,8 @@
 const sqlEngine = {
 
     /*
-     * Fixed challenge questions should run
+     * Fixed challenge questions run
      * inside the browser.
-     *
-     * Backend remains available for operations
-     * that require server-side persistence.
      */
     mode: "browser",
 
@@ -28,9 +25,9 @@ const sqlEngine = {
 
 
         /*
-         * =========================================
+         * =====================================================
          * BROWSER SQL ENGINE
-         * =========================================
+         * =====================================================
          */
 
         if (
@@ -38,49 +35,28 @@ const sqlEngine = {
             window.browserSqlEngine
         ) {
 
-            try {
+            return await window.browserSqlEngine.execute(
+                query,
+                {
 
-                return await window.browserSqlEngine.execute(
-                    query,
-                    {
-                        database:
-                            options.database ||
-                            "Banking",
+                    database:
+                        options.database ||
+                        "Banking",
 
-                        /*
-                         * IMPORTANT:
-                         * Pass expected output to the
-                         * browser engine so it can
-                         * validate the answer.
-                         */
-                        expectedOutput:
-                            options.expectedOutput ||
-                            null
-                    }
-                );
+                    expectedOutput:
+                        options.expectedOutput ||
+                        null
 
-            } catch (error) {
-
-                console.error(
-                    "Browser SQL execution failed:",
-                    error
-                );
-
-                /*
-                 * Do NOT automatically fall back
-                 * to Render.
-                 */
-                throw error;
-
-            }
+                }
+            );
 
         }
 
 
         /*
-         * =========================================
+         * =====================================================
          * BACKEND FALLBACK
-         * =========================================
+         * =====================================================
          */
 
         if (
@@ -96,8 +72,7 @@ const sqlEngine = {
 
         return await executeSqlQuery(
             query,
-            options.expectedOutput ||
-            null
+            options.expectedOutput || null
         );
 
     }
@@ -106,7 +81,7 @@ const sqlEngine = {
 
 
 /*
- * Make SQL engine globally available.
+ * Global availability.
  */
 
 window.sqlEngine =
