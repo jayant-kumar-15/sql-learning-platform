@@ -756,24 +756,19 @@ function openDifficultyQuestions(difficulty) {
         filteredQuestions
     );
 
-    console.log(
-        "Filtered count:",
-        filteredQuestions.length
-    );
-
     currentQuestionList =
         filteredQuestions;
 
-    loadQuestions(
-        filteredQuestions
-    );
+    // Populate ONLY this difficulty's questions
+    loadQuestions(filteredQuestions);
 
+    // IMPORTANT:
+    // Hide filters for Beginner / Intermediate / Expert
+    questionFilters.style.display = "none";
 
-    questionFilters.style.display =
-    "flex";
-
-    openQuestionsPopup();
-
+    // Open popup
+    questionsPopup.style.display = "block";
+    overlay.style.display = "block";
 }
 
 
