@@ -46,7 +46,7 @@
         "id": 202,
         "difficulty": "Expert",
         "database": "Banking",
-        "tables": ["customers, accounts"],
+        "tables": ["customers", "accounts"],
         "points": 50,
         "status": "incomplete",
         "question": "Assign a row number to every customer based on account balance from highest to lowest. Display customer name, balance and row number.",
