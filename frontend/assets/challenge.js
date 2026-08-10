@@ -1,295 +1,83 @@
+/*
+ * ============================================================
+ * SQL LEARNING PLATFORM - CHALLENGE ENGINE
+ * ============================================================
+ */
 
-const hintButton = document.getElementById("hint-btn");
+const BEGINNER_FILE =
+    "../assets/questions-beginner.json";
 
-const hintText = document.getElementById("hint-text");
+const INTERMEDIATE_FILE =
+    "../assets/questions-intermediate.json";
 
-hintButton.addEventListener("click", function () {
+const EXPERT_FILE =
+    "../assets/questions-expert.json";
 
-    if (hintText.style.display === "none") {
 
-        hintText.style.display = "block";
+/* ============================================================
+ * GLOBAL STATE
+ * ============================================================
+ */
 
-        hintButton.textContent = "🙈 Hide Hint";
+let allChallenges = [];
 
-    } else {
-
-        hintText.style.display = "none";
-
-        hintButton.textContent = "🔒 Show Hint";
-
-    }
-
-});
-
-const solutionButton = document.getElementById("solution-btn");
-
-const solutionText = document.getElementById("solution-text");
-
-solutionButton.addEventListener("click", function () {
-
-    const confirmAnswer = confirm(
-
-        "⚠️ Viewing the solution will make this question ineligible for points.\n\nDo you want to continue?"
-
-    );
-
-    if (confirmAnswer) {
-
-    currentQuestion.status = "skipped";
-
-const progressList =
-    challenges.length > 0
-        ? challenges
-        : allChallenges.filter(function (question) {
-
-            return question.difficulty ===
-                currentQuestion.difficulty;
-
-        });
-
-localStorage.setItem(
-    "sqlChallenges_" +
-    currentQuestion.difficulty,
-    JSON.stringify(progressList)
-);
-        
-loadQuestions();
-
-loadAllProgress();
-
-    solutionText.style.display = "block";
-
-    solutionButton.textContent = "👀 Solution Viewed";
-
-    }
-
-});
-
-document
-    .getElementById("beginner-btn")
-    .addEventListener("click", function () {
-
-        loadDifficulty("beginner");
-
-        questionFilters.style.display = "none";
-
-        questionsPopup.style.display = "block";
-
-        overlay.style.display = "block";
-
-    });
-
-document
-    .getElementById("intermediate-btn")
-    .addEventListener("click", function () {
-
-        loadDifficulty("intermediate");
-
-        questionFilters.style.display = "none";
-
-        questionsPopup.style.display = "block";
-
-        overlay.style.display = "block";
-
-    });
-
-document
-    .getElementById("expert-btn")
-    .addEventListener("click", function () {
-
-        loadDifficulty("expert");
-
-        questionFilters.style.display = "none";
-
-        questionsPopup.style.display = "block";
-
-        overlay.style.display = "block";
-
-    });
-
-console.log(
-    document.getElementById("intermediate-btn")
-);
-
-console.log(
-    document.getElementById("expert-btn")
-);
-
-const allQuestionsButton = document.getElementById("all-questions-btn");
-
-const questionsPopup = document.getElementById("questions-popup");
-
-const closePopupButton = document.getElementById("close-popup");
-const overlay = document.getElementById("overlay");
-
-allQuestionsButton.addEventListener("click", function () {
-
-    loadQuestions(allChallenges);
-    
-    questionsPopup.style.display = "block";
-
-    overlay.style.display = "block";
-
-    questionFilters.style.display = "flex";
-
-});
-
-closePopupButton.addEventListener("click", function () {
-
-    questionsPopup.style.display = "none";
-
-overlay.style.display = "none";
-
-});
-
-const questionsGrid = document.getElementById("questions-grid");
-const questionTitle = document.getElementById("question-title");
-
-const databaseName = document.getElementById("database-name");
-
-const tableName = document.getElementById("table-name");
-
-const questionText = document.getElementById("question-text");
 let currentQuestionList = [];
+
 let currentQuestion = null;
 
-window.addEventListener(
-    "allQuestionsLoaded",
-    function () {
 
-        if (
-            allChallenges.length > 0 &&
-            currentQuestion === null
-        ) {
+/*
+ * This is kept for compatibility with existing code.
+ */
+let challenges = [];
 
-            currentQuestionList = allChallenges;
 
-            currentQuestion = allChallenges[0];
+/* ============================================================
+ * DOM ELEMENTS
+ * ============================================================
+ */
 
-            showQuestion(currentQuestion);
+const hintButton =
+    document.getElementById("hint-btn");
 
-        }
+const hintText =
+    document.getElementById("hint-text");
 
-    }
-);
+const solutionButton =
+    document.getElementById("solution-btn");
 
-function showQuestion(question) {
+const solutionText =
+    document.getElementById("solution-text");
 
-    currentQuestion = question;
-    console.log("CURRENT QUESTION:", currentQuestion);
-console.log("CURRENT QUESTION LIST:", currentQuestionList);
+const questionsPopup =
+    document.getElementById("questions-popup");
 
-    questionTitle.textContent =
-        "Question " + question.id;
+const closePopupButton =
+    document.getElementById("close-popup");
 
-    databaseName.textContent =
-        question.database;
+const overlay =
+    document.getElementById("overlay");
 
-    tableName.textContent =
-        question.table;
+const questionsGrid =
+    document.getElementById("questions-grid");
 
-    questionText.textContent =
-        question.question;
+const questionTitle =
+    document.getElementById("question-title");
 
-    hintText.textContent =
-        question.hint;
+const databaseName =
+    document.getElementById("database-name");
 
-    solutionText.textContent =
-        question.solution;
+const tableName =
+    document.getElementById("table-name");
 
-    hintText.style.display = "none";
+const questionText =
+    document.getElementById("question-text");
 
-    solutionText.style.display = "none";
+const questionFilters =
+    document.getElementById("question-filters");
 
-    hintButton.textContent =
-        "🔒 Show Hint";
-
-    solutionButton.textContent =
-        "🔒 View Solution";
-}
-
-function loadQuestions(questionList = challenges) {
-
-    questionsGrid.innerHTML = "";
-    currentQuestionList = questionList;
-
-    questionList.forEach(function (challenge) {
-
-        const card = document.createElement("div");
-
-        card.className = "question-popup-card";
-
-        let statusIcon = "❌";
-
-        if (challenge.status === "completed") {
-
-            statusIcon = "✅";
-
-        } else if (challenge.status === "skipped") {
-
-            statusIcon = "⏭️";
-
-        }
-
-        card.innerHTML = `
-
-            <div class="question-popup-text">
-
-                <strong>
-                    ${challenge.id}. ${challenge.question}
-                </strong>
-
-            </div>
-
-            <div class="question-popup-actions">
-
-                <span class="question-status">
-                    ${statusIcon}
-                </span>
-
-                <button
-                    type="button"
-                    class="popup-start-btn"
-                >
-                    Start
-                </button>
-
-            </div>
-
-        `;
-
-        const startButton =
-            card.querySelector(".popup-start-btn");
-
-        startButton.addEventListener("click", function () {
-
-            showQuestion(challenge);
-
-            questionsPopup.style.display = "none";
-
-            overlay.style.display = "none";
-
-        });
-
-        questionsGrid.appendChild(card);
-
-    });
-
-    if (questionList.length > 0 && currentQuestion === null) {
-
-    showQuestion(questionList[0]);
-
-    }
-}
-console.log("loadQuestions function ended");
-
-const totalScore = document.getElementById("total-score");
-
-const completedCount = document.getElementById("completed-count");
-
-const skippedCount = document.getElementById("skipped-count");
-
-const remainingCount = document.getElementById("remaining-count");
+const allQuestionsButton =
+    document.getElementById("all-questions-btn");
 
 const previousQuestionButton =
     document.getElementById("previous-question-btn");
@@ -297,106 +85,41 @@ const previousQuestionButton =
 const nextQuestionButton =
     document.getElementById("next-question-btn");
 
+const runButton =
+    document.getElementById("run-query-btn");
 
-previousQuestionButton.addEventListener("click", function () {
+const totalScore =
+    document.getElementById("total-score");
 
-    const questionList =
-        currentQuestionList.length > 0
-            ? currentQuestionList
-            : allChallenges;
+const completedCount =
+    document.getElementById("completed-count");
 
-    if (questionList.length === 0) {
-        return;
-    }
+const skippedCount =
+    document.getElementById("skipped-count");
 
-    if (currentQuestion === null) {
+const remainingCount =
+    document.getElementById("remaining-count");
 
-        currentQuestion = questionList[0];
+const resultMessage =
+    document.getElementById("result-message");
 
-    }
+const beginnerProgress =
+    document.getElementById("easy-progress");
 
-    const currentIndex =
-        questionList.findIndex(function (challenge) {
+const intermediateProgress =
+    document.getElementById("medium-progress");
 
-            return challenge.id === currentQuestion.id;
+const expertProgress =
+    document.getElementById("expert-progress");
 
-        });
+const beginnerFill =
+    document.getElementById("easy-fill");
 
-    if (currentIndex > 0) {
+const intermediateFill =
+    document.getElementById("medium-fill");
 
-        showQuestion(
-            questionList[currentIndex - 1]
-        );
-
-    }
-
-});
-
-nextQuestionButton.addEventListener("click", function () {
-
-    const questionList =
-        currentQuestionList.length > 0
-            ? currentQuestionList
-            : allChallenges;
-
-    if (questionList.length === 0) {
-        return;
-    }
-
-    /*
-     * After page refresh, Question 1 is displayed
-     * from the HTML, but currentQuestion is still null.
-     * Treat the first question as the current question.
-     */
-    if (currentQuestion === null) {
-
-        currentQuestion = questionList[0];
-
-    }
-
-    const currentIndex =
-        questionList.findIndex(function (challenge) {
-
-            return challenge.id === currentQuestion.id;
-
-        });
-
-    if (
-        currentIndex >= 0 &&
-        currentIndex < questionList.length - 1
-    ) {
-
-        showQuestion(
-            questionList[currentIndex + 1]
-        );
-
-    }
-
-});
-
-const beginnerProgress = document.getElementById(
-    "easy-progress"
-);
-
-const intermediateProgress = document.getElementById(
-    "medium-progress"
-);
-
-const expertProgress = document.getElementById(
-    "expert-progress"
-);
-
-const beginnerFill = document.getElementById(
-    "easy-fill"
-);
-
-const intermediateFill = document.getElementById(
-    "medium-fill"
-);
-
-const expertFill = document.getElementById(
-    "expert-fill"
-);
+const expertFill =
+    document.getElementById("expert-fill");
 
 const filterAll =
     document.getElementById("filter-all");
@@ -410,493 +133,1003 @@ const filterIntermediate =
 const filterExpert =
     document.getElementById("filter-expert");
 
-const questionFilters =
-    document.getElementById("question-filters");
+const resetButton =
+    document.getElementById("reset-progress-btn");
 
-function filterQuestions(difficulty) {
+const searchBox =
+    document.getElementById("question-search");
 
-    let filteredQuestions;
 
-    if (difficulty === "All") {
+/* ============================================================
+ * LOAD JSON QUESTION BANKS
+ * ============================================================
+ */
 
-        filteredQuestions = allChallenges;
-
-    } else {
-
-        filteredQuestions = allChallenges.filter(
-            function (challenge) {
-
-                return challenge.difficulty === difficulty;
-
-            }
-        );
-
-    }
-
-    loadQuestions(filteredQuestions);
-
-}
-
-function setActiveFilter(activeButton) {
-
-    filterAll.classList.remove("active");
-
-    filterBeginner.classList.remove("active");
-
-    filterIntermediate.classList.remove("active");
-
-    filterExpert.classList.remove("active");
-
-    activeButton.classList.add("active");
-
-}
-
-filterAll.addEventListener("click", function () {
-
-    setActiveFilter(filterAll);
-
-    loadQuestions(allChallenges);
-
-});
-
-
-filterBeginner.addEventListener("click", function () {
-
-    setActiveFilter(filterBeginner);
-
-    filterQuestions("Beginner");
-
-});
-
-
-filterIntermediate.addEventListener("click", function () {
-
-    setActiveFilter(filterIntermediate);
-
-    filterQuestions("Intermediate");
-
-});
-
-
-filterExpert.addEventListener("click", function () {
-
-    setActiveFilter(filterExpert);
-
-    filterQuestions("Expert");
-
-});
-
-function updateScoreBoard(data = allChallenges) {
-console.log(data);
-    let score = 0;
-
-    let completed = 0;
-
-    let skipped = 0;
-
-    let remaining = 0;
-
-    let beginnerTotal = 0;
-let beginnerCompleted = 0;
-
-let intermediateTotal = 0;
-let intermediateCompleted = 0;
-
-let expertTotal = 0;
-let expertCompleted = 0;
-    
-    data.forEach(function (challenge) {
-        
-if (challenge.difficulty === "Beginner") {
-
-    beginnerTotal++;
-
-    if (challenge.status === "completed") {
-
-        beginnerCompleted++;
-
-    }
-
-}
-
-if (challenge.difficulty === "Intermediate") {
-
-    
-    intermediateTotal++;
-
-    if (challenge.status === "completed") {
-
-        intermediateCompleted++;
-
-    }
-
-}
-
-
-if (challenge.difficulty === "Expert") {
-
-    expertTotal++;
-
-    if (challenge.status === "completed") {
-
-        expertCompleted++;
-
-    }
-
-}
-        
-
-        if (challenge.status === "completed") {
-
-            completed++;
-
-            score += challenge.points;
-
-        } else if (challenge.status === "skipped") {
-
-            skipped++;
-
-        } else {
-
-            remaining++;
-
-        }
-
-    });
-
-totalScore.textContent = score;
-
-completedCount.textContent = completed;
-
-skippedCount.textContent = skipped;
-
-remainingCount.textContent = remaining;
-
-console.log("Beginner total =", beginnerTotal);
-
-console.log("Beginner completed =", beginnerCompleted);
-
-beginnerProgress.textContent =
-
-    beginnerTotal === 0
-        ? "0%"
-        : Math.round(
-              (beginnerCompleted / beginnerTotal) * 100
-          ) + "%";
-
-intermediateProgress.textContent =
-
-    intermediateTotal === 0
-        ? "0%"
-        : Math.round(
-              (intermediateCompleted / intermediateTotal) * 100
-          ) + "%";
-
-expertProgress.textContent =
-
-    expertTotal === 0
-        ? "0%"
-        : Math.round(
-              (expertCompleted / expertTotal) * 100
-          ) + "%";
-
-const beginnerPercentage = beginnerTotal === 0
-    ? 0
-    : Math.round(
-          (beginnerCompleted / beginnerTotal) * 100
-      );
-
-const intermediatePercentage = intermediateTotal === 0
-    ? 0
-    : Math.round(
-          (intermediateCompleted / intermediateTotal) * 100
-      );
-
-const expertPercentage = expertTotal === 0
-    ? 0
-    : Math.round(
-          (expertCompleted / expertTotal) * 100
-      );
-
-beginnerFill.style.width =
-    beginnerPercentage + "%";
-
-intermediateFill.style.width =
-    intermediatePercentage + "%";
-
-expertFill.style.width =
-    expertPercentage + "%";
-}
-    
-const runButton = document.getElementById("run-query-btn");
-
-
-const resultMessage = document.getElementById("result-message");
-
-
-   runButton.addEventListener("click", async function () {
-
-    const sqlEditor =
-        document.getElementById("sql-editor");
-
-    const resultMessage =
-        document.getElementById("result-message");
-
-    const queryResultStatus =
-        document.getElementById(
-            "query-result-status"
-        );
-
-    const userQuery =
-        sqlEditor.value.trim();
-
-
-    /*
-     * Clear previous messages
-     */
-
-    resultMessage.textContent = "";
-
-    queryResultStatus.textContent = "";
-
-
-    /*
-     * Validate empty query
-     */
-
-    if (userQuery === "") {
-
-        queryResultStatus.textContent =
-            "❌ Please enter a SQL query.";
-
-        return;
-
-    }
-
-
-    /*
-     * Disable button while query is running
-     */
-
-    runButton.disabled = true;
-
-    runButton.textContent =
-        "⏳ Running...";
-
+async function loadQuestionBanks() {
 
     try {
 
+        const responses =
+            await Promise.all([
+
+                fetch(BEGINNER_FILE),
+
+                fetch(INTERMEDIATE_FILE),
+
+                fetch(EXPERT_FILE)
+
+            ]);
+
+
+        for (const response of responses) {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load question bank: " +
+                    response.status
+                );
+
+            }
+
+        }
+
+
+        const beginnerQuestions =
+            await responses[0].json();
+
+        const intermediateQuestions =
+            await responses[1].json();
+
+        const expertQuestions =
+            await responses[2].json();
+
+
+        allChallenges = [
+
+            ...beginnerQuestions,
+
+            ...intermediateQuestions,
+
+            ...expertQuestions
+
+        ];
+
+
         /*
-         * Send query + expected output
+         * Restore saved progress.
          */
-
-        const data =
-            await executeSqlQuery(
-
-                userQuery,
-
-                currentQuestion.expectedOutput
-
-            );
+        restoreProgress();
 
 
         /*
-         * Display actual SQL results
+         * Default state = Beginner.
+         *
+         * This means refreshing the page automatically
+         * starts with Beginner Question #1.
          */
+        currentQuestionList =
+            getQuestionsByDifficulty("Beginner");
 
-        displayQueryResults(data);
+        challenges =
+            currentQuestionList;
+
+
+        if (currentQuestionList.length > 0) {
+
+            currentQuestion =
+                currentQuestionList[0];
+
+            showQuestion(currentQuestion);
+
+        }
+
+
+        updateScoreBoard();
 
 
         /*
-         * Check challenge correctness
+         * Notify other scripts if they depend on this event.
          */
-
-        if (data.isCorrect === true) {
-
-            currentQuestion.status =
-                "completed";
+        window.dispatchEvent(
+            new Event("allQuestionsLoaded")
+        );
 
 
-            /*
-             * Save progress
-             */
+        console.log(
+            "✅ Question banks loaded:",
+            allChallenges
+        );
 
-            const progressList =
-                challenges.length > 0
-                    ? challenges
-                    : allChallenges.filter(
-                        function (question) {
+    } catch (error) {
 
-                            return question.difficulty ===
-                                currentQuestion.difficulty;
+        console.error(
+            "❌ Question bank loading failed:",
+            error
+        );
+
+        questionText.textContent =
+            "Unable to load SQL challenges.";
+
+    }
+
+}
+
+
+/* ============================================================
+ * GET QUESTIONS BY DIFFICULTY
+ * ============================================================
+ */
+
+function getQuestionsByDifficulty(difficulty) {
+
+    return allChallenges.filter(
+        function (question) {
+
+            return question.difficulty === difficulty;
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * RESTORE PROGRESS
+ * ============================================================
+ */
+
+function restoreProgress() {
+
+    allChallenges.forEach(
+        function (question) {
+
+            const storageKey =
+                "sqlChallenges_" +
+                question.difficulty;
+
+            const saved =
+                localStorage.getItem(storageKey);
+
+
+            if (!saved) {
+
+                return;
+
+            }
+
+
+            try {
+
+                const savedQuestions =
+                    JSON.parse(saved);
+
+
+                const savedQuestion =
+                    savedQuestions.find(
+                        function (item) {
+
+                            return item.id ===
+                                question.id;
 
                         }
                     );
 
 
+                if (savedQuestion) {
+
+                    question.status =
+                        savedQuestion.status ||
+                        "incomplete";
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Progress restore error:",
+                    error
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * SAVE PROGRESS
+ * ============================================================
+ */
+
+function saveProgress() {
+
+    const difficulties = [
+        "Beginner",
+        "Intermediate",
+        "Expert"
+    ];
+
+
+    difficulties.forEach(
+        function (difficulty) {
+
+            const questions =
+                getQuestionsByDifficulty(
+                    difficulty
+                );
+
+
             localStorage.setItem(
 
                 "sqlChallenges_" +
-                currentQuestion.difficulty,
+                difficulty,
 
-                JSON.stringify(
-                    progressList
-                )
+                JSON.stringify(questions)
 
             );
-
-
-            /*
-             * Correct answer message
-             */
-
-            queryResultStatus.textContent =
-                "✅ Correct answer! +" +
-                currentQuestion.points +
-                " points";
-
-
-            queryResultStatus.className =
-                "query-result-status success";
-
-
-            /*
-             * Refresh question status
-             */
-
-            loadQuestions();
-
-            loadAllProgress();
-
-
-        } else {
-
-            /*
-             * SQL executed successfully,
-             * but result is logically incorrect
-             */
-
-            queryResultStatus.textContent =
-                "❌ Query executed successfully, but the result is incorrect. Try again.";
-
-
-            queryResultStatus.className =
-                "query-result-status error";
 
         }
-
-
-    } catch (error) {
-
-        /*
-         * Hide old results when query fails
-         */
-
-        const resultsContainer =
-            document.getElementById(
-                "query-results-container"
-            );
-
-
-        resultsContainer.style.display =
-            "none";
-
-
-        /*
-         * Display SQL error beside
-         * Run Query button
-         */
-
-        queryResultStatus.textContent =
-            "❌ " + error.message;
-
-
-        queryResultStatus.className =
-            "query-result-status error";
-
-    } finally {
-
-        /*
-         * Enable button again
-         */
-
-        runButton.disabled = false;
-
-        runButton.textContent =
-            "▶️ Run Query";
-
-    }
-
-});             
-
-
-const resetButton = document.getElementById(
-    "reset-progress-btn"
-);
-
-resetButton.addEventListener("click", function () {
-
-    const confirmReset = confirm(
-
-        "⚠️ Are you sure you want to reset your progress?"
-
     );
 
-    if (!confirmReset) {
+}
+
+
+/* ============================================================
+ * SHOW QUESTION
+ * ============================================================
+ */
+
+function showQuestion(question) {
+
+    if (!question) {
 
         return;
 
     }
 
-    challenges.forEach(function (challenge) {
 
-        challenge.status = "incomplete";
+    currentQuestion =
+        question;
 
-    });
 
-    localStorage.removeItem("sqlChallenges_Beginner");
+    questionTitle.textContent =
+        "Question " + question.id;
 
-localStorage.removeItem("sqlChallenges_Intermediate");
 
-localStorage.removeItem("sqlChallenges_Expert");
+    databaseName.textContent =
+        question.database;
 
-    
 
-    alert("✅ Progress has been reset.");
+    tableName.textContent =
+        question.table;
 
-});
 
- const searchBox = document.getElementById("question-search"); 
+    questionText.textContent =
+        question.question;
 
-if (searchBox) {
 
-    searchBox.addEventListener("input", function () {
+    hintText.textContent =
+        question.hint;
 
-        const searchText = searchBox.value.toLowerCase();
 
-        const buttons = document.querySelectorAll(
-            "#questions-grid button"
-        );
+    solutionText.textContent =
+        question.solution;
 
-        buttons.forEach(function (button) {
 
-            const text = button.textContent.toLowerCase();
+    hintText.style.display =
+        "none";
 
-            if (
-                text.includes(searchText)
-            ) {
 
-                button.style.display = "";
+    solutionText.style.display =
+        "none";
 
-            } else {
 
-                button.style.display = "none";
+    hintButton.textContent =
+        "🔒 Show Hint";
 
-            }
 
-        });
+    solutionButton.textContent =
+        "🔒 View Solution";
 
-    });
+
+    /*
+     * Clear previous SQL result message.
+     */
+    if (resultMessage) {
+
+        resultMessage.textContent = "";
+
+    }
 
 }
 
+
+/* ============================================================
+ * LOAD QUESTION POPUP
+ * ============================================================
+ */
+
+function loadQuestions(questionList) {
+
+    if (!questionList) {
+
+        questionList =
+            currentQuestionList;
+
+    }
+
+
+    currentQuestionList =
+        questionList;
+
+
+    challenges =
+        questionList;
+
+
+    questionsGrid.innerHTML = "";
+
+
+    questionList.forEach(
+        function (challenge) {
+
+            const card =
+                document.createElement("div");
+
+
+            card.className =
+                "question-popup-card";
+
+
+            let statusIcon =
+                "❌";
+
+
+            if (
+                challenge.status ===
+                "completed"
+            ) {
+
+                statusIcon =
+                    "✅";
+
+            } else if (
+                challenge.status ===
+                "skipped"
+            ) {
+
+                statusIcon =
+                    "⏭️";
+
+            }
+
+
+            card.innerHTML = `
+
+                <div class="question-popup-text">
+
+                    <strong>
+                        ${challenge.id}.
+                        ${challenge.question}
+                    </strong>
+
+                </div>
+
+                <div class="question-popup-actions">
+
+                    <span class="question-status">
+                        ${statusIcon}
+                    </span>
+
+                    <button
+                        type="button"
+                        class="popup-start-btn"
+                    >
+                        Start
+                    </button>
+
+                </div>
+
+            `;
+
+
+            const startButton =
+                card.querySelector(
+                    ".popup-start-btn"
+                );
+
+
+            startButton.addEventListener(
+                "click",
+                function () {
+
+                    showQuestion(challenge);
+
+                    questionsPopup.style.display =
+                        "none";
+
+                    overlay.style.display =
+                        "none";
+
+                }
+            );
+
+
+            questionsGrid.appendChild(card);
+
+        }
+    );
+
+
+    applySearchFilter();
+
+}
+
+
+/* ============================================================
+ * DIFFICULTY LOADING
+ * ============================================================
+ */
+
+function loadDifficulty(difficulty) {
+
+    const questions =
+        getQuestionsByDifficulty(
+            difficulty
+        );
+
+
+    currentQuestionList =
+        questions;
+
+
+    challenges =
+        questions;
+
+
+    /*
+     * IMPORTANT:
+     * Always reset to the first question
+     * when changing difficulty.
+     */
+    currentQuestion =
+        questions.length > 0
+            ? questions[0]
+            : null;
+
+
+    if (currentQuestion) {
+
+        showQuestion(
+            currentQuestion
+        );
+
+    }
+
+
+    loadQuestions(questions);
+
+
+    updateScoreBoard();
+
+}
+
+
+/* ============================================================
+ * FILTER QUESTIONS
+ * ============================================================
+ */
+
+function filterQuestions(difficulty) {
+
+    if (difficulty === "All") {
+
+        currentQuestionList =
+            allChallenges;
+
+    } else {
+
+        currentQuestionList =
+            getQuestionsByDifficulty(
+                difficulty
+            );
+
+    }
+
+
+    challenges =
+        currentQuestionList;
+
+
+    /*
+     * Filtering also starts from
+     * the first question in that filter.
+     */
+    currentQuestion =
+        currentQuestionList.length > 0
+            ? currentQuestionList[0]
+            : null;
+
+
+    if (currentQuestion) {
+
+        showQuestion(
+            currentQuestion
+        );
+
+    }
+
+
+    loadQuestions(
+        currentQuestionList
+    );
+
+}
+
+
+/* ============================================================
+ * FILTER BUTTON STATE
+ * ============================================================
+ */
+
+function setActiveFilter(activeButton) {
+
+    [
+        filterAll,
+        filterBeginner,
+        filterIntermediate,
+        filterExpert
+
+    ].forEach(
+        function (button) {
+
+            if (button) {
+
+                button.classList.remove(
+                    "active"
+                );
+
+            }
+
+        }
+    );
+
+
+    if (activeButton) {
+
+        activeButton.classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+ * POPUP BUTTONS
+ * ============================================================
+ */
+
+if (allQuestionsButton) {
+
+    allQuestionsButton.addEventListener(
+        "click",
+        function () {
+
+            currentQuestionList =
+                allChallenges;
+
+            challenges =
+                allChallenges;
+
+
+            currentQuestion =
+                allChallenges.length > 0
+                    ? allChallenges[0]
+                    : null;
+
+
+            if (currentQuestion) {
+
+                showQuestion(
+                    currentQuestion
+                );
+
+            }
+
+
+            loadQuestions(
+                allChallenges
+            );
+
+
+            questionsPopup.style.display =
+                "block";
+
+            overlay.style.display =
+                "block";
+
+            questionFilters.style.display =
+                "flex";
+
+
+            setActiveFilter(
+                filterAll
+            );
+
+        }
+    );
+
+}
+
+
+if (closePopupButton) {
+
+    closePopupButton.addEventListener(
+        "click",
+        function () {
+
+            questionsPopup.style.display =
+                "none";
+
+            overlay.style.display =
+                "none";
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * BEGINNER / INTERMEDIATE / EXPERT BUTTONS
+ * ============================================================
+ */
+
+const beginnerButton =
+    document.getElementById(
+        "beginner-btn"
+    );
+
+
+const intermediateButton =
+    document.getElementById(
+        "intermediate-btn"
+    );
+
+
+const expertButton =
+    document.getElementById(
+        "expert-btn"
+    );
+
+
+if (beginnerButton) {
+
+    beginnerButton.addEventListener(
+        "click",
+        function () {
+
+            loadDifficulty(
+                "Beginner"
+            );
+
+
+            setActiveFilter(
+                filterBeginner
+            );
+
+
+            questionFilters.style.display =
+                "none";
+
+
+            questionsPopup.style.display =
+                "block";
+
+
+            overlay.style.display =
+                "block";
+
+        }
+    );
+
+}
+
+
+if (intermediateButton) {
+
+    intermediateButton.addEventListener(
+        "click",
+        function () {
+
+            loadDifficulty(
+                "Intermediate"
+            );
+
+
+            setActiveFilter(
+                filterIntermediate
+            );
+
+
+            questionFilters.style.display =
+                "none";
+
+
+            questionsPopup.style.display =
+                "block";
+
+
+            overlay.style.display =
+                "block";
+
+        }
+    );
+
+}
+
+
+if (expertButton) {
+
+    expertButton.addEventListener(
+        "click",
+        function () {
+
+            loadDifficulty(
+                "Expert"
+            );
+
+
+            setActiveFilter(
+                filterExpert
+            );
+
+
+            questionFilters.style.display =
+                "none";
+
+
+            questionsPopup.style.display =
+                "block";
+
+
+            overlay.style.display =
+                "block";
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * FILTER EVENTS
+ * ============================================================
+ */
+
+if (filterAll) {
+
+    filterAll.addEventListener(
+        "click",
+        function () {
+
+            setActiveFilter(
+                filterAll
+            );
+
+            filterQuestions(
+                "All"
+            );
+
+        }
+    );
+
+}
+
+
+if (filterBeginner) {
+
+    filterBeginner.addEventListener(
+        "click",
+        function () {
+
+            setActiveFilter(
+                filterBeginner
+            );
+
+            filterQuestions(
+                "Beginner"
+            );
+
+        }
+    );
+
+}
+
+
+if (filterIntermediate) {
+
+    filterIntermediate.addEventListener(
+        "click",
+        function () {
+
+            setActiveFilter(
+                filterIntermediate
+            );
+
+            filterQuestions(
+                "Intermediate"
+            );
+
+        }
+    );
+
+}
+
+
+if (filterExpert) {
+
+    filterExpert.addEventListener(
+        "click",
+        function () {
+
+            setActiveFilter(
+                filterExpert
+            );
+
+            filterQuestions(
+                "Expert"
+            );
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * NEXT QUESTION
+ * ============================================================
+ */
+
+if (nextQuestionButton) {
+
+    nextQuestionButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                currentQuestionList.length ===
+                0
+            ) {
+
+                return;
+
+            }
+
+
+            const currentIndex =
+                currentQuestionList.findIndex(
+                    function (question) {
+
+                        return question.id ===
+                            currentQuestion.id;
+
+                    }
+                );
+
+
+            if (
+                currentIndex >= 0 &&
+                currentIndex <
+                    currentQuestionList.length - 1
+            ) {
+
+                showQuestion(
+                    currentQuestionList[
+                        currentIndex + 1
+                    ]
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * PREVIOUS QUESTION
+ * ============================================================
+ */
+
+if (previousQuestionButton) {
+
+    previousQuestionButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                currentQuestionList.length ===
+                0
+            ) {
+
+                return;
+
+            }
+
+
+            const currentIndex =
+                currentQuestionList.findIndex(
+                    function (question) {
+
+                        return question.id ===
+                            currentQuestion.id;
+
+                    }
+                );
+
+
+            if (currentIndex > 0) {
+
+                showQuestion(
+                    currentQuestionList[
+                        currentIndex - 1
+                    ]
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * HINT
+ * ============================================================
+ */
+
+if (hintButton) {
+
+    hintButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                hintText.style.display ===
+                "none"
+            ) {
+
+                hintText.style.display =
+                    "block";
+
+                hintButton.textContent =
+                    "🙈 Hide Hint";
+
+            } else {
+
+                hintText.style.display =
+                    "none";
+
+                hintButton.textContent =
+                    "🔒 Show Hint";
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * SOLUTION
+ * ===================================================
