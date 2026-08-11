@@ -7,6 +7,11 @@ const sqlEngine = {
     mode: "browser",
 
 
+    /* ============================================================
+     * EXECUTE SQL
+     * ============================================================
+     */
+
     async execute(
         query,
         options = {}
@@ -25,9 +30,9 @@ const sqlEngine = {
 
 
         /*
-         * =====================================================
+         * ========================================================
          * BROWSER SQL ENGINE
-         * =====================================================
+         * ========================================================
          */
 
         if (
@@ -35,28 +40,94 @@ const sqlEngine = {
             window.browserSqlEngine
         ) {
 
-            return await window.browserSqlEngine.execute(
-                query,
-                {
+            try {
 
-                    database:
-                        options.database ||
-                        "Banking",
+                /*
+                 * Execute query inside browser SQLite.
+                 *
+                 * expectedOutput is passed so the
+                 * browser engine can produce the
+                 * initial result comparison.
+                 */
 
-                    expectedOutput:
-                        options.expectedOutput ||
-                        null
+                const result =
+                    await window.browserSqlEngine.execute(
+                        query,
+                        {
+
+                            database:
+                                options.database ||
+                                "Banking",
+
+                            expectedOutput:
+                                options.expectedOutput ||
+                                null
+
+                        }
+                    );
+
+
+                /*
+                 * =================================================
+                 * CHALLENGE VALIDATION
+                 * =================================================
+                 *
+                 * Only fixed challenge questions
+                 * should use challengeValidator.
+                 *
+                 * User-created databases will not
+                 * pass a challenge object.
+                 */
+
+                if (
+                    options.challenge &&
+                    window.challengeValidator
+                ) {
+
+                    console.log(
+                        "🧠 Running challenge validator..."
+                    );
+
+
+                    result.isCorrect =
+                        window.challengeValidator.validate(
+                            options.challenge,
+                            result
+                        );
+
+
+                    console.log(
+                        "🧠 Challenge validation result:",
+                        result.isCorrect
+                    );
 
                 }
-            );
+
+
+                return result;
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "❌ Browser SQL execution failed:",
+                    error
+                );
+
+
+                throw error;
+
+            }
 
         }
 
 
         /*
-         * =====================================================
+         * ========================================================
          * BACKEND FALLBACK
-         * =====================================================
+         * ========================================================
          */
 
         if (
@@ -81,8 +152,14 @@ const sqlEngine = {
 
 
 /*
- * Global availability.
+ * ================================================================
+ * GLOBAL AVAILABILITY
+ * ================================================================
  */
 
 window.sqlEngine =
     sqlEngine;
+
+console.log(
+    "✅ sqlEngine.js loaded successfully"
+);
