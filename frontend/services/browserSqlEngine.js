@@ -4,17 +4,46 @@
  * ============================================================
  */
 
-    
+
 /*
  * ============================================================
- * QUERY RESULT COMPARISON
+ * ROBUST QUERY RESULT VALIDATION
  * ============================================================
+ *
+ * The SQL approach does NOT matter.
+ *
+ * We only validate whether the user's query
+ * produces the correct result table.
+ *
+ * Handles:
+ *
+ * - Different row order
+ * - Different column order
+ * - Upper/lower case differences in strings
+ * - Extra whitespace
+ * - 50000 vs 50000.0
+ * - NULL values
+ * - Different SQL approaches
+ *
+ * Example:
+ *
+ * JOIN
+ * Subquery
+ * EXISTS
+ * IN
+ * CTE
+ *
+ * can all be accepted if they produce
+ * the same logical result.
  */
 
-function compareQueryResults(actualRows, expectedRows) {
+function compareQueryResults(
+    actualRows,
+    expectedRows
+) {
 
     /*
-     * Both results must be arrays.
+     * Both must be arrays.
      */
     if (
         !Array.isArray(actualRows) ||
@@ -27,7 +56,7 @@ function compareQueryResults(actualRows, expectedRows) {
 
 
     /*
-     * Same number of rows required.
+     * Same number of rows.
      */
     if (
         actualRows.length !==
@@ -40,43 +69,54 @@ function compareQueryResults(actualRows, expectedRows) {
 
 
     /*
-     * Convert a value into a
-     * comparison-friendly format.
+     * ========================================================
+     * NORMALIZE VALUE
+     * ========================================================
      */
+
     function normalizeValue(value) {
 
+        /*
+         * NULL
+         */
         if (
             value === null ||
             value === undefined
         ) {
 
-            return null;
+            return "__NULL__";
 
         }
 
 
         /*
-         * Numbers:
+         * Numbers
          *
          * 50000
          * 50000.0
+         * 5e4
          *
-         * are treated as the same.
+         * become the same numeric value.
          */
         if (
             typeof value === "number"
         ) {
 
-            return Number(value);
+            return String(
+                Number(value)
+            );
 
         }
 
 
         /*
-         * Strings:
+         * Strings
          *
-         * Remove unnecessary spaces
-         * and ignore capitalization.
+         * Ignore:
+         *
+         * - leading spaces
+         * - trailing spaces
+         * - capitalization
          */
         return String(value)
             .trim()
@@ -86,19 +126,28 @@ function compareQueryResults(actualRows, expectedRows) {
 
 
     /*
-     * Normalize a complete row.
+     * ========================================================
+     * NORMALIZE ROW
+     * ========================================================
      *
-     * IMPORTANT:
-     * Column names are included so that
-     * different aliases do not accidentally
-     * produce a false match.
+     * Column names are included so that:
+     *
+     * customer_name
+     *
+     * and
+     *
+     * balance
+     *
+     * cannot accidentally be confused.
      */
+
     function normalizeRow(row) {
 
         return Object.keys(row)
             .map(function (column) {
 
                 return {
+
                     column:
                         String(column)
                             .trim()
@@ -124,8 +173,11 @@ function compareQueryResults(actualRows, expectedRows) {
 
 
     /*
-     * Normalize all rows.
+     * ========================================================
+     * NORMALIZE ALL ROWS
+     * ========================================================
      */
+
     const actualNormalized =
         actualRows.map(
             normalizeRow
@@ -138,21 +190,27 @@ function compareQueryResults(actualRows, expectedRows) {
 
 
     /*
-     * Sort rows.
+     * ========================================================
+     * SORT ROWS
+     * ========================================================
      *
-     * This makes row order irrelevant.
+     * SQL does not guarantee row order unless
+     * ORDER BY is explicitly used.
      *
-     * Example:
+     * Therefore:
      *
      * Rahul
      * Priya
      *
-     * is considered the same as:
+     * and:
      *
      * Priya
      * Rahul
+     *
+     * are considered equivalent.
      */
-    function rowSort(a, b) {
+
+    function sortRows(a, b) {
 
         return JSON.stringify(a)
             .localeCompare(
@@ -163,17 +221,20 @@ function compareQueryResults(actualRows, expectedRows) {
 
 
     actualNormalized.sort(
-        rowSort
+        sortRows
     );
 
     expectedNormalized.sort(
-        rowSort
+        sortRows
     );
 
 
     /*
-     * Final comparison.
+     * ========================================================
+     * FINAL COMPARISON
+     * ========================================================
      */
+
     const actualJson =
         JSON.stringify(
             actualNormalized
@@ -185,17 +246,31 @@ function compareQueryResults(actualRows, expectedRows) {
         );
 
 
-    const result =
+    const isCorrect =
         actualJson === expectedJson;
 
 
     /*
-     * Debug information.
+     * ========================================================
+     * DEBUG INFORMATION
+     * ========================================================
      *
-     * We can remove this later.
+     * Keep this for now while testing.
+     * We can remove it later.
      */
+
     console.log(
         "========== QUERY VALIDATION =========="
+    );
+
+    console.log(
+        "Actual rows:",
+        actualRows
+    );
+
+    console.log(
+        "Expected rows:",
+        expectedRows
     );
 
     console.log(
@@ -210,7 +285,7 @@ function compareQueryResults(actualRows, expectedRows) {
 
     console.log(
         "Validation result:",
-        result
+        isCorrect
     );
 
     console.log(
@@ -218,38 +293,11 @@ function compareQueryResults(actualRows, expectedRows) {
     );
 
 
-    return result;
+    return isCorrect;
 
 }
 
-/*
- * ============================================================
- * VALUE NORMALIZATION
- * ============================================================
- */
 
-function normalizeValue(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return null;
-
-    }
-
-    if (
-        typeof value === "number"
-    ) {
-
-        return value;
-
-    }
-
-    return String(value).trim();
-
-}
 
 
 /*
