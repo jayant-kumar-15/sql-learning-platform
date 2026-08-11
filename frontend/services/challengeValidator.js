@@ -362,3 +362,7 @@ const challengeValidator = {
 
 window.challengeValidator =
     challengeValidator;
+
+console.log(
+    "✅ challengeValidator.js loaded successfully"
+);
