@@ -4,22 +4,6 @@
  * ============================================================
  */
 
-function compareQueryResults(actualRows, expectedRows) {
-
-    if (
-        !Array.isArray(actualRows) ||
-        !Array.isArray(expectedRows)
-    ) {
-        return false;
-    }
-
-    /*
-     * Different number of rows = incorrect
-     */
-    if (actualRows.length !== expectedRows.length) {
-        return false;
-    }
-
     
 /*
  * ============================================================
@@ -937,4 +921,4 @@ window.browserSqlEngine =
     browserSqlEngine;
 
 window.preloadChallengeDatabase =
-    preloadChallengeDatabase ;
+    preloadChallengeDatabase;
