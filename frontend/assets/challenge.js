@@ -1540,7 +1540,10 @@ if (runButton) {
                 currentQuestion.database,
 
             expectedOutput:
-                currentQuestion.expectedOutput
+                currentQuestion.expectedOutput,
+
+            challenge:
+                currentQuestion
         }
     );
 
