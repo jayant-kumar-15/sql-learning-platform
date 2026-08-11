@@ -1484,9 +1484,7 @@ if (runButton) {
         async function () {
 
             if (!currentQuestion) {
-
                 return;
-
             }
 
 
@@ -1502,13 +1500,53 @@ if (runButton) {
                 );
 
 
+            const resultsContainer =
+                document.getElementById(
+                    "query-results-container"
+                );
+
+
             const userQuery =
                 sqlEditor.value.trim();
 
 
-            queryResultStatus.textContent =
-                "";
+            /*
+             * ====================================================
+             * CLEAR PREVIOUS RESULT STATE
+             * ====================================================
+             *
+             * Important when running another query
+             * without refreshing the browser.
+             */
 
+            queryResultStatus.textContent = "";
+
+            queryResultStatus.className =
+                "query-result-status";
+
+
+            if (resultsContainer) {
+
+                /*
+                 * Remove the previous result table/content.
+                 */
+                resultsContainer.innerHTML = "";
+
+                /*
+                 * Show the container again because
+                 * the previous query may have hidden it.
+                 */
+                resultsContainer.style.display =
+                    "block";
+
+            }
+
+
+            /*
+             * ====================================================
+             * VALIDATE QUERY
+             * ====================================================
+             */
 
             if (
                 userQuery === ""
@@ -1522,9 +1560,14 @@ if (runButton) {
             }
 
 
+            /*
+             * ====================================================
+             * DISABLE RUN BUTTON
+             * ====================================================
+             */
+
             runButton.disabled =
                 true;
-
 
             runButton.textContent =
                 "⏳ Running...";
@@ -1532,26 +1575,49 @@ if (runButton) {
 
             try {
 
+                /*
+                 * =================================================
+                 * EXECUTE QUERY
+                 * =================================================
+                 */
+
                 const data =
-    await sqlEngine.execute(
-        userQuery,
-        {
-            database:
-                currentQuestion.database,
+                    await sqlEngine.execute(
+                        userQuery,
+                        {
 
-            expectedOutput:
-                currentQuestion.expectedOutput,
+                            database:
+                                currentQuestion.database,
 
-            challenge:
-                currentQuestion
-        }
-    );
+                            expectedOutput:
+                                currentQuestion.expectedOutput,
 
+                            challenge:
+                                currentQuestion
+
+                        }
+                    );
+
+
+                /*
+                 * =================================================
+                 * DISPLAY NEW RESULTS
+                 * =================================================
+                 *
+                 * This must completely replace the previous
+                 * query's results.
+                 */
 
                 displayQueryResults(
                     data
                 );
 
+
+                /*
+                 * =================================================
+                 * CHECK CORRECTNESS
+                 * =================================================
+                 */
 
                 if (
                     data.isCorrect ===
@@ -1582,12 +1648,17 @@ if (runButton) {
                     );
 
 
+                    /*
+                     * Reload question list.
+                     */
                     loadQuestions(
                         currentQuestionList
                     );
 
 
-                } else {
+                }
+
+                else {
 
                     queryResultStatus.textContent =
                         "❌ Query executed successfully, but the result is incorrect. Try again.";
@@ -1599,15 +1670,21 @@ if (runButton) {
                 }
 
 
-            } catch (error) {
+            }
 
-                const resultsContainer =
-                    document.getElementById(
-                        "query-results-container"
-                    );
+            catch (error) {
 
+                /*
+                 * Hide result container when
+                 * query execution fails.
+                 */
 
-                if (resultsContainer) {
+                if (
+                    resultsContainer
+                ) {
+
+                    resultsContainer.innerHTML =
+                        "";
 
                     resultsContainer.style.display =
                         "none";
@@ -1623,11 +1700,13 @@ if (runButton) {
                 queryResultStatus.className =
                     "query-result-status error";
 
-            } finally {
+            }
+
+
+            finally {
 
                 runButton.disabled =
                     false;
-
 
                 runButton.textContent =
                     "▶️ Run Query";
