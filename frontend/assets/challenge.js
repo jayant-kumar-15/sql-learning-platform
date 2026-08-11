@@ -1472,251 +1472,178 @@ window.updateScoreBoard =
     };
 
 
+
 /* ============================================================
- * QUERY EXECUTION
- * ============================================================
- */
+
+QUERY EXECUTION
+
+============================================================
+*/
+
 
 if (runButton) {
 
-    runButton.addEventListener(
-        "click",
-        async function () {
+runButton.addEventListener(    
+    "click",    
+    async function () {    
 
-            if (!currentQuestion) {
-                return;
-            }
+        if (!currentQuestion) {    
 
+            return;    
 
-            const sqlEditor =
-                document.getElementById(
-                    "sql-editor"
-                );
+        }    
 
 
-            const queryResultStatus =
-                document.getElementById(
-                    "query-result-status"
-                );
+        const sqlEditor =    
+            document.getElementById(    
+                "sql-editor"    
+            );    
 
 
-            const resultsContainer =
-                document.getElementById(
-                    "query-results-container"
-                );
+        const queryResultStatus =    
+            document.getElementById(    
+                "query-result-status"    
+            );    
 
 
-            const userQuery =
-                sqlEditor.value.trim();
+        const userQuery =    
+            sqlEditor.value.trim();    
 
 
-            /*
-             * ====================================================
-             * CLEAR PREVIOUS RESULT STATE
-             * ====================================================
-             *
-             * Important when running another query
-             * without refreshing the browser.
-             */
+        queryResultStatus.textContent =    
+            "";    
 
-            queryResultStatus.textContent = "";
 
-            queryResultStatus.className =
-                "query-result-status";
+        if (    
+            userQuery === ""    
+        ) {    
 
+            queryResultStatus.textContent =    
+                "❌ Please enter a SQL query.";    
 
-            if (resultsContainer) {
+            return;    
 
-                /*
-                 * Remove the previous result table/content.
-                 */
-                resultsContainer.innerHTML = "";
+        }    
 
-                /*
-                 * Show the container again because
-                 * the previous query may have hidden it.
-                 */
-                resultsContainer.style.display =
-                    "block";
 
-            }
+        runButton.disabled =    
+            true;    
 
 
-            /*
-             * ====================================================
-             * VALIDATE QUERY
-             * ====================================================
-             */
+        runButton.textContent =    
+            "⏳ Running...";    
 
-            if (
-                userQuery === ""
-            ) {
 
-                queryResultStatus.textContent =
-                    "❌ Please enter a SQL query.";
+        try {    
 
-                return;
+            const data =    
+await sqlEngine.execute(    
+    userQuery,    
+    {    
+        database:    
+            currentQuestion.database,    
 
-            }
+        expectedOutput:    
+            currentQuestion.expectedOutput,    
 
+        challenge:    
+            currentQuestion    
+    }    
+);    
 
-            /*
-             * ====================================================
-             * DISABLE RUN BUTTON
-             * ====================================================
-             */
 
-            runButton.disabled =
-                true;
+            displayQueryResults(    
+                data    
+            );    
 
-            runButton.textContent =
-                "⏳ Running...";
 
+            if (    
+                data.isCorrect ===    
+                true    
+            ) {    
 
-            try {
+                currentQuestion.status =    
+                    "completed";    
 
-                /*
-                 * =================================================
-                 * EXECUTE QUERY
-                 * =================================================
-                 */
 
-                const data =
-                    await sqlEngine.execute(
-                        userQuery,
-                        {
+                saveDifficultyProgress(    
+                    currentQuestion.difficulty    
+                );    
 
-                            database:
-                                currentQuestion.database,
 
-                            expectedOutput:
-                                currentQuestion.expectedOutput,
+                queryResultStatus.textContent =    
+                    "✅ Correct answer! +" +    
+                    currentQuestion.points +    
+                    " points";    
 
-                            challenge:
-                                currentQuestion
 
-                        }
-                    );
+                queryResultStatus.className =    
+                    "query-result-status success";    
 
 
-                /*
-                 * =================================================
-                 * DISPLAY NEW RESULTS
-                 * =================================================
-                 *
-                 * This must completely replace the previous
-                 * query's results.
-                 */
+                window.updateScoreBoard(    
+                    allChallenges    
+                );    
 
-                displayQueryResults(
-                    data
-                );
 
+                loadQuestions(    
+                    currentQuestionList    
+                );    
 
-                /*
-                 * =================================================
-                 * CHECK CORRECTNESS
-                 * =================================================
-                 */
 
-                if (
-                    data.isCorrect ===
-                    true
-                ) {
+            } else {    
 
-                    currentQuestion.status =
-                        "completed";
+                queryResultStatus.textContent =    
+                    "❌ Query executed successfully, but the result is incorrect. Try again.";    
 
 
-                    saveDifficultyProgress(
-                        currentQuestion.difficulty
-                    );
+                queryResultStatus.className =    
+                    "query-result-status error";    
 
+            }    
 
-                    queryResultStatus.textContent =
-                        "✅ Correct answer! +" +
-                        currentQuestion.points +
-                        " points";
 
+        } catch (error) {    
 
-                    queryResultStatus.className =
-                        "query-result-status success";
+            const resultsContainer =    
+                document.getElementById(    
+                    "query-results-container"    
+                );    
 
 
-                    window.updateScoreBoard(
-                        allChallenges
-                    );
+            if (resultsContainer) {    
 
+                resultsContainer.style.display =    
+                    "none";    
 
-                    /*
-                     * Reload question list.
-                     */
-                    loadQuestions(
-                        currentQuestionList
-                    );
+            }    
 
 
-                }
+            queryResultStatus.textContent =    
+                "❌ " +    
+                error.message;    
 
-                else {
 
-                    queryResultStatus.textContent =
-                        "❌ Query executed successfully, but the result is incorrect. Try again.";
+            queryResultStatus.className =    
+                "query-result-status error";    
 
+        } finally {    
 
-                    queryResultStatus.className =
-                        "query-result-status error";
+            runButton.disabled =    
+                false;    
 
-                }
 
+            runButton.textContent =    
+                "▶️ Run Query";    
 
-            }
+        }    
 
-            catch (error) {
-
-                /*
-                 * Hide result container when
-                 * query execution fails.
-                 */
-
-                if (
-                    resultsContainer
-                ) {
-
-                    resultsContainer.innerHTML =
-                        "";
-
-                    resultsContainer.style.display =
-                        "none";
-
-                }
-
-
-                queryResultStatus.textContent =
-                    "❌ " +
-                    error.message;
-
-
-                queryResultStatus.className =
-                    "query-result-status error";
-
-            }
-
-
-            finally {
-
-                runButton.disabled =
-                    false;
-
-                runButton.textContent =
-                    "▶️ Run Query";
-
-            }
-
-        }
-    );
+    }    
+);
 
 }
+
+
 
 
 /* ============================================================
