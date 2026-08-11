@@ -3,36 +3,63 @@
  * CHALLENGE VALIDATOR
  * ============================================================
  *
- * Central validation layer for fixed challenge questions.
+ * Central validation layer for challenge questions.
  *
  * Supported validation types:
  *
  * RESULT
- * DATABASE_STATE
+ * ORDERED_RESULT
  * ROW_COUNT
+ * DATABASE_STATE
  * CUSTOM
  *
- * RESULT:
- *   Used mainly for SELECT questions.
  *
- * DATABASE_STATE:
- *   Will be used later for INSERT / UPDATE / DELETE.
+ * RESULT
+ * ------------------------------------------------------------
+ * Used mainly for SELECT questions.
  *
- * ROW_COUNT:
- *   Used when the challenge cares about affected rows.
+ * Row order does NOT matter.
  *
- * CUSTOM:
- *   Reserved for special challenge-specific validation.
+ * Example:
+ *
+ * Rahul | 60000
+ * Priya | 70000
+ *
+ * is equivalent to:
+ *
+ * Priya | 70000
+ * Rahul | 60000
+ *
+ *
+ * ORDERED_RESULT
+ * ------------------------------------------------------------
+ * Used when row order is intentionally important.
+ *
+ *
+ * ROW_COUNT
+ * ------------------------------------------------------------
+ * Used when only the number of returned rows matters.
+ *
+ *
+ * DATABASE_STATE
+ * ------------------------------------------------------------
+ * Used later for INSERT / UPDATE / DELETE challenges.
+ *
+ *
+ * CUSTOM
+ * ------------------------------------------------------------
+ * Reserved for special challenge-specific validation.
  * ============================================================
  */
+
 
 const challengeValidator = {
 
 
     /*
-     * ========================================================
+     * ============================================================
      * MAIN VALIDATION FUNCTION
-     * ========================================================
+     * ============================================================
      */
 
     validate(
@@ -41,7 +68,9 @@ const challengeValidator = {
     ) {
 
         /*
-         * Basic validation.
+         * --------------------------------------------------------
+         * BASIC VALIDATION
+         * --------------------------------------------------------
          */
 
         if (!challenge) {
@@ -63,16 +92,24 @@ const challengeValidator = {
 
 
         /*
-         * Determine validation type.
+         * --------------------------------------------------------
+         * DETERMINE VALIDATION TYPE
+         * --------------------------------------------------------
          *
-         * Existing questions that don't have
-         * validationType will automatically
-         * behave as RESULT questions.
+         * Existing questions without validationType
+         * automatically use RESULT.
+         *
+         * This means we do NOT need to update all
+         * existing challenge JSON files immediately.
          */
 
         const validationType =
-            challenge.validationType ||
-            "RESULT";
+            String(
+                challenge.validationType ||
+                "RESULT"
+            )
+            .trim()
+            .toUpperCase();
 
 
         console.log(
@@ -81,10 +118,16 @@ const challengeValidator = {
         );
 
 
+        console.log(
+            "📝 Challenge ID:",
+            challenge.id
+        );
+
+
         /*
-         * ====================================================
-         * RESULT VALIDATION
-         * ====================================================
+         * ========================================================
+         * RESULT
+         * ========================================================
          */
 
         if (
@@ -92,18 +135,57 @@ const challengeValidator = {
             "RESULT"
         ) {
 
-            return this.validateResult(
-                challenge,
-                actualResult
+            const result =
+                this.validateResult(
+                    challenge,
+                    actualResult
+                );
+
+
+            console.log(
+                "🎯 RESULT validation:",
+                result
             );
+
+
+            return result;
 
         }
 
 
         /*
-         * ====================================================
-         * ROW COUNT VALIDATION
-         * ====================================================
+         * ========================================================
+         * ORDERED RESULT
+         * ========================================================
+         */
+
+        if (
+            validationType ===
+            "ORDERED_RESULT"
+        ) {
+
+            const result =
+                this.validateOrderedResult(
+                    challenge,
+                    actualResult
+                );
+
+
+            console.log(
+                "🎯 ORDERED_RESULT validation:",
+                result
+            );
+
+
+            return result;
+
+        }
+
+
+        /*
+         * ========================================================
+         * ROW COUNT
+         * ========================================================
          */
 
         if (
@@ -111,21 +193,28 @@ const challengeValidator = {
             "ROW_COUNT"
         ) {
 
-            return this.validateRowCount(
-                challenge,
-                actualResult
+            const result =
+                this.validateRowCount(
+                    challenge,
+                    actualResult
+                );
+
+
+            console.log(
+                "🎯 ROW_COUNT validation:",
+                result
             );
+
+
+            return result;
 
         }
 
 
         /*
-         * ====================================================
+         * ========================================================
          * DATABASE STATE
-         * ====================================================
-         *
-         * This will be expanded when we implement
-         * INSERT / UPDATE / DELETE challenges.
+         * ========================================================
          */
 
         if (
@@ -133,18 +222,28 @@ const challengeValidator = {
             "DATABASE_STATE"
         ) {
 
-            return this.validateDatabaseState(
-                challenge,
-                actualResult
+            const result =
+                this.validateDatabaseState(
+                    challenge,
+                    actualResult
+                );
+
+
+            console.log(
+                "🎯 DATABASE_STATE validation:",
+                result
             );
+
+
+            return result;
 
         }
 
 
         /*
-         * ====================================================
-         * CUSTOM VALIDATION
-         * ====================================================
+         * ========================================================
+         * CUSTOM
+         * ========================================================
          */
 
         if (
@@ -152,16 +251,31 @@ const challengeValidator = {
             "CUSTOM"
         ) {
 
-            return this.validateCustom(
-                challenge,
-                actualResult
+            const result =
+                this.validateCustom(
+                    challenge,
+                    actualResult
+                );
+
+
+            console.log(
+                "🎯 CUSTOM validation:",
+                result
             );
+
+
+            return result;
 
         }
 
 
         /*
-         * Unknown validation type.
+         * ========================================================
+         * UNKNOWN VALIDATION TYPE
+         * ========================================================
+         *
+         * For safety we don't automatically mark an
+         * unknown validation type as correct.
          */
 
         console.error(
@@ -176,16 +290,25 @@ const challengeValidator = {
 
 
     /*
-     * ========================================================
+     * ============================================================
      * RESULT VALIDATION
-     * ========================================================
+     * ============================================================
      *
-     * Used for SELECT challenges.
+     * This is our primary SELECT validator.
      *
-     * The browserSqlEngine already performs
-     * robust result comparison.
+     * The browserSqlEngine already performs robust comparison.
      *
-     * We simply use its result here.
+     * Therefore:
+     *
+     * JOIN
+     * SUBQUERY
+     * EXISTS
+     * IN
+     * CTE
+     * UNION
+     *
+     * can all be accepted when they produce the same
+     * logical result.
      */
 
     validateResult(
@@ -194,8 +317,9 @@ const challengeValidator = {
     ) {
 
         /*
-         * If browserSqlEngine has already
-         * calculated isCorrect, use it.
+         * --------------------------------------------------------
+         * Use browserSqlEngine result when available.
+         * --------------------------------------------------------
          */
 
         if (
@@ -209,7 +333,9 @@ const challengeValidator = {
 
 
         /*
-         * Otherwise compare directly.
+         * --------------------------------------------------------
+         * Direct fallback comparison.
+         * --------------------------------------------------------
          */
 
         if (
@@ -229,11 +355,14 @@ const challengeValidator = {
 
 
         /*
-         * No expected result available.
+         * --------------------------------------------------------
+         * Missing expected output.
+         * --------------------------------------------------------
          */
 
         console.warn(
-            "⚠️ RESULT validation requested but expectedOutput is missing."
+            "⚠️ RESULT validation requested but expectedOutput is missing.",
+            challenge.id
         );
 
 
@@ -243,20 +372,242 @@ const challengeValidator = {
 
 
     /*
-     * ========================================================
+     * ============================================================
+     * ORDERED RESULT VALIDATION
+     * ============================================================
+     *
+     * Unlike RESULT validation, this validator DOES care
+     * about row order.
+     *
+     * This can be used for questions such as:
+     *
+     * "Display the top 5 customers ordered by balance DESC."
+     *
+     * ============================================================
+     */
+
+    validateOrderedResult(
+        challenge,
+        actualResult
+    ) {
+
+        if (
+            !Array.isArray(
+                challenge.expectedOutput
+            )
+        ) {
+
+            console.warn(
+                "⚠️ ORDERED_RESULT requires expectedOutput."
+            );
+
+            return false;
+
+        }
+
+
+        const actualRows =
+            Array.isArray(
+                actualResult.rows
+            )
+                ? actualResult.rows
+                : [];
+
+
+        const expectedRows =
+            challenge.expectedOutput;
+
+
+        /*
+         * Same number of rows.
+         */
+
+        if (
+            actualRows.length !==
+            expectedRows.length
+        ) {
+
+            return false;
+
+        }
+
+
+        /*
+         * Normalize values.
+         */
+
+        function normalizeValue(value) {
+
+            if (
+                value === null ||
+                value === undefined
+            ) {
+
+                return "__NULL__";
+
+            }
+
+
+            if (
+                typeof value === "number"
+            ) {
+
+                return String(
+                    Number(value)
+                );
+
+            }
+
+
+            return String(value)
+                .trim()
+                .toLowerCase();
+
+        }
+
+
+        /*
+         * Compare row-by-row.
+         */
+
+        for (
+            let i = 0;
+            i < expectedRows.length;
+            i++
+        ) {
+
+            const actualRow =
+                actualRows[i];
+
+
+            const expectedRow =
+                expectedRows[i];
+
+
+            const actualColumns =
+                Object.keys(
+                    actualRow
+                )
+                .map(function (column) {
+
+                    return String(column)
+                        .trim()
+                        .toLowerCase();
+
+                })
+                .sort();
+
+
+            const expectedColumns =
+                Object.keys(
+                    expectedRow
+                )
+                .map(function (column) {
+
+                    return String(column)
+                        .trim()
+                        .toLowerCase();
+
+                })
+                .sort();
+
+
+            /*
+             * Same columns required.
+             */
+
+            if (
+                JSON.stringify(
+                    actualColumns
+                ) !==
+                JSON.stringify(
+                    expectedColumns
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            /*
+             * Compare values by column.
+             */
+
+            for (
+                const expectedColumn
+                of Object.keys(expectedRow)
+            ) {
+
+                let actualColumn =
+                    Object.keys(actualRow)
+                        .find(function (column) {
+
+                            return String(column)
+                                .trim()
+                                .toLowerCase() ===
+                                String(expectedColumn)
+                                    .trim()
+                                    .toLowerCase();
+
+                        });
+
+
+                if (
+                    actualColumn ===
+                    undefined
+                ) {
+
+                    return false;
+
+                }
+
+
+                const actualValue =
+                    normalizeValue(
+                        actualRow[
+                            actualColumn
+                        ]
+                    );
+
+
+                const expectedValue =
+                    normalizeValue(
+                        expectedRow[
+                            expectedColumn
+                        ]
+                    );
+
+
+                if (
+                    actualValue !==
+                    expectedValue
+                ) {
+
+                    return false;
+
+                }
+
+            }
+
+        }
+
+
+        return true;
+
+    },
+
+
+    /*
+     * ============================================================
      * ROW COUNT VALIDATION
-     * ========================================================
+     * ============================================================
      */
 
     validateRowCount(
         challenge,
         actualResult
     ) {
-
-        /*
-         * Expected row count can be defined
-         * in the challenge JSON.
-         */
 
         const expectedRowCount =
             Number(
@@ -266,9 +617,20 @@ const challengeValidator = {
 
         const actualRowCount =
             Number(
-                actualResult.rowCount || 0
+                actualResult.rowCount ||
+                (
+                    Array.isArray(
+                        actualResult.rows
+                    )
+                        ? actualResult.rows.length
+                        : 0
+                )
             );
 
+
+        /*
+         * Validate configuration.
+         */
 
         if (
             Number.isNaN(
@@ -277,7 +639,8 @@ const challengeValidator = {
         ) {
 
             console.warn(
-                "⚠️ expectedRowCount is missing."
+                "⚠️ expectedRowCount is missing.",
+                challenge.id
             );
 
             return false;
@@ -294,14 +657,20 @@ const challengeValidator = {
 
 
     /*
-     * ========================================================
+     * ============================================================
      * DATABASE STATE VALIDATION
-     * ========================================================
+     * ============================================================
      *
-     * Placeholder for INSERT / UPDATE /
-     * DELETE challenge validation.
+     * Reserved for:
      *
-     * We will implement this properly next.
+     * INSERT
+     * UPDATE
+     * DELETE
+     *
+     * challenges.
+     *
+     * We will connect this to the browser SQLite database
+     * after the SELECT challenge system is fully stable.
      */
 
     validateDatabaseState(
@@ -315,12 +684,15 @@ const challengeValidator = {
 
 
         /*
-         * For now we don't automatically
-         * mark it correct.
-         *
-         * The next step will inspect the
-         * actual SQLite database state.
+         * We intentionally do NOT mark this
+         * as correct yet.
          */
+
+        console.warn(
+            "⚠️ DATABASE_STATE validator is not implemented yet.",
+            challenge.id
+        );
+
 
         return false;
 
@@ -328,9 +700,11 @@ const challengeValidator = {
 
 
     /*
-     * ========================================================
+     * ============================================================
      * CUSTOM VALIDATION
-     * ========================================================
+     * ============================================================
+     *
+     * Reserved for special challenge types.
      */
 
     validateCustom(
@@ -343,9 +717,11 @@ const challengeValidator = {
         );
 
 
-        /*
-         * Reserved for special questions.
-         */
+        console.warn(
+            "⚠️ CUSTOM validator has no rule configured.",
+            challenge.id
+        );
+
 
         return false;
 
@@ -362,6 +738,7 @@ const challengeValidator = {
 
 window.challengeValidator =
     challengeValidator;
+
 
 console.log(
     "✅ challengeValidator.js loaded successfully"
