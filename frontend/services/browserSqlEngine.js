@@ -1,40 +1,52 @@
 /*
  * ============================================================
- * QUERY RESULT COMPARISON
- * ============================================================
- */
-
-
-/*
- * ============================================================
  * ROBUST QUERY RESULT VALIDATION
  * ============================================================
  *
  * The SQL approach does NOT matter.
  *
- * We only validate whether the user's query
- * produces the correct result table.
+ * We validate the logical result produced by
+ * the user's SQL query.
  *
- * Handles:
+ * Supported:
  *
+ * - JOIN
+ * - SUBQUERY
+ * - EXISTS
+ * - IN
+ * - CTE
  * - Different row order
  * - Different column order
- * - Upper/lower case differences in strings
- * - Extra whitespace
- * - 50000 vs 50000.0
+ * - Different column aliases
+ * - String case differences
+ * - Leading/trailing spaces
+ * - Numeric representation differences
  * - NULL values
- * - Different SQL approaches
+ * - Duplicate rows
  *
  * Example:
  *
- * JOIN
- * Subquery
- * EXISTS
- * IN
- * CTE
+ * User:
  *
- * can all be accepted if they produce
+ * SELECT c.customer_name, a.balance
+ * FROM customers c
+ * JOIN accounts a
+ *   ON c.customer_id = a.customer_id
+ * WHERE a.balance > 50000;
+ *
+ * and another valid solution:
+ *
+ * SELECT customer_name, balance
+ * FROM customers
+ * WHERE customer_id IN (
+ *     SELECT customer_id
+ *     FROM accounts
+ *     WHERE balance > 50000
+ * );
+ *
+ * can both be accepted when they produce
  * the same logical result.
+ * ============================================================
  */
 
 function compareQueryResults(
@@ -43,8 +55,11 @@ function compareQueryResults(
 ) {
 
     /*
-     * Both must be arrays.
+     * ========================================================
+     * BASIC VALIDATION
+     * ========================================================
      */
+
     if (
         !Array.isArray(actualRows) ||
         !Array.isArray(expectedRows)
@@ -56,12 +71,44 @@ function compareQueryResults(
 
 
     /*
-     * Same number of rows.
+     * Empty result sets.
+     *
+     * If both are empty, the query produced
+     * the expected result.
      */
+
+    if (
+        actualRows.length === 0 &&
+        expectedRows.length === 0
+    ) {
+
+        console.log(
+            "✅ Both actual and expected results are empty."
+        );
+
+        return true;
+
+    }
+
+
+    /*
+     * Different number of rows means the
+     * logical result is different.
+     *
+     * This also preserves duplicate rows.
+     */
+
     if (
         actualRows.length !==
         expectedRows.length
     ) {
+
+        console.log(
+            "❌ Row count mismatch:",
+            actualRows.length,
+            "vs",
+            expectedRows.length
+        );
 
         return false;
 
@@ -70,193 +117,654 @@ function compareQueryResults(
 
     /*
      * ========================================================
-     * NORMALIZE VALUE
+     * VALUE NORMALIZATION
      * ========================================================
      */
 
     function normalizeValue(value) {
 
         /*
-         * NULL
+         * NULL values.
          */
+
         if (
             value === null ||
             value === undefined
         ) {
 
-            return "__NULL__";
+            return {
+                type: "null",
+                value: null
+            };
 
         }
 
 
         /*
-         * Numbers
+         * Boolean values.
+         */
+
+        if (
+            typeof value === "boolean"
+        ) {
+
+            return {
+                type: "boolean",
+                value: value
+            };
+
+        }
+
+
+        /*
+         * Numbers.
+         *
+         * Convert everything to Number so:
          *
          * 50000
          * 50000.0
-         * 5e4
+         * "50000"
          *
-         * become the same numeric value.
+         * can be treated as the same value.
          */
+
         if (
             typeof value === "number"
         ) {
 
-            return String(
-                Number(value)
+            if (
+                Number.isNaN(value)
+            ) {
+
+                return {
+                    type: "nan",
+                    value: "nan"
+                };
+
+            }
+
+            return {
+                type: "number",
+                value: Number(value)
+            };
+
+        }
+
+
+        /*
+         * Strings.
+         */
+
+        const stringValue =
+            String(value)
+                .trim();
+
+
+        /*
+         * Empty strings.
+         */
+
+        if (
+            stringValue === ""
+        ) {
+
+            return {
+                type: "string",
+                value: ""
+            };
+
+        }
+
+
+        /*
+         * If a string represents a number,
+         * treat it as a number.
+         *
+         * Examples:
+         *
+         * "50000"
+         * "50000.0"
+         * "5e4"
+         */
+
+        const numericValue =
+            Number(stringValue);
+
+
+        if (
+            !Number.isNaN(numericValue) &&
+            stringValue !== ""
+        ) {
+
+            return {
+                type: "number",
+                value: numericValue
+            };
+
+        }
+
+
+        /*
+         * Normal text.
+         *
+         * Ignore capitalization and
+         * surrounding whitespace.
+         */
+
+        return {
+            type: "string",
+            value:
+                stringValue
+                    .toLowerCase()
+        };
+
+    }
+
+
+    /*
+     * ========================================================
+     * VALUES ARE EQUAL
+     * ========================================================
+     */
+
+    function valuesEqual(
+        actualValue,
+        expectedValue
+    ) {
+
+        const actual =
+            normalizeValue(
+                actualValue
+            );
+
+        const expected =
+            normalizeValue(
+                expectedValue
+            );
+
+
+        /*
+         * NULL.
+         */
+
+        if (
+            actual.type === "null" &&
+            expected.type === "null"
+        ) {
+
+            return true;
+
+        }
+
+
+        /*
+         * Different NULL/non-NULL values.
+         */
+
+        if (
+            actual.type === "null" ||
+            expected.type === "null"
+        ) {
+
+            return false;
+
+        }
+
+
+        /*
+         * Numeric comparison.
+         *
+         * Small floating-point differences
+         * are tolerated.
+         */
+
+        if (
+            actual.type === "number" &&
+            expected.type === "number"
+        ) {
+
+            return (
+                Math.abs(
+                    actual.value -
+                    expected.value
+                ) < 0.000001
             );
 
         }
 
 
         /*
-         * Strings
-         *
-         * Ignore:
-         *
-         * - leading spaces
-         * - trailing spaces
-         * - capitalization
+         * Boolean comparison.
          */
-        return String(value)
-            .trim()
-            .toLowerCase();
+
+        if (
+            actual.type === "boolean" &&
+            expected.type === "boolean"
+        ) {
+
+            return (
+                actual.value ===
+                expected.value
+            );
+
+        }
+
+
+        /*
+         * String comparison.
+         */
+
+        return (
+            String(actual.value) ===
+            String(expected.value)
+        );
 
     }
 
 
     /*
      * ========================================================
-     * NORMALIZE ROW
+     * ROW HELPERS
+     * ========================================================
+     */
+
+    function getColumns(row) {
+
+        return Object.keys(row);
+
+    }
+
+
+    /*
+     * ========================================================
+     * EXACT COLUMN-NAME MATCH
      * ========================================================
      *
-     * Column names are included so that:
+     * First attempt:
+     *
+     * customer_name -> customer_name
+     * balance       -> balance
+     *
+     * This is the safest comparison.
+     */
+
+    function compareRowsByColumnName(
+        actualRow,
+        expectedRow
+    ) {
+
+        const actualColumns =
+            getColumns(
+                actualRow
+            );
+
+        const expectedColumns =
+            getColumns(
+                expectedRow
+            );
+
+
+        /*
+         * Number of columns must match.
+         */
+
+        if (
+            actualColumns.length !==
+            expectedColumns.length
+        ) {
+
+            return false;
+
+        }
+
+
+        /*
+         * Every expected column must exist.
+         */
+
+        for (
+            let i = 0;
+            i < expectedColumns.length;
+            i++
+        ) {
+
+            const expectedColumn =
+                expectedColumns[i];
+
+
+            const matchingActualColumn =
+                actualColumns.find(
+                    function (actualColumn) {
+
+                        return (
+                            String(actualColumn)
+                                .trim()
+                                .toLowerCase() ===
+                            String(expectedColumn)
+                                .trim()
+                                .toLowerCase()
+                        );
+
+                    }
+                );
+
+
+            if (
+                !matchingActualColumn
+            ) {
+
+                return false;
+
+            }
+
+
+            if (
+                !valuesEqual(
+                    actualRow[
+                        matchingActualColumn
+                    ],
+                    expectedRow[
+                        expectedColumn
+                    ]
+                )
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
+    }
+
+
+    /*
+     * ========================================================
+     * COLUMN-ORDER / ALIAS-TOLERANT MATCH
+     * ========================================================
+     *
+     * If column names are different, compare
+     * the values themselves.
+     *
+     * Example:
+     *
+     * SELECT customer_name AS name
+     *
+     * can match:
      *
      * customer_name
      *
-     * and
+     * because the actual values are identical.
      *
-     * balance
+     * IMPORTANT:
      *
-     * cannot accidentally be confused.
+     * We do NOT simply compare JSON.
      */
 
-    function normalizeRow(row) {
+    function compareRowsByValues(
+        actualRow,
+        expectedRow
+    ) {
 
-        return Object.keys(row)
-            .map(function (column) {
-
-                return {
-
-                    column:
-                        String(column)
-                            .trim()
-                            .toLowerCase(),
-
-                    value:
-                        normalizeValue(
-                            row[column]
-                        )
-
-                };
-
-            })
-            .sort(function (a, b) {
-
-                return a.column.localeCompare(
-                    b.column
-                );
-
-            });
-
-    }
-
-
-    /*
-     * ========================================================
-     * NORMALIZE ALL ROWS
-     * ========================================================
-     */
-
-    const actualNormalized =
-        actualRows.map(
-            normalizeRow
-        );
-
-    const expectedNormalized =
-        expectedRows.map(
-            normalizeRow
-        );
-
-
-    /*
-     * ========================================================
-     * SORT ROWS
-     * ========================================================
-     *
-     * SQL does not guarantee row order unless
-     * ORDER BY is explicitly used.
-     *
-     * Therefore:
-     *
-     * Rahul
-     * Priya
-     *
-     * and:
-     *
-     * Priya
-     * Rahul
-     *
-     * are considered equivalent.
-     */
-
-    function sortRows(a, b) {
-
-        return JSON.stringify(a)
-            .localeCompare(
-                JSON.stringify(b)
+        const actualColumns =
+            getColumns(
+                actualRow
             );
 
+        const expectedColumns =
+            getColumns(
+                expectedRow
+            );
+
+
+        if (
+            actualColumns.length !==
+            expectedColumns.length
+        ) {
+
+            return false;
+
+        }
+
+
+        /*
+         * Track which actual columns
+         * have already been matched.
+         */
+
+        const usedActualColumns =
+            new Set();
+
+
+        /*
+         * Try to match every expected
+         * value with exactly one actual value.
+         *
+         * This handles column order
+         * and aliases.
+         */
+
+        for (
+            let i = 0;
+            i < expectedColumns.length;
+            i++
+        ) {
+
+            const expectedColumn =
+                expectedColumns[i];
+
+            const expectedValue =
+                expectedRow[
+                    expectedColumn
+                ];
+
+
+            let foundMatch =
+                false;
+
+
+            for (
+                let j = 0;
+                j < actualColumns.length;
+                j++
+            ) {
+
+                const actualColumn =
+                    actualColumns[j];
+
+
+                if (
+                    usedActualColumns.has(
+                        actualColumn
+                    )
+                ) {
+
+                    continue;
+
+                }
+
+
+                const actualValue =
+                    actualRow[
+                        actualColumn
+                    ];
+
+
+                if (
+                    valuesEqual(
+                        actualValue,
+                        expectedValue
+                    )
+                ) {
+
+                    usedActualColumns.add(
+                        actualColumn
+                    );
+
+                    foundMatch =
+                        true;
+
+                    break;
+
+                }
+
+            }
+
+
+            if (
+                !foundMatch
+            ) {
+
+                return false;
+
+            }
+
+        }
+
+
+        return true;
+
     }
 
 
-    actualNormalized.sort(
-        sortRows
-    );
-
-    expectedNormalized.sort(
-        sortRows
-    );
-
-
     /*
      * ========================================================
-     * FINAL COMPARISON
+     * ROW COMPARISON
      * ========================================================
      */
 
-    const actualJson =
-        JSON.stringify(
-            actualNormalized
+    function rowsEqual(
+        actualRow,
+        expectedRow
+    ) {
+
+        /*
+         * First use exact column names.
+         */
+
+        if (
+            compareRowsByColumnName(
+                actualRow,
+                expectedRow
+            )
+        ) {
+
+            return true;
+
+        }
+
+
+        /*
+         * If that fails, allow column
+         * aliases / different column order.
+         */
+
+        return compareRowsByValues(
+            actualRow,
+            expectedRow
         );
 
-    const expectedJson =
-        JSON.stringify(
-            expectedNormalized
-        );
-
-
-    const isCorrect =
-        actualJson === expectedJson;
+    }
 
 
     /*
      * ========================================================
-     * DEBUG INFORMATION
+     * MATCH ROWS
      * ========================================================
      *
-     * Keep this for now while testing.
-     * We can remove it later.
+     * We do NOT sort only by JSON because
+     * column aliases/order can differ.
+     *
+     * Instead, each expected row must find
+     * exactly one unused matching actual row.
+     *
+     * This also handles duplicate rows correctly.
+     */
+
+    const usedActualRows =
+        new Set();
+
+
+    for (
+        let i = 0;
+        i < expectedRows.length;
+        i++
+    ) {
+
+        const expectedRow =
+            expectedRows[i];
+
+
+        let matched =
+            false;
+
+
+        for (
+            let j = 0;
+            j < actualRows.length;
+            j++
+        ) {
+
+            /*
+             * Do not use the same actual row
+             * twice.
+             */
+
+            if (
+                usedActualRows.has(j)
+            ) {
+
+                continue;
+
+            }
+
+
+            if (
+                rowsEqual(
+                    actualRows[j],
+                    expectedRow
+                )
+            ) {
+
+                usedActualRows.add(j);
+
+                matched =
+                    true;
+
+                break;
+
+            }
+
+        }
+
+
+        /*
+         * Expected row could not be found.
+         */
+
+        if (
+            !matched
+        ) {
+
+            console.log(
+                "❌ Expected row not found:",
+                expectedRow
+            );
+
+            return false;
+
+        }
+
+    }
+
+
+    /*
+     * ========================================================
+     * SUCCESS
+     * ========================================================
      */
 
     console.log(
@@ -274,18 +782,8 @@ function compareQueryResults(
     );
 
     console.log(
-        "Actual normalized:",
-        actualJson
-    );
-
-    console.log(
-        "Expected normalized:",
-        expectedJson
-    );
-
-    console.log(
         "Validation result:",
-        isCorrect
+        true
     );
 
     console.log(
@@ -293,7 +791,7 @@ function compareQueryResults(
     );
 
 
-    return isCorrect;
+    return true;
 
 }
 
