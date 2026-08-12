@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SQL Sandbox | SQL Learning Platform</title>
+
+    <link
+        rel="stylesheet"
+        href="sandbox.css?v=1"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         TOP BAR
+         ===================================================== -->
+
+    <header class="sandbox-header">
+
+        <div class="header-left">
+
+            <button
+                id="mobile-sidebar-button"
+                class="mobile-sidebar-button"
+                type="button"
+            >
+                ☰
+            </button>
+
+            <a
+                href="../home.html"
+                class="brand"
+            >
+                SQL Learning Platform
+            </a>
+
+            <span class="page-title">
+                / Sandbox
+            </span>
+
+        </div>
+
+
+        <div class="header-right">
+
+            <span
+                id="active-database-label"
+                class="active-database-label"
+            >
+                Banking
+            </span>
+
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN SANDBOX
+         ===================================================== -->
+
+    <main class="sandbox-layout">
+
+
+        <!-- =================================================
+             LEFT DATABASE SIDEBAR
+             ================================================= -->
+
+        <aside
+            id="database-sidebar"
+            class="database-sidebar"
+        >
+
+            <div class="sidebar-header">
+
+                <span>
+                    DATABASE EXPLORER
+                </span>
+
+                <button
+                    id="close-sidebar-button"
+                    class="close-sidebar-button"
+                    type="button"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- Search -->
+
+            <div class="database-search">
+
+                <input
+                    id="database-search-input"
+                    type="text"
+                    placeholder="Search tables..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- Databases -->
+
+            <div
+                id="database-tree"
+                class="database-tree"
+            >
+
+                <!-- Banking -->
+
+                <div
+                    class="database-item expanded"
+                    data-database="Banking"
+                >
+
+                    <div class="database-header">
+
+                        <span class="database-arrow">
+                            ▼
+                        </span>
+
+                        <span class="database-icon">
+                            🗄️
+                        </span>
+
+                        <span class="database-name">
+                            Banking
+                        </span>
+
+                    </div>
+
+
+                    <div class="table-list">
+
+                        <div
+                            class="table-item"
+                            data-table="customers"
+                        >
+                            <span>▦</span>
+                            customers
+                        </div>
+
+
+                        <div
+                            class="table-item"
+                            data-table="accounts"
+                        >
+                            <span>▦</span>
+                            accounts
+                        </div>
+
+
+                        <div
+                            class="table-item"
+                            data-table="transactions"
+                        >
+                            <span>▦</span>
+                            transactions
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- User databases will be inserted here -->
+
+            </div>
+
+
+            <!-- Create database -->
+
+            <div class="sidebar-actions">
+
+                <button
+                    id="create-database-button"
+                    class="create-database-button"
+                    type="button"
+                >
+                    ＋ Create Database
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =================================================
+             MAIN WORKSPACE
+             ================================================= -->
+
+        <section class="sandbox-workspace">
+
+
+            <!-- =================================================
+                 SQL EDITOR
+                 ================================================= -->
+
+            <section class="sql-editor-section">
+
+                <div class="workspace-toolbar">
+
+                    <div class="workspace-title">
+
+                        <span>
+                            SQL WORKSHEET
+                        </span>
+
+                    </div>
+
+
+                    <div class="workspace-actions">
+
+                        <button
+                            id="clear-query-button"
+                            class="toolbar-button"
+                            type="button"
+                        >
+                            Clear
+                        </button>
+
+
+                        <button
+                            id="run-query-button"
+                            class="run-query-button"
+                            type="button"
+                        >
+                            ▶ Run Query
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="editor-wrapper">
+
+                    <textarea
+                        id="sql-editor"
+                        class="sql-editor"
+                        spellcheck="false"
+                        placeholder="-- Write your SQL query here
+
+SELECT *
+FROM customers;"
+                    ></textarea>
+
+                </div>
+
+
+                <div
+                    id="sandbox-status"
+                    class="sandbox-status"
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 RESULTS
+                 ================================================= -->
+
+            <section
+                id="results-section"
+                class="results-section"
+            >
+
+                <div class="results-header">
+
+                    <div>
+
+                        <h2>
+                            Query Results
+                        </h2>
+
+                        <span
+                            id="results-summary"
+                            class="results-summary"
+                        >
+                            No query executed
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        id="download-results-button"
+                        class="download-button"
+                        type="button"
+                        disabled
+                    >
+                        ↓ Download CSV
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="results-container"
+                    class="results-container"
+                >
+
+                    <div class="empty-results">
+
+                        <div class="empty-results-icon">
+                            ◫
+                        </div>
+
+                        <p>
+                            Run a SQL query to see results here.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         CREATE DATABASE MODAL
+         ===================================================== -->
+
+    <div
+        id="database-modal"
+        class="modal-overlay hidden"
+    >
+
+        <div class="modal">
+
+            <div class="modal-header">
+
+                <h2>
+                    Create Database
+                </h2>
+
+                <button
+                    id="close-database-modal"
+                    class="modal-close"
+                    type="button"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <label
+                    for="database-name-input"
+                >
+                    Database name
+                </label>
+
+                <input
+                    id="database-name-input"
+                    type="text"
+                    placeholder="e.g. MyPracticeDB"
+                    maxlength="50"
+                    autocomplete="off"
+                >
+
+                <p class="modal-help">
+                    Your Sandbox database will be stored
+                    locally in your browser.
+                </p>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button
+                    id="cancel-database-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="save-database-button"
+                    class="primary-button"
+                    type="button"
+                >
+                    Create Database
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script
+        src="sandbox.js?v=1"
+    ></script>
+
+</body>
+
+</html>
