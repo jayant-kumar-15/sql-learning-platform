@@ -14,7 +14,12 @@
 
     <link
         rel="stylesheet"
-        href="sandbox.css?v=1"
+        href="../styles/main.css?v=17"
+    >
+
+    <link
+        rel="stylesheet"
+        href="sandbox.css?v=2"
     >
 
 </head>
@@ -22,11 +27,54 @@
 
 <body>
 
+
     <!-- =====================================================
-         TOP BAR
+         PLATFORM HEADER
          ===================================================== -->
 
-    <header class="sandbox-header">
+    <header>
+
+        <h1>
+            SQL Learning Platform
+        </h1>
+
+
+        <nav>
+
+            <a href="../home.html">
+                Home
+            </a>
+
+            <a href="../tutorial.html">
+                Tutorials
+            </a>
+
+            <a href="../playground.html">
+                Playground
+            </a>
+
+            <a href="../challenge.html">
+                Challenges
+            </a>
+
+            <a href="sandbox.html">
+                Sandbox
+            </a>
+
+            <a href="../explorer.html">
+                Explorer
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- =====================================================
+         SANDBOX TOP BAR
+         ===================================================== -->
+
+    <div class="sandbox-header">
 
         <div class="header-left">
 
@@ -38,15 +86,9 @@
                 ☰
             </button>
 
-            <a
-                href="../home.html"
-                class="brand"
-            >
-                SQL Learning Platform
-            </a>
 
             <span class="page-title">
-                / Sandbox
+                SQL Sandbox
             </span>
 
         </div>
@@ -63,7 +105,7 @@
 
         </div>
 
-    </header>
+    </div>
 
 
     <!-- =====================================================
@@ -87,6 +129,7 @@
                 <span>
                     DATABASE EXPLORER
                 </span>
+
 
                 <button
                     id="close-sidebar-button"
@@ -113,14 +156,17 @@
             </div>
 
 
-            <!-- Databases -->
+            <!-- Database Tree -->
 
             <div
                 id="database-tree"
                 class="database-tree"
             >
 
-                <!-- Banking -->
+
+                <!-- =================================================
+                     EXISTING BANKING DATABASE
+                     ================================================= -->
 
                 <div
                     class="database-item expanded"
@@ -133,9 +179,11 @@
                             ▼
                         </span>
 
+
                         <span class="database-icon">
                             🗄️
                         </span>
+
 
                         <span class="database-name">
                             Banking
@@ -146,12 +194,18 @@
 
                     <div class="table-list">
 
+
                         <div
                             class="table-item"
                             data-table="customers"
                         >
-                            <span>▦</span>
+
+                            <span>
+                                ▦
+                            </span>
+
                             customers
+
                         </div>
 
 
@@ -159,8 +213,13 @@
                             class="table-item"
                             data-table="accounts"
                         >
-                            <span>▦</span>
+
+                            <span>
+                                ▦
+                            </span>
+
                             accounts
+
                         </div>
 
 
@@ -168,23 +227,35 @@
                             class="table-item"
                             data-table="transactions"
                         >
-                            <span>▦</span>
+
+                            <span>
+                                ▦
+                            </span>
+
                             transactions
+
                         </div>
+
 
                     </div>
 
                 </div>
 
 
-                <!-- User databases will be inserted here -->
+                <!--
+                    User-created databases
+                    will be inserted here
+                    dynamically.
+                -->
+
 
             </div>
 
 
-            <!-- Create database -->
+            <!-- Sidebar Actions -->
 
             <div class="sidebar-actions">
+
 
                 <button
                     id="create-database-button"
@@ -193,6 +264,7 @@
                 >
                     ＋ Create Database
                 </button>
+
 
             </div>
 
@@ -212,18 +284,19 @@
 
             <section class="sql-editor-section">
 
+
                 <div class="workspace-toolbar">
+
 
                     <div class="workspace-title">
 
-                        <span>
-                            SQL WORKSHEET
-                        </span>
+                        SQL WORKSHEET
 
                     </div>
 
 
                     <div class="workspace-actions">
+
 
                         <button
                             id="clear-query-button"
@@ -242,12 +315,16 @@
                             ▶ Run Query
                         </button>
 
+
                     </div>
 
                 </div>
 
 
+                <!-- SQL Editor -->
+
                 <div class="editor-wrapper">
+
 
                     <textarea
                         id="sql-editor"
@@ -259,19 +336,23 @@ SELECT *
 FROM customers;"
                     ></textarea>
 
+
                 </div>
 
+
+                <!-- Status -->
 
                 <div
                     id="sandbox-status"
                     class="sandbox-status"
                 ></div>
 
+
             </section>
 
 
             <!-- =================================================
-                 RESULTS
+                 QUERY RESULTS
                  ================================================= -->
 
             <section
@@ -279,13 +360,16 @@ FROM customers;"
                 class="results-section"
             >
 
+
                 <div class="results-header">
+
 
                     <div>
 
                         <h2>
                             Query Results
                         </h2>
+
 
                         <span
                             id="results-summary"
@@ -306,31 +390,42 @@ FROM customers;"
                         ↓ Download CSV
                     </button>
 
+
                 </div>
 
+
+                <!-- Results -->
 
                 <div
                     id="results-container"
                     class="results-container"
                 >
 
+
                     <div class="empty-results">
+
 
                         <div class="empty-results-icon">
                             ◫
                         </div>
 
+
                         <p>
                             Run a SQL query to see results here.
                         </p>
 
+
                     </div>
+
 
                 </div>
 
+
             </section>
 
+
         </section>
+
 
     </main>
 
@@ -344,13 +439,17 @@ FROM customers;"
         class="modal-overlay hidden"
     >
 
+
         <div class="modal">
 
+
             <div class="modal-header">
+
 
                 <h2>
                     Create Database
                 </h2>
+
 
                 <button
                     id="close-database-modal"
@@ -360,16 +459,19 @@ FROM customers;"
                     ×
                 </button>
 
+
             </div>
 
 
             <div class="modal-body">
+
 
                 <label
                     for="database-name-input"
                 >
                     Database name
                 </label>
+
 
                 <input
                     id="database-name-input"
@@ -379,15 +481,20 @@ FROM customers;"
                     autocomplete="off"
                 >
 
+
                 <p class="modal-help">
+
                     Your Sandbox database will be stored
                     locally in your browser.
+
                 </p>
+
 
             </div>
 
 
             <div class="modal-footer">
+
 
                 <button
                     id="cancel-database-button"
@@ -397,6 +504,7 @@ FROM customers;"
                     Cancel
                 </button>
 
+
                 <button
                     id="save-database-button"
                     class="primary-button"
@@ -405,9 +513,12 @@ FROM customers;"
                     Create Database
                 </button>
 
+
             </div>
 
+
         </div>
+
 
     </div>
 
@@ -419,6 +530,7 @@ FROM customers;"
     <script
         src="sandbox.js?v=1"
     ></script>
+
 
 </body>
 
