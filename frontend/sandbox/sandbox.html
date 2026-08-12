@@ -12,10 +12,10 @@
 
     <title>SQL Sandbox | SQL Learning Platform</title>
 
-
-    <!-- =====================================================
-         SANDBOX CSS
-         ===================================================== -->
+    <link
+        rel="stylesheet"
+        href="../styles/main.css?v=17"
+    >
 
     <link
         rel="stylesheet"
@@ -27,7 +27,6 @@
 
 <body>
 
-
     <!-- =====================================================
          PLATFORM NAVIGATION
          ===================================================== -->
@@ -37,7 +36,6 @@
         <h1>
             SQL Learning Platform
         </h1>
-
 
         <nav class="platform-nav">
 
@@ -71,14 +69,39 @@
 
 
     <!-- =====================================================
-         SANDBOX
+         SANDBOX HEADER
+         ===================================================== -->
+
+    <div class="sandbox-header">
+
+        <div class="header-left">
+
+            <button
+                id="mobile-sidebar-button"
+                class="mobile-sidebar-button"
+                type="button"
+            >
+                ☰
+            </button>
+
+            <span class="page-title">
+                SQL Sandbox
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN SANDBOX
          ===================================================== -->
 
     <main class="sandbox-layout">
 
 
         <!-- =================================================
-             LEFT DATABASE EXPLORER
+             DATABASE SIDEBAR
              ================================================= -->
 
         <aside
@@ -86,13 +109,11 @@
             class="database-sidebar"
         >
 
-
             <div class="sidebar-header">
 
                 <span>
                     DATABASE EXPLORER
                 </span>
-
 
                 <button
                     id="close-sidebar-button"
@@ -119,9 +140,7 @@
             </div>
 
 
-            <!-- =================================================
-                 USER DATABASE TREE
-                 ================================================= -->
+            <!-- Database Tree -->
 
             <div
                 id="database-tree"
@@ -129,38 +148,35 @@
             >
 
                 <!--
-                    IMPORTANT:
+                    Sandbox starts empty.
 
-                    No Banking database is hard-coded here.
-
-                    User-created databases and tables will be
-                    inserted by sandbox.js.
-
+                    User-created databases and tables
+                    will be inserted here by sandbox.js.
                 -->
 
-                <div class="sandbox-empty-database">
+                <div
+                    id="empty-database-message"
+                    class="empty-database-message"
+                >
 
-                    <div class="sandbox-empty-icon">
+                    <div class="empty-database-icon">
                         🗄️
                     </div>
 
-                    <div class="sandbox-empty-title">
+                    <p>
                         No databases yet
-                    </div>
+                    </p>
 
-                    <div class="sandbox-empty-text">
-                        Create a database to start building
-                        your own tables.
-                    </div>
+                    <span>
+                        Create a database to get started.
+                    </span>
 
                 </div>
 
             </div>
 
 
-            <!-- =================================================
-                 SIDEBAR ACTIONS
-                 ================================================= -->
+            <!-- Sidebar Actions -->
 
             <div class="sidebar-actions">
 
@@ -174,7 +190,6 @@
 
             </div>
 
-
         </aside>
 
 
@@ -186,16 +201,14 @@
 
 
             <!-- =================================================
-                 SANDBOX INFORMATION
+                 INFORMATION BANNER
                  ================================================= -->
 
             <section class="sandbox-info-banner">
 
-
                 <div class="sandbox-info-icon">
                     🗄️
                 </div>
-
 
                 <div class="sandbox-info-content">
 
@@ -203,17 +216,14 @@
                         Your SQL Sandbox
                     </strong>
 
-
                     <span>
                         Create your own databases and tables
-                        here for personal practice,
-                        experimentation and SQL development.
-                        Your Sandbox data is stored locally
-                        in your browser.
+                        for personal SQL practice and
+                        experimentation. Your Sandbox data
+                        is stored locally in your browser.
                     </span>
 
                 </div>
-
 
             </section>
 
@@ -227,12 +237,10 @@
                 id="query-tabs-container"
             >
 
-
                 <div
                     class="query-tabs"
                     id="query-tabs"
                 >
-
 
                     <button
                         class="query-tab active"
@@ -247,30 +255,28 @@
                     </button>
 
 
+                    <!-- + stays beside Query 1 -->
+
+                    <button
+                        id="new-query-button"
+                        class="new-query-button"
+                        type="button"
+                        title="New Query"
+                    >
+                        ＋
+                    </button>
+
                 </div>
-
-
-                <button
-                    id="new-query-button"
-                    class="new-query-button"
-                    type="button"
-                    title="New Query"
-                >
-                    ＋
-                </button>
-
 
             </div>
 
 
             <!-- =================================================
-                 SQL WORKSHEET
+                 SQL EDITOR
                  ================================================= -->
 
             <section class="sql-editor-section">
 
-
-                <!-- Toolbar -->
 
                 <div class="workspace-toolbar">
 
@@ -287,14 +293,18 @@
                     <div class="workspace-actions">
 
 
+                        <!-- Describe -->
+
                         <button
-                            id="clear-query-button"
+                            id="describe-table-button"
                             class="toolbar-button"
                             type="button"
                         >
-                            Clear
+                            Describe
                         </button>
 
+
+                        <!-- Schema -->
 
                         <button
                             id="view-schema-button"
@@ -305,6 +315,8 @@
                         </button>
 
 
+                        <!-- Relationships -->
+
                         <button
                             id="view-relationships-button"
                             class="toolbar-button"
@@ -313,6 +325,8 @@
                             Relationships
                         </button>
 
+
+                        <!-- Run -->
 
                         <button
                             id="run-query-button"
@@ -325,35 +339,23 @@
 
                     </div>
 
-
                 </div>
 
 
-                <!-- =================================================
-                     SQL EDITOR
-                     ================================================= -->
+                <!-- SQL Editor -->
 
                 <div class="editor-wrapper">
-
 
                     <textarea
                         id="sql-editor"
                         class="sql-editor"
                         spellcheck="false"
-                        placeholder="-- Create your tables and write your SQL here
+                        placeholder="-- Write your SQL query here
 
 -- Example:
-
-CREATE TABLE employees (
-    employee_id INTEGER,
-    employee_name TEXT,
-    department TEXT
-);
-
 SELECT *
-FROM employees;"
+FROM your_table;"
                     ></textarea>
-
 
                 </div>
 
@@ -378,16 +380,13 @@ FROM employees;"
                 class="results-section"
             >
 
-
                 <div class="results-header">
-
 
                     <div>
 
                         <h2>
                             Query Results
                         </h2>
-
 
                         <span
                             id="results-summary"
@@ -408,42 +407,32 @@ FROM employees;"
                         ↓ Download CSV
                     </button>
 
-
                 </div>
 
-
-                <!-- Results container -->
 
                 <div
                     id="results-container"
                     class="results-container"
                 >
 
-
                     <div class="empty-results">
-
 
                         <div class="empty-results-icon">
                             ◫
                         </div>
 
-
                         <p>
                             Run a SQL query to see results here.
                         </p>
 
-
                     </div>
 
-
                 </div>
-
 
             </section>
 
 
         </section>
-
 
     </main>
 
@@ -457,7 +446,6 @@ FROM employees;"
         class="modal-overlay hidden"
     >
 
-
         <div class="modal">
 
 
@@ -466,7 +454,6 @@ FROM employees;"
                 <h2>
                     Create Database
                 </h2>
-
 
                 <button
                     id="close-database-modal"
@@ -481,13 +468,11 @@ FROM employees;"
 
             <div class="modal-body">
 
-
                 <label
                     for="database-name-input"
                 >
                     Database name
                 </label>
-
 
                 <input
                     id="database-name-input"
@@ -497,21 +482,17 @@ FROM employees;"
                     autocomplete="off"
                 >
 
-
                 <p class="modal-help">
 
-                    Your Sandbox database is stored locally
-                    in your browser. It does not use
-                    server-side database storage.
+                    Your Sandbox database will be stored
+                    locally in your browser.
 
                 </p>
-
 
             </div>
 
 
             <div class="modal-footer">
-
 
                 <button
                     id="cancel-database-button"
@@ -521,7 +502,6 @@ FROM employees;"
                     Cancel
                 </button>
 
-
                 <button
                     id="save-database-button"
                     class="primary-button"
@@ -530,12 +510,9 @@ FROM employees;"
                     Create Database
                 </button>
 
-
             </div>
 
-
         </div>
-
 
     </div>
 
@@ -545,9 +522,8 @@ FROM employees;"
          ===================================================== -->
 
     <script
-        src="sandbox.js?v=2"
+        src="sandbox.js?v=1"
     ></script>
-
 
 </body>
 
