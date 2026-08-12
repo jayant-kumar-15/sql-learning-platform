@@ -12,6 +12,11 @@
 
     <title>SQL Sandbox | SQL Learning Platform</title>
 
+
+    <!-- =====================================================
+         PLATFORM STYLES
+         ===================================================== -->
+
     <link
         rel="stylesheet"
         href="../styles/main.css?v=17"
@@ -22,10 +27,29 @@
         href="sandbox.css?v=5"
     >
 
+
+    <!-- =====================================================
+         SQLITE WASM
+         =====================================================
+
+         sql.js runs SQLite directly inside the browser.
+
+         The JavaScript library is loaded from CDN.
+         sandbox.js initializes the SQLite WASM engine.
+
+         Version is pinned so future library updates do not
+         unexpectedly change Sandbox behaviour.
+         ===================================================== -->
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.14.1/sql-wasm.js"
+    ></script>
+
 </head>
 
 
 <body>
+
 
     <!-- =====================================================
          PLATFORM NAVIGATION
@@ -104,9 +128,7 @@
             </div>
 
 
-            <!-- =================================================
-                 DATABASE SEARCH
-                 ================================================= -->
+            <!-- Database Search -->
 
             <div class="database-search">
 
@@ -120,14 +142,19 @@
             </div>
 
 
-            <!-- =================================================
-                 DATABASE TREE
-                 ================================================= -->
+            <!-- Database Tree -->
 
             <div
                 id="database-tree"
                 class="database-tree"
             >
+
+                <!--
+                    Sandbox starts empty.
+
+                    Databases and tables created by the user
+                    will be inserted here by sandbox.js.
+                -->
 
                 <div
                     id="empty-database-message"
@@ -153,9 +180,7 @@
             </div>
 
 
-            <!-- =================================================
-                 SIDEBAR ACTIONS
-                 ================================================= -->
+            <!-- Sidebar Actions -->
 
             <div class="sidebar-actions">
 
@@ -214,13 +239,13 @@
                  ================================================= -->
 
             <div
-                id="query-tabs-container"
                 class="query-tabs-container"
+                id="query-tabs-container"
             >
 
                 <div
-                    id="query-tabs"
                     class="query-tabs"
+                    id="query-tabs"
                 >
 
                     <button
@@ -237,8 +262,8 @@
 
 
                     <!--
-                        New Query button stays immediately
-                        beside Query 1.
+                        New query button intentionally stays
+                        immediately beside Query 1.
                     -->
 
                     <button
@@ -260,15 +285,10 @@
                  SQL EDITOR
                  ================================================= -->
 
-            <section
-                id="sql-editor-section"
-                class="sql-editor-section"
-            >
+            <section class="sql-editor-section">
 
 
-                <!-- =================================================
-                     WORKSPACE TOOLBAR
-                     ================================================= -->
+                <!-- Worksheet Toolbar -->
 
                 <div class="workspace-toolbar">
 
@@ -285,7 +305,11 @@
                     <div class="workspace-actions">
 
 
-                        <!-- Describe -->
+                        <!--
+                            Describes the currently selected
+                            table. Detailed behaviour will be
+                            connected in a later step.
+                        -->
 
                         <button
                             id="describe-table-button"
@@ -296,7 +320,9 @@
                         </button>
 
 
-                        <!-- Schema -->
+                        <!--
+                            Displays table/schema information.
+                        -->
 
                         <button
                             id="view-schema-button"
@@ -307,7 +333,9 @@
                         </button>
 
 
-                        <!-- Relationships -->
+                        <!--
+                            Displays table relationships.
+                        -->
 
                         <button
                             id="view-relationships-button"
@@ -318,7 +346,10 @@
                         </button>
 
 
-                        <!-- Run Query -->
+                        <!--
+                            Executes the SQL currently inside
+                            the worksheet.
+                        -->
 
                         <button
                             id="run-query-button"
@@ -334,7 +365,7 @@
 
 
                 <!-- =================================================
-                     SQL EDITOR
+                     SQL TEXT EDITOR
                      ================================================= -->
 
                 <div class="editor-wrapper">
@@ -343,9 +374,6 @@
                         id="sql-editor"
                         class="sql-editor"
                         spellcheck="false"
-                        autocomplete="off"
-                        autocorrect="off"
-                        autocapitalize="off"
                         wrap="off"
                         placeholder="-- Write your SQL query here
 
@@ -358,13 +386,12 @@ FROM your_table;"
 
 
                 <!-- =================================================
-                     SQL STATUS
+                     SANDBOX STATUS
                      ================================================= -->
 
                 <div
                     id="sandbox-status"
                     class="sandbox-status"
-                    aria-live="polite"
                 ></div>
 
 
@@ -373,20 +400,38 @@ FROM your_table;"
 
             <!-- =================================================
                  QUERY RESULTS
+                 =================================================
 
                  IMPORTANT:
-                 Results are hidden when the page loads.
 
-                 JavaScript will show this section only after
-                 the user clicks Run Query.
+                 This section starts hidden.
+
+                 It becomes visible only after the user runs
+                 a SQL query.
+
+                 The resize handle allows the user to drag the
+                 results panel vertically.
+
+                 Maximize / minimize / close controls are
+                 handled by sandbox.js.
                  ================================================= -->
 
             <section
                 id="results-section"
-                class="results-section"
-                hidden
-                aria-hidden="true"
+                class="results-section results-hidden"
             >
+
+
+                <!-- =================================================
+                     RESULTS RESIZE HANDLE
+                     ================================================= -->
+
+                <div
+                    id="results-resize-handle"
+                    class="results-resize-handle"
+                    title="Drag to resize results"
+                    aria-label="Resize query results"
+                ></div>
 
 
                 <!-- =================================================
@@ -396,7 +441,7 @@ FROM your_table;"
                 <div class="results-header">
 
 
-                    <div class="results-title-block">
+                    <div class="results-title-container">
 
                         <h2>
                             Query Results
@@ -413,31 +458,68 @@ FROM your_table;"
                     </div>
 
 
+                    <!-- Results Controls -->
+
                     <div class="results-actions">
 
 
-                        <!-- Close Results -->
-
-                        <button
-                            id="close-results-button"
-                            class="close-results-button"
-                            type="button"
-                            title="Close query results"
-                            aria-label="Close query results"
-                        >
-                            ×
-                        </button>
-
-
-                        <!-- Download CSV -->
+                        <!--
+                            Download current result set.
+                        -->
 
                         <button
                             id="download-results-button"
                             class="download-button"
                             type="button"
                             disabled
+                            title="Download results as CSV"
                         >
-                            ↓ Download CSV
+                            ↓ CSV
+                        </button>
+
+
+                        <!--
+                            Minimize results panel.
+                        -->
+
+                        <button
+                            id="minimize-results-button"
+                            class="results-control-button"
+                            type="button"
+                            title="Minimize results"
+                            aria-label="Minimize results"
+                        >
+                            −
+                        </button>
+
+
+                        <!--
+                            Maximize results panel.
+                        -->
+
+                        <button
+                            id="maximize-results-button"
+                            class="results-control-button"
+                            type="button"
+                            title="Maximize results"
+                            aria-label="Maximize results"
+                        >
+                            ⛶
+                        </button>
+
+
+                        <!--
+                            Close results completely.
+                        -->
+
+                        <button
+                            id="close-results-button"
+                            class="results-control-button"
+                            type="button"
+                            title="Close results"
+                            aria-label="Close results"
+                        >
+                            ×
                         </button>
 
                     </div>
@@ -446,7 +528,7 @@ FROM your_table;"
 
 
                 <!-- =================================================
-                     RESULTS CONTENT
+                     RESULTS DATA CONTAINER
                      ================================================= -->
 
                 <div
@@ -489,10 +571,6 @@ FROM your_table;"
         <div class="modal">
 
 
-            <!-- =================================================
-                 MODAL HEADER
-                 ================================================= -->
-
             <div class="modal-header">
 
                 <h2>
@@ -511,10 +589,6 @@ FROM your_table;"
 
             </div>
 
-
-            <!-- =================================================
-                 MODAL BODY
-                 ================================================= -->
 
             <div class="modal-body">
 
@@ -544,10 +618,6 @@ FROM your_table;"
             </div>
 
 
-            <!-- =================================================
-                 MODAL FOOTER
-                 ================================================= -->
-
             <div class="modal-footer">
 
                 <button
@@ -575,10 +645,18 @@ FROM your_table;"
 
 
     <!-- =====================================================
-         JAVASCRIPT
+         SANDBOX JAVASCRIPT
+         =====================================================
+
+         sql.js is loaded above first.
+
+         sandbox.js can therefore access the global
+         initSqlJs function.
          ===================================================== -->
 
-    <script src="sandbox.js?v=1"></script>
+    <script
+        src="sandbox.js?v=2"
+    ></script>
 
 </body>
 
