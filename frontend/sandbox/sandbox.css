@@ -11,11 +11,15 @@ html,
 body {
     margin: 0;
     padding: 0;
+
     width: 100%;
     height: 100%;
+
+    background: #0b1120;
 }
 
 body {
+
     font-family:
         Inter,
         -apple-system,
@@ -24,6 +28,7 @@ body {
         sans-serif;
 
     background: #0b1120;
+
     color: #e5e7eb;
 
     overflow: hidden;
@@ -37,6 +42,7 @@ body {
 .platform-header {
 
     height: 58px;
+    min-height: 58px;
 
     display: flex;
     align-items: center;
@@ -46,7 +52,9 @@ body {
 
     background: #0f172a;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
+
 }
 
 
@@ -55,6 +63,7 @@ body {
     margin: 0;
 
     font-size: 18px;
+
     font-weight: 700;
 
     color: #f8fafc;
@@ -70,7 +79,21 @@ body {
 
     gap: 22px;
 
+    min-width: 0;
+
     overflow-x: auto;
+
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+}
+
+
+/* Hide navbar scrollbar */
+
+.platform-nav::-webkit-scrollbar {
+
+    display: none;
 }
 
 
@@ -81,11 +104,13 @@ body {
     text-decoration: none;
 
     font-size: 13px;
+
     font-weight: 600;
 
     white-space: nowrap;
 
-    transition: color .15s ease;
+    transition:
+        color .15s ease;
 }
 
 
@@ -98,7 +123,6 @@ body {
 .platform-nav a[href="sandbox.html"] {
 
     color: #60a5fa;
-
 }
 
 
@@ -109,6 +133,7 @@ body {
 .sandbox-header {
 
     height: 42px;
+    min-height: 42px;
 
     display: flex;
     align-items: center;
@@ -117,7 +142,8 @@ body {
 
     background: #0f172a;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 }
 
 
@@ -128,18 +154,19 @@ body {
 }
 
 
-.page-title {
-
-    font-size: 13px;
-    font-weight: 700;
-
-    color: #dbeafe;
-}
-
-
 .header-right {
 
     margin-left: auto;
+}
+
+
+.page-title {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #dbeafe;
 }
 
 
@@ -148,6 +175,7 @@ body {
     color: #93c5fd;
 
     font-size: 12px;
+
     font-weight: 600;
 }
 
@@ -182,9 +210,14 @@ body {
 
     display: flex;
 
-    height: calc(100vh - 100px);
+    width: 100%;
+
+    height:
+        calc(100vh - 100px);
 
     min-height: 0;
+
+    overflow: hidden;
 }
 
 
@@ -195,14 +228,17 @@ body {
 .database-sidebar {
 
     width: 260px;
+
     min-width: 260px;
 
     display: flex;
+
     flex-direction: column;
 
     background: #0f172a;
 
-    border-right: 1px solid #263247;
+    border-right:
+        1px solid #263247;
 }
 
 
@@ -210,17 +246,23 @@ body {
 
     height: 46px;
 
+    min-height: 46px;
+
     padding: 0 14px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 
     color: #94a3b8;
 
     font-size: 11px;
+
     font-weight: 700;
 
     letter-spacing: .06em;
@@ -236,11 +278,14 @@ body {
 .database-search input {
 
     width: 100%;
+
     height: 34px;
 
     padding: 0 10px;
 
-    border: 1px solid #334155;
+    border:
+        1px solid #334155;
+
     border-radius: 6px;
 
     outline: none;
@@ -264,7 +309,8 @@ body {
     border-color: #3b82f6;
 
     box-shadow:
-        0 0 0 2px rgba(59, 130, 246, .12);
+        0 0 0 2px
+        rgba(59, 130, 246, .12);
 }
 
 
@@ -275,6 +321,8 @@ body {
     min-height: 0;
 
     overflow-y: auto;
+
+    overflow-x: hidden;
 
     padding: 5px 8px;
 }
@@ -305,6 +353,7 @@ body {
     color: #94a3b8;
 
     font-size: 13px;
+
     font-weight: 600;
 }
 
@@ -336,6 +385,7 @@ body {
     height: 34px;
 
     display: flex;
+
     align-items: center;
 
     gap: 7px;
@@ -347,6 +397,7 @@ body {
     cursor: pointer;
 
     font-size: 13px;
+
     font-weight: 600;
 
     color: #e2e8f0;
@@ -392,6 +443,7 @@ body {
     height: 32px;
 
     display: flex;
+
     align-items: center;
 
     gap: 7px;
@@ -424,16 +476,19 @@ body {
 
     padding: 11px;
 
-    border-top: 1px solid #263247;
+    border-top:
+        1px solid #263247;
 }
 
 
 .create-database-button {
 
     width: 100%;
+
     height: 36px;
 
-    border: 1px solid #334155;
+    border:
+        1px solid #334155;
 
     border-radius: 6px;
 
@@ -444,6 +499,7 @@ body {
     cursor: pointer;
 
     font-size: 13px;
+
     font-weight: 600;
 }
 
@@ -467,12 +523,16 @@ body {
     flex: 1;
 
     min-width: 0;
+
     min-height: 0;
 
     display: flex;
+
     flex-direction: column;
 
     background: #0b1120;
+
+    overflow: hidden;
 }
 
 
@@ -485,6 +545,7 @@ body {
     min-height: 54px;
 
     display: flex;
+
     align-items: center;
 
     gap: 11px;
@@ -493,17 +554,23 @@ body {
 
     background: #111c31;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 }
 
 
 .sandbox-info-icon {
 
     width: 34px;
+
     height: 34px;
 
+    flex: 0 0 34px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     border-radius: 7px;
@@ -519,6 +586,7 @@ body {
 .sandbox-info-content {
 
     display: flex;
+
     flex-direction: column;
 
     gap: 2px;
@@ -537,7 +605,7 @@ body {
 
 .sandbox-info-content span {
 
-    color: #aebbd0;
+    color: #b8c5d9;
 
     font-size: 11px;
 
@@ -552,25 +620,46 @@ body {
 .query-tabs-container {
 
     height: 40px;
+
     min-height: 40px;
 
     display: flex;
+
     align-items: stretch;
 
     background: #0f172a;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
+
+    overflow: hidden;
 }
 
 
 .query-tabs {
 
     display: flex;
+
     align-items: stretch;
 
     min-width: 0;
 
     overflow-x: auto;
+
+    overflow-y: hidden;
+
+    scrollbar-width: none;
+}
+
+
+/*
+   IMPORTANT:
+   Hide the horizontal scrollbar under Query 1.
+*/
+
+.query-tabs::-webkit-scrollbar {
+
+    display: none;
 }
 
 
@@ -578,13 +667,18 @@ body {
 
     min-width: 90px;
 
+    max-width: 180px;
+
     height: 40px;
 
     padding: 0 15px;
 
+    flex: 0 0 auto;
+
     border: 0;
 
-    border-right: 1px solid #263247;
+    border-right:
+        1px solid #263247;
 
     background: #111c31;
 
@@ -593,6 +687,7 @@ body {
     cursor: pointer;
 
     font-size: 12px;
+
     font-weight: 600;
 
     white-space: nowrap;
@@ -613,7 +708,8 @@ body {
 
     color: #60a5fa;
 
-    border-top: 2px solid #3b82f6;
+    border-top:
+        2px solid #3b82f6;
 }
 
 
@@ -635,13 +731,20 @@ body {
 .new-query-button {
 
     width: 40px;
+
     min-width: 40px;
 
     height: 40px;
 
+    flex: 0 0 40px;
+
     border: 0;
 
-    border-right: 1px solid #263247;
+    border-left:
+        1px solid #263247;
+
+    border-right:
+        1px solid #263247;
 
     background: #111c31;
 
@@ -662,65 +765,104 @@ body {
 
 
 /* ============================================================
-   SQL EDITOR
+   SQL EDITOR SECTION
    ============================================================ */
+
+/*
+   IMPORTANT:
+   The editor gets approximately 70% of the
+   remaining workspace height.
+
+   Results use the remaining space below.
+*/
 
 .sql-editor-section {
 
-    /*
-     * Give the query editor considerably more space.
-     */
-    height: 64%;
+    flex: 0 0 68%;
 
-    min-height: 350px;
+    min-height: 0;
 
     display: flex;
+
     flex-direction: column;
 
     background: #0b1120;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 
-    min-height: 0;
+    overflow: hidden;
 }
 
 
+/* ============================================================
+   WORKSPACE TOOLBAR
+   ============================================================ */
+
 .workspace-toolbar {
 
-    height: 46px;
-    min-height: 46px;
+    height: 48px;
+
+    min-height: 48px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
+    gap: 10px;
 
     padding: 0 13px;
 
     background: #0f172a;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 }
 
 
 .workspace-title {
 
-    color: #cbd5e1;
+    color: #dbe7ff;
 
     font-size: 11px;
+
     font-weight: 700;
 
     letter-spacing: .05em;
+
+    white-space: nowrap;
 }
 
 
 .workspace-actions {
 
     display: flex;
+
     align-items: center;
 
     gap: 7px;
+
+    min-width: 0;
+
+    overflow-x: auto;
+
+    overflow-y: hidden;
+
+    scrollbar-width: none;
 }
 
+
+.workspace-actions::-webkit-scrollbar {
+
+    display: none;
+}
+
+
+/* ============================================================
+   TOOLBAR BUTTONS
+   ============================================================ */
 
 .toolbar-button,
 .run-query-button {
@@ -729,18 +871,24 @@ body {
 
     padding: 0 13px;
 
+    flex: 0 0 auto;
+
     border-radius: 7px;
 
     cursor: pointer;
 
     font-size: 12px;
+
     font-weight: 600;
+
+    white-space: nowrap;
 }
 
 
 .toolbar-button {
 
-    border: 1px solid #3b4a63;
+    border:
+        1px solid #3b4a63;
 
     background: #111c31;
 
@@ -764,7 +912,8 @@ body {
 #view-schema-button,
 #view-relationships-button {
 
-    border: 1px solid #3b4a63;
+    border:
+        1px solid #3b4a63;
 
     background: #111c31;
 
@@ -784,6 +933,8 @@ body {
 }
 
 
+/* Run Query */
+
 .run-query-button {
 
     border: 0;
@@ -793,6 +944,7 @@ body {
     color: #ffffff;
 
     padding-left: 15px;
+
     padding-right: 15px;
 }
 
@@ -812,7 +964,7 @@ body {
 
 
 /* ============================================================
-   QUERY EDITOR
+   QUERY EDITOR AREA
    ============================================================ */
 
 .editor-wrapper {
@@ -821,22 +973,37 @@ body {
 
     min-height: 0;
 
-    padding: 10px;
+    padding: 12px;
 
     background: #0b1120;
+
+    overflow: hidden;
 }
 
 
+/*
+   IMPORTANT:
+   This textarea owns the scrollbar.
+
+   Long queries will scroll INSIDE this box.
+*/
+
 .sql-editor {
 
+    display: block;
+
     width: 100%;
+
     height: 100%;
+
+    min-height: 0;
 
     resize: none;
 
-    padding: 16px;
+    padding: 18px;
 
-    border: 1px solid #334155;
+    border:
+        1px solid #3b82f6;
 
     border-radius: 8px;
 
@@ -856,25 +1023,25 @@ body {
 
     font-size: 14px;
 
-    line-height: 1.65;
+    line-height: 1.7;
 
-    /*
-     * Long SQL stays inside the editor.
-     */
-    overflow: auto;
+    overflow-y: auto;
+
+    overflow-x: auto;
 
     white-space: pre;
 
     tab-size: 4;
 
     box-shadow:
-        inset 0 1px 2px rgba(0, 0, 0, .25);
+        inset 0 1px 2px
+        rgba(0, 0, 0, .25);
 }
 
 
 .sql-editor::placeholder {
 
-    color: #64748b;
+    color: #71809a;
 
     opacity: 1;
 }
@@ -882,11 +1049,14 @@ body {
 
 .sql-editor:focus {
 
-    border-color: #3b82f6;
+    border-color: #60a5fa;
 
     box-shadow:
-        0 0 0 2px rgba(59, 130, 246, .12),
-        inset 0 1px 2px rgba(0, 0, 0, .25);
+        0 0 0 2px
+        rgba(96, 165, 250, .12),
+
+        inset 0 1px 2px
+        rgba(0, 0, 0, .25);
 }
 
 
@@ -896,34 +1066,56 @@ body {
 
 .sql-editor::-webkit-scrollbar {
 
-    width: 9px;
-    height: 9px;
+    width: 10px;
+
+    height: 10px;
 }
 
 
 .sql-editor::-webkit-scrollbar-track {
 
-    background: #0f172a;
-}
-
-
-.sql-editor::-webkit-scrollbar-thumb {
-
-    background: #334155;
+    background: #0b1120;
 
     border-radius: 8px;
 }
 
 
-.sql-editor::-webkit-scrollbar-thumb:hover {
+.sql-editor::-webkit-scrollbar-thumb {
 
     background: #475569;
+
+    border-radius: 8px;
+
+    border:
+        2px solid #0b1120;
 }
 
+
+.sql-editor::-webkit-scrollbar-thumb:hover {
+
+    background: #64748b;
+}
+
+
+.sql-editor {
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        #475569
+        #0b1120;
+}
+
+
+/* ============================================================
+   SANDBOX STATUS
+   ============================================================ */
 
 .sandbox-status {
 
     min-height: 28px;
+
+    height: 28px;
 
     padding: 5px 13px;
 
@@ -932,6 +1124,8 @@ body {
     color: #94a3b8;
 
     font-size: 12px;
+
+    overflow: hidden;
 }
 
 
@@ -941,17 +1135,17 @@ body {
 
 .results-section {
 
-    /*
-     * Remaining space goes to results.
-     */
-    flex: 1;
+    flex: 1 1 auto;
 
     min-height: 0;
 
     display: flex;
+
     flex-direction: column;
 
     background: #0f172a;
+
+    overflow: hidden;
 }
 
 
@@ -959,15 +1153,22 @@ body {
 
     min-height: 52px;
 
+    height: 52px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
+
+    gap: 10px;
 
     padding: 7px 13px;
 
     background: #0f172a;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 }
 
 
@@ -995,7 +1196,8 @@ body {
 
     padding: 0 11px;
 
-    border: 1px solid #334155;
+    border:
+        1px solid #334155;
 
     border-radius: 6px;
 
@@ -1006,7 +1208,10 @@ body {
     cursor: pointer;
 
     font-size: 12px;
+
     font-weight: 600;
+
+    white-space: nowrap;
 }
 
 
@@ -1028,6 +1233,10 @@ body {
 }
 
 
+/* ============================================================
+   RESULTS CONTAINER
+   ============================================================ */
+
 .results-container {
 
     flex: 1;
@@ -1046,14 +1255,16 @@ body {
 
 .empty-results {
 
-    height: 100%;
-
     min-height: 120px;
 
+    height: 100%;
+
     display: flex;
+
     flex-direction: column;
 
     align-items: center;
+
     justify-content: center;
 
     color: #64748b;
@@ -1112,7 +1323,8 @@ body {
 
     font-weight: 700;
 
-    border-bottom: 1px solid #334155;
+    border-bottom:
+        1px solid #334155;
 
     white-space: nowrap;
 }
@@ -1124,7 +1336,8 @@ body {
 
     color: #cbd5e1;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 
     white-space: nowrap;
 }
@@ -1137,13 +1350,15 @@ body {
 
 
 /* ============================================================
-   RESULTS SCROLLBAR
+   RESULTS + SIDEBAR SCROLLBARS
    ============================================================ */
 
 .results-container::-webkit-scrollbar,
 .database-tree::-webkit-scrollbar {
 
     width: 9px;
+
+    height: 9px;
 }
 
 
@@ -1183,9 +1398,11 @@ body {
     display: flex;
 
     align-items: center;
+
     justify-content: center;
 
-    background: rgba(2, 6, 23, .72);
+    background:
+        rgba(2, 6, 23, .72);
 
     z-index: 1000;
 }
@@ -1201,16 +1418,19 @@ body {
 
     width: 420px;
 
-    max-width: calc(100vw - 30px);
+    max-width:
+        calc(100vw - 30px);
 
     background: #111c31;
 
-    border: 1px solid #334155;
+    border:
+        1px solid #334155;
 
     border-radius: 10px;
 
     box-shadow:
-        0 20px 50px rgba(0, 0, 0, .5);
+        0 20px 50px
+        rgba(0, 0, 0, .5);
 }
 
 
@@ -1219,11 +1439,13 @@ body {
     display: flex;
 
     align-items: center;
+
     justify-content: space-between;
 
     padding: 16px 18px;
 
-    border-bottom: 1px solid #263247;
+    border-bottom:
+        1px solid #263247;
 }
 
 
@@ -1272,6 +1494,7 @@ body {
     color: #cbd5e1;
 
     font-size: 13px;
+
     font-weight: 600;
 }
 
@@ -1279,11 +1502,13 @@ body {
 .modal-body input {
 
     width: 100%;
+
     height: 38px;
 
     padding: 0 10px;
 
-    border: 1px solid #334155;
+    border:
+        1px solid #334155;
 
     border-radius: 6px;
 
@@ -1323,7 +1548,8 @@ body {
 
     padding: 14px 18px;
 
-    border-top: 1px solid #263247;
+    border-top:
+        1px solid #263247;
 }
 
 
@@ -1339,13 +1565,15 @@ body {
     cursor: pointer;
 
     font-size: 13px;
+
     font-weight: 600;
 }
 
 
 .secondary-button {
 
-    border: 1px solid #334155;
+    border:
+        1px solid #334155;
 
     background: #111c31;
 
@@ -1391,6 +1619,8 @@ body {
 
         height: 54px;
 
+        min-height: 54px;
+
         padding: 0 12px;
     }
 
@@ -1406,6 +1636,8 @@ body {
         gap: 10px;
 
         overflow-x: auto;
+
+        overflow-y: hidden;
     }
 
 
@@ -1418,135 +1650,9 @@ body {
     .sandbox-header {
 
         height: 42px;
+
+        min-height: 42px;
     }
 
 
-    .sandbox-layout {
-
-        height: calc(100vh - 96px);
-    }
-
-
-    .mobile-sidebar-button {
-
-        display: block;
-
-        margin-right: 8px;
-    }
-
-
-    .database-sidebar {
-
-        position: fixed;
-
-        left: 0;
-
-        top: 96px;
-
-        bottom: 0;
-
-        z-index: 500;
-
-        transform: translateX(-100%);
-
-        transition: transform .2s ease;
-
-        box-shadow:
-            5px 0 20px rgba(0, 0, 0, .5);
-    }
-
-
-    .database-sidebar.mobile-open {
-
-        transform: translateX(0);
-    }
-
-
-    .close-sidebar-button {
-
-        display: block;
-
-        border: 0;
-
-        background: transparent;
-
-        color: #94a3b8;
-
-        font-size: 22px;
-
-        cursor: pointer;
-    }
-
-
-    .sandbox-info-banner {
-
-        padding: 7px 10px;
-    }
-
-
-    .sandbox-info-content span {
-
-        font-size: 10px;
-    }
-
-
-    .query-tab {
-
-        min-width: 85px;
-
-        padding: 0 12px;
-    }
-
-
-    /*
-     * Still give the SQL editor priority on mobile.
-     */
-
-    .sql-editor-section {
-
-        height: 60%;
-
-        min-height: 280px;
-    }
-
-
-    .workspace-toolbar {
-
-        padding: 0 9px;
-    }
-
-
-    .workspace-actions {
-
-        gap: 4px;
-
-        overflow-x: auto;
-    }
-
-
-    .toolbar-button {
-
-        display: block;
-
-        padding: 0 8px;
-    }
-
-
-    .run-query-button {
-
-        padding: 0 9px;
-    }
-
-
-    .results-header {
-
-        padding: 7px 9px;
-    }
-
-
-    .download-button {
-
-        padding: 0 8px;
-    }
-
-}
+    
