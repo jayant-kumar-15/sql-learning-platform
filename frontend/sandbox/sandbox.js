@@ -2927,7 +2927,6 @@ function describeSelectedTable() {
 
     }
 
-
     try {
 
         const table =
