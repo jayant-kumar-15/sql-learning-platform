@@ -29,7 +29,7 @@
 
     <link
         rel="stylesheet"
-        href="sandbox.css?v=2"
+        href="sandbox.css?v=3"
     >
 
 </head>
@@ -165,14 +165,12 @@
 
             <div class="database-search">
 
-
                 <input
                     id="database-search-input"
                     type="text"
                     placeholder="Search tables..."
                     autocomplete="off"
                 >
-
 
             </div>
 
@@ -269,8 +267,8 @@
 
                 <!--
                     User-created databases
-                    will be added here
-                    dynamically by sandbox.js.
+                    will be inserted here
+                    by sandbox.js.
                 -->
 
 
@@ -305,6 +303,85 @@
 
 
             <!-- =================================================
+                 SANDBOX INFORMATION MESSAGE
+                 ================================================= -->
+
+            <section class="sandbox-info-banner">
+
+
+                <div class="sandbox-info-icon">
+                    🗄️
+                </div>
+
+
+                <div class="sandbox-info-content">
+
+
+                    <strong>
+                        Your SQL Sandbox
+                    </strong>
+
+
+                    <span>
+                        Create your own databases and tables
+                        here for personal practice and
+                        experimentation. Your Sandbox data
+                        is stored locally in your browser.
+                    </span>
+
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =================================================
+                 QUERY SHEETS
+                 ================================================= -->
+
+            <div
+                class="query-tabs-container"
+                id="query-tabs-container"
+            >
+
+
+                <div
+                    class="query-tabs"
+                    id="query-tabs"
+                >
+
+
+                    <button
+                        class="query-tab active"
+                        data-query-id="1"
+                        type="button"
+                    >
+
+                        <span class="query-tab-name">
+                            Query 1
+                        </span>
+
+                    </button>
+
+
+                </div>
+
+
+                <button
+                    id="new-query-button"
+                    class="new-query-button"
+                    type="button"
+                    title="New Query"
+                >
+                    ＋
+                </button>
+
+
+            </div>
+
+
+            <!-- =================================================
                  SQL EDITOR
                  ================================================= -->
 
@@ -316,7 +393,11 @@
 
                     <div class="workspace-title">
 
-                        SQL WORKSHEET
+
+                        <span>
+                            SQL WORKSHEET
+                        </span>
+
 
                     </div>
 
@@ -330,6 +411,24 @@
                             type="button"
                         >
                             Clear
+                        </button>
+
+
+                        <button
+                            id="view-schema-button"
+                            class="toolbar-button"
+                            type="button"
+                        >
+                            Schema
+                        </button>
+
+
+                        <button
+                            id="view-relationships-button"
+                            class="toolbar-button"
+                            type="button"
+                        >
+                            Relationships
                         </button>
 
 
@@ -367,7 +466,7 @@ FROM customers;"
                 </div>
 
 
-                <!-- Sandbox Status -->
+                <!-- Status -->
 
                 <div
                     id="sandbox-status"
@@ -423,7 +522,7 @@ FROM customers;"
                 </div>
 
 
-                <!-- Results Container -->
+                <!-- Results -->
 
                 <div
                     id="results-container"
@@ -553,7 +652,7 @@ FROM customers;"
 
 
     <!-- =====================================================
-         SANDBOX JAVASCRIPT
+         JAVASCRIPT
          ===================================================== -->
 
     <script
