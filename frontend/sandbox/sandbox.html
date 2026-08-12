@@ -11,33 +11,35 @@
     >
 
     <title>SQL Sandbox | SQL Learning Platform</title>
-    <nav>
-
-    <a href="../pages/home.html">Home</a>
-
-    <a href="../pages/tutorial.html">Tutorials</a>
-
-    <a href="../pages/playground.html">Playground</a>
-
-    <a href="../pages/challenge.html">Challenges</a>
-
-    <a href="../pages/explorer.html">Explorer</a>
-
-    </nav>
-
-    <link rel="stylesheet" href="../styles/main.css?v=17">
-   
-    <link rel="stylesheet" href="sandbox.css?v=2">
-
-</head>
-
-<body>
-
-    <!-- rest of your Sandbox code goes here -->
 
 
     <!-- =====================================================
-         PLATFORM HEADER
+         COMMON PLATFORM CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="../styles/main.css?v=17"
+    >
+
+
+    <!-- =====================================================
+         SANDBOX CSS
+         ===================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="sandbox.css?v=2"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         PLATFORM NAVIGATION
          ===================================================== -->
 
     <header>
@@ -49,19 +51,19 @@
 
         <nav>
 
-            <a href="../home.html">
+            <a href="../pages/home.html">
                 Home
             </a>
 
-            <a href="../tutorial.html">
+            <a href="../pages/tutorial.html">
                 Tutorials
             </a>
 
-            <a href="../playground.html">
+            <a href="../pages/playground.html">
                 Playground
             </a>
 
-            <a href="../challenge.html">
+            <a href="../pages/challenge.html">
                 Challenges
             </a>
 
@@ -69,7 +71,7 @@
                 Sandbox
             </a>
 
-            <a href="../explorer.html">
+            <a href="../pages/explorer.html">
                 Explorer
             </a>
 
@@ -79,12 +81,14 @@
 
 
     <!-- =====================================================
-         SANDBOX TOP BAR
+         SANDBOX HEADER
          ===================================================== -->
 
     <div class="sandbox-header">
 
+
         <div class="header-left">
+
 
             <button
                 id="mobile-sidebar-button"
@@ -99,10 +103,12 @@
                 SQL Sandbox
             </span>
 
+
         </div>
 
 
         <div class="header-right">
+
 
             <span
                 id="active-database-label"
@@ -111,7 +117,9 @@
                 Banking
             </span>
 
+
         </div>
+
 
     </div>
 
@@ -124,7 +132,7 @@
 
 
         <!-- =================================================
-             LEFT DATABASE SIDEBAR
+             DATABASE SIDEBAR
              ================================================= -->
 
         <aside
@@ -132,7 +140,9 @@
             class="database-sidebar"
         >
 
+
             <div class="sidebar-header">
+
 
                 <span>
                     DATABASE EXPLORER
@@ -147,6 +157,7 @@
                     ×
                 </button>
 
+
             </div>
 
 
@@ -154,12 +165,14 @@
 
             <div class="database-search">
 
+
                 <input
                     id="database-search-input"
                     type="text"
                     placeholder="Search tables..."
                     autocomplete="off"
                 >
+
 
             </div>
 
@@ -173,7 +186,7 @@
 
 
                 <!-- =================================================
-                     EXISTING BANKING DATABASE
+                     BANKING DATABASE
                      ================================================= -->
 
                 <div
@@ -181,7 +194,9 @@
                     data-database="Banking"
                 >
 
+
                     <div class="database-header">
+
 
                         <span class="database-arrow">
                             ▼
@@ -196,6 +211,7 @@
                         <span class="database-name">
                             Banking
                         </span>
+
 
                     </div>
 
@@ -247,13 +263,14 @@
 
                     </div>
 
+
                 </div>
 
 
                 <!--
                     User-created databases
-                    will be inserted here
-                    dynamically.
+                    will be added here
+                    dynamically by sandbox.js.
                 -->
 
 
@@ -275,6 +292,7 @@
 
 
             </div>
+
 
         </aside>
 
@@ -326,6 +344,7 @@
 
                     </div>
 
+
                 </div>
 
 
@@ -348,7 +367,7 @@ FROM customers;"
                 </div>
 
 
-                <!-- Status -->
+                <!-- Sandbox Status -->
 
                 <div
                     id="sandbox-status"
@@ -374,6 +393,7 @@ FROM customers;"
 
                     <div>
 
+
                         <h2>
                             Query Results
                         </h2>
@@ -385,6 +405,7 @@ FROM customers;"
                         >
                             No query executed
                         </span>
+
 
                     </div>
 
@@ -402,7 +423,7 @@ FROM customers;"
                 </div>
 
 
-                <!-- Results -->
+                <!-- Results Container -->
 
                 <div
                     id="results-container"
@@ -532,7 +553,7 @@ FROM customers;"
 
 
     <!-- =====================================================
-         JAVASCRIPT
+         SANDBOX JAVASCRIPT
          ===================================================== -->
 
     <script
