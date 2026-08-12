@@ -3,70 +3,46 @@
  * SQL SANDBOX
  * ============================================================
  *
- * STEP 2:
- * SQLite WASM integration + worksheet behaviour.
+ * Current responsibilities:
  *
- * Responsibilities of this file:
- *
- * 1. Initialize SQLite WASM.
- * 2. Create the initial in-browser SQLite database.
- * 3. Execute SQL entered by the user.
- * 4. Display query results.
- * 5. Open results only after Run Query.
- * 6. Resize the results panel by dragging.
- * 7. Minimize / maximize / close results.
- * 8. Download query results as CSV.
- * 9. Handle database creation UI.
- * 10. Handle database explorer interactions.
+ * 1. SQL editor UI behaviour
+ * 2. Query execution button behaviour
+ * 3. Query results rendering
+ * 4. CSV download
+ * 5. Database creation UI
+ * 6. Database Explorer rendering
+ * 7. Database/table persistence using localStorage
+ * 8. Table selection -> SQL editor
+ * 9. Mobile database sidebar
  *
  * IMPORTANT:
+ * ------------------------------------------------------------
+ * The actual SQLite execution engine can be connected later.
  *
- * sql.js currently keeps the SQLite database in memory.
- * Persistent browser storage for Sandbox databases will be
- * implemented in a later step.
+ * For now, this file maintains the Sandbox structure and
+ * persists databases/tables in the browser.
+ *
+ * Persistence layer:
+ *     localStorage
+ *
+ * Later:
+ *     SQLite WASM can use this same state structure.
  * ============================================================
  */
 
 
 /* ============================================================
- * SQLITE CONFIGURATION
+ * STORAGE CONFIGURATION
  * ============================================================ */
 
-const SQL_WASM_VERSION =
-    "1.14.1";
-
-
-const SQL_WASM_PATH =
-    "https://cdnjs.cloudflare.com/ajax/libs/sql.js/" +
-    SQL_WASM_VERSION +
-    "/";
-
-
-/* ============================================================
- * SQLITE STATE
- * ============================================================ */
-
-let sqliteEngine = null;
-
-
 /*
- * The currently active SQLite database.
+ * Single storage key for the Sandbox.
  *
- * At this stage we maintain one active database.
- *
- * Later this will be expanded so each user-created Sandbox
- * database has its own SQLite instance / stored database.
+ * Keeping one central key makes future migration easier.
  */
 
-let activeSqliteDatabase = null;
-
-
-/*
- * Prevent Run Query from executing before SQLite has finished
- * loading.
- */
-
-let sqliteReady = false;
+const SANDBOX_STORAGE_KEY =
+    "sqlLearningPlatformSandbox";
 
 
 /* ============================================================
@@ -91,12 +67,6 @@ const sandboxStatus =
     );
 
 
-const resultsSection =
-    document.getElementById(
-        "results-section"
-    );
-
-
 const resultsContainer =
     document.getElementById(
         "results-container"
@@ -112,30 +82,6 @@ const resultsSummary =
 const downloadResultsButton =
     document.getElementById(
         "download-results-button"
-    );
-
-
-const minimizeResultsButton =
-    document.getElementById(
-        "minimize-results-button"
-    );
-
-
-const maximizeResultsButton =
-    document.getElementById(
-        "maximize-results-button"
-    );
-
-
-const closeResultsButton =
-    document.getElementById(
-        "close-results-button"
-    );
-
-
-const resultsResizeHandle =
-    document.getElementById(
-        "results-resize-handle"
     );
 
 
@@ -175,6 +121,12 @@ const databaseNameInput =
     );
 
 
+const activeDatabaseLabel =
+    document.getElementById(
+        "active-database-label"
+    );
+
+
 const mobileSidebarButton =
     document.getElementById(
         "mobile-sidebar-button"
@@ -193,6 +145,18 @@ const databaseSidebar =
     );
 
 
+const databaseTree =
+    document.getElementById(
+        "database-tree"
+    );
+
+
+const emptyDatabaseMessage =
+    document.getElementById(
+        "empty-database-message"
+    );
+
+
 const databaseSearchInput =
     document.getElementById(
         "database-search-input"
@@ -200,548 +164,184 @@ const databaseSearchInput =
 
 
 /* ============================================================
- * RESULT STORAGE
+ * SANDBOX STATE
  * ============================================================ */
+
+/*
+ * Example state:
+ *
+ * {
+ *     databases: [
+ *
+ *         {
+ *             id: "db_123",
+ *             name: "HealthcareDB",
+ *             tables: [
+ *
+ *                 {
+ *                     name: "Patients"
+ *                 },
+ *
+ *                 {
+ *                     name: "Doctors"
+ *                 }
+ *
+ *             ]
+ *         }
+ *
+ *     ],
+ *
+ *     activeDatabaseId: "db_123"
+ * }
+ *
+ * This structure is intentionally simple.
+ *
+ * Later SQLite WASM can become the actual SQL engine while
+ * this state continues to control the Sandbox UI.
+ */
+
+let sandboxState = {
+    databases: [],
+    activeDatabaseId: null
+};
+
+
+/*
+ * Stores the most recent query result.
+ *
+ * Used by CSV download.
+ */
 
 let latestResults = null;
 
 
 /* ============================================================
- * RESULTS PANEL STATE
+ * LOAD SANDBOX STATE
  * ============================================================ */
 
-const DEFAULT_RESULTS_HEIGHT =
-    180;
-
-
-const MIN_RESULTS_HEIGHT =
-    80;
-
-
-const MAX_RESULTS_HEIGHT =
-    650;
-
-
 /*
- * Stores the previous height before maximize/minimize.
+ * Load previously saved Sandbox data from localStorage.
+ *
+ * This is called when the page opens.
  */
 
-let previousResultsHeight =
-    DEFAULT_RESULTS_HEIGHT;
-
-
-/*
- * Drag state for the results resize handle.
- */
-
-let isResizingResults =
-    false;
-
-
-/* ============================================================
- * SQLITE INITIALIZATION
- * ============================================================ */
-
-async function initializeSQLite() {
-
-    /*
-     * sql.js exposes initSqlJs globally because the library
-     * was loaded before sandbox.js in sandbox.html.
-     */
-
-    if (
-        typeof window.initSqlJs !==
-        "function"
-    ) {
-
-        showStatus(
-            "❌ SQLite library could not be loaded.",
-            "error"
-        );
-
-        return;
-
-    }
-
+function loadSandboxState() {
 
     try {
 
-        showStatus(
-            "⏳ Initializing SQLite...",
-            "info"
-        );
-
-
-        /*
-         * Initialize the WebAssembly SQLite engine.
-         *
-         * locateFile tells sql.js where the corresponding
-         * sql-wasm.wasm file is located.
-         */
-
-        sqliteEngine =
-            await window.initSqlJs({
-
-                locateFile:
-                    function (filename) {
-
-                        return (
-                            SQL_WASM_PATH +
-                            filename
-                        );
-
-                    }
-
-            });
-
-
-        /*
-         * Create the first in-memory SQLite database.
-         */
-
-        activeSqliteDatabase =
-            new sqliteEngine.Database();
-
-
-        sqliteReady =
-            true;
-
-
-        /*
-         * Run Query is now available.
-         */
-
-        if (runQueryButton) {
-
-            runQueryButton.disabled =
-                false;
-
-        }
-
-
-        showStatus(
-            "✅ SQLite ready.",
-            "success"
-        );
-
-
-        /*
-         * Remove the temporary status message after a
-         * short delay so the worksheet remains clean.
-         */
-
-        setTimeout(
-            function () {
-
-                if (
-                    sandboxStatus &&
-                    sandboxStatus.textContent ===
-                    "✅ SQLite ready."
-                ) {
-
-                    showStatus(
-                        "",
-                        ""
-                    );
-
-                }
-
-            },
-            2500
-        );
-
-
-    }
-    catch (error) {
-
-        console.error(
-            "SQLite initialization failed:",
-            error
-        );
-
-
-        sqliteReady =
-            false;
-
-
-        if (runQueryButton) {
-
-            runQueryButton.disabled =
-                true;
-
-        }
-
-
-        showStatus(
-            "❌ Failed to initialize SQLite.",
-            "error"
-        );
-
-    }
-
-}
-
-
-/* ============================================================
- * RUN QUERY
- * ============================================================ */
-
-if (runQueryButton) {
-
-    /*
-     * Disable Run Query until SQLite is ready.
-     */
-
-    runQueryButton.disabled =
-        true;
-
-
-    runQueryButton.addEventListener(
-        "click",
-        executeCurrentQuery
-    );
-
-}
-
-
-/*
- * Main SQL execution function.
- */
-
-function executeCurrentQuery() {
-
-    if (!sqliteReady) {
-
-        showStatus(
-            "⏳ SQLite is still loading. Please wait.",
-            "info"
-        );
-
-        return;
-
-    }
-
-
-    if (!activeSqliteDatabase) {
-
-        showStatus(
-            "❌ No active SQLite database.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    const query =
-        sqlEditor
-            ? sqlEditor.value.trim()
-            : "";
-
-
-    /*
-     * Do not destroy the user's query when it is empty.
-     */
-
-    if (!query) {
-
-        showStatus(
-            "❌ Please enter a SQL query.",
-            "error"
-        );
-
-        if (sqlEditor) {
-
-            sqlEditor.focus();
-
-        }
-
-        return;
-
-    }
-
-
-    /*
-     * Start timing the SQL execution.
-     */
-
-    const startTime =
-        performance.now();
-
-
-    try {
-
-        /*
-         * db.exec() supports SQL statements such as:
-         *
-         * CREATE TABLE
-         * INSERT
-         * UPDATE
-         * DELETE
-         * SELECT
-         *
-         * SELECT statements return result sets.
-         */
-
-        const executionResults =
-            activeSqliteDatabase.exec(
-                query
+        const savedState =
+            localStorage.getItem(
+                SANDBOX_STORAGE_KEY
             );
 
 
-        const endTime =
-            performance.now();
+        if (!savedState) {
 
-
-        const executionTime =
-            Math.round(
-                endTime -
-                startTime
-            );
-
-
-        /*
-         * sql.js returns an array of result sets.
-         *
-         * For normal worksheet usage we display the first
-         * returned result set.
-         */
-
-        if (
-            !executionResults ||
-            executionResults.length === 0
-        ) {
-
-            /*
-             * CREATE / INSERT / UPDATE / DELETE queries
-             * generally do not return rows.
-             */
-
-            latestResults = {
-
-                columns: [],
-
-                rows: [],
-
-                executionTime:
-                    executionTime
-
+            sandboxState = {
+                databases: [],
+                activeDatabaseId: null
             };
-
-
-            showResultsPanel();
-
-
-            resultsSummary.textContent =
-                "Query executed • " +
-                executionTime +
-                " ms";
-
-
-            resultsContainer.innerHTML = `
-
-                <div class="empty-results">
-
-                    <div class="empty-results-icon">
-                        ✓
-                    </div>
-
-                    <p>
-                        Query executed successfully.
-                    </p>
-
-                </div>
-
-            `;
-
-
-            if (downloadResultsButton) {
-
-                downloadResultsButton.disabled =
-                    true;
-
-            }
-
-
-            /*
-             * Refresh the database explorer because a
-             * CREATE TABLE statement may have created a
-             * new table.
-             */
-
-            refreshDatabaseExplorer();
-
-
-            showStatus(
-                "✅ Query executed successfully.",
-                "success"
-            );
-
 
             return;
 
         }
 
 
-        /*
-         * Use the first result set returned by SQLite.
-         */
-
-        const result =
-            executionResults[0];
-
-
-        const columns =
-            Array.isArray(result.columns)
-                ? result.columns
-                : [];
-
-
-        const values =
-            Array.isArray(result.values)
-                ? result.values
-                : [];
-
-
-        /*
-         * Convert sql.js array rows into objects.
-         *
-         * This keeps the result renderer independent from
-         * the SQLite library.
-         */
-
-        const rows =
-            values.map(
-                function (valueRow) {
-
-                    const row = {};
-
-
-                    columns.forEach(
-                        function (column, index) {
-
-                            row[column] =
-                                valueRow[index];
-
-                        }
-                    );
-
-
-                    return row;
-
-                }
+        const parsedState =
+            JSON.parse(
+                savedState
             );
 
 
-        latestResults = {
+        /*
+         * Basic validation.
+         *
+         * Prevents corrupted localStorage data from
+         * breaking the Sandbox.
+         */
 
-            columns:
-                columns,
+        if (
+            !parsedState ||
+            !Array.isArray(
+                parsedState.databases
+            )
+        ) {
 
-            rows:
-                rows,
+            sandboxState = {
+                databases: [],
+                activeDatabaseId: null
+            };
 
-            executionTime:
-                executionTime
+            return;
+
+        }
+
+
+        sandboxState = {
+
+            databases:
+                parsedState.databases,
+
+            activeDatabaseId:
+                parsedState.activeDatabaseId ||
+                null
 
         };
 
 
-        /*
-         * Display results only after Run Query.
-         */
-
-        displaySandboxResults(
-            latestResults
-        );
-
-
-        /*
-         * Open the results panel.
-         */
-
-        showResultsPanel();
-
-
-        showStatus(
-            "✅ Query executed successfully.",
-            "success"
-        );
-
-
     }
+
     catch (error) {
 
         console.error(
-            "SQL execution error:",
+            "❌ Failed to load Sandbox state:",
             error
         );
 
 
-        /*
-         * SQL errors are displayed in the results area rather
-         * than destroying the user's SQL.
-         */
+        sandboxState = {
+            databases: [],
+            activeDatabaseId: null
+        };
 
-        showResultsPanel();
+    }
 
-
-        latestResults =
-            null;
+}
 
 
-        if (resultsSummary) {
+/* ============================================================
+ * SAVE SANDBOX STATE
+ * ============================================================ */
 
-            resultsSummary.textContent =
-                "Query failed";
+/*
+ * Save the current Sandbox state.
+ *
+ * Every database/table change should call this function.
+ */
 
-        }
+function saveSandboxState() {
 
+    try {
 
-        if (downloadResultsButton) {
+        localStorage.setItem(
+            SANDBOX_STORAGE_KEY,
+            JSON.stringify(
+                sandboxState
+            )
+        );
 
-            downloadResultsButton.disabled =
-                true;
+    }
 
-        }
+    catch (error) {
 
-
-        if (resultsContainer) {
-
-            resultsContainer.innerHTML = `
-
-                <div class="empty-results">
-
-                    <div
-                        class="empty-results-icon"
-                        style="color:#f87171;"
-                    >
-                        ⚠
-                    </div>
-
-                    <p
-                        style="color:#fca5a5;"
-                    >
-                        ${escapeHTML(
-                            error.message ||
-                            "SQL execution failed."
-                        )}
-                    </p>
-
-                </div>
-
-            `;
-
-        }
+        console.error(
+            "❌ Failed to save Sandbox state:",
+            error
+        );
 
 
         showStatus(
-            "❌ SQL error: " +
-            (
-                error.message ||
-                "Query failed."
-            ),
+            "❌ Unable to save Sandbox data in this browser.",
             "error"
         );
 
@@ -751,291 +351,124 @@ function executeCurrentQuery() {
 
 
 /* ============================================================
- * SHOW RESULTS PANEL
+ * DATABASE ID
  * ============================================================ */
-
-function showResultsPanel() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    /*
-     * Remove hidden state.
-     */
-
-    resultsSection.classList.remove(
-        "results-hidden"
-    );
-
-
-    /*
-     * Restore compact results height unless the user had
-     * explicitly maximized the panel.
-     */
-
-    resultsSection.classList.remove(
-        "results-maximized"
-    );
-
-
-    resultsSection.classList.remove(
-        "results-minimized"
-    );
-
-
-    resultsSection.style.height =
-        previousResultsHeight +
-        "px";
-
-
-    resultsSection.style.flexBasis =
-        previousResultsHeight +
-        "px";
-
-}
-
-
-/* ============================================================
- * CLOSE RESULTS
- * ============================================================ */
-
-if (closeResultsButton) {
-
-    closeResultsButton.addEventListener(
-        "click",
-        function () {
-
-            closeResultsPanel();
-
-        }
-    );
-
-}
-
-
-function closeResultsPanel() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    resultsSection.classList.remove(
-        "results-maximized"
-    );
-
-
-    resultsSection.classList.remove(
-        "results-minimized"
-    );
-
-
-    resultsSection.classList.add(
-        "results-hidden"
-    );
-
-
-    resultsSection.style.height =
-        "";
-
-
-    resultsSection.style.flexBasis =
-        "";
-
-}
-
-
-/* ============================================================
- * MINIMIZE RESULTS
- * ============================================================ */
-
-if (minimizeResultsButton) {
-
-    minimizeResultsButton.addEventListener(
-        "click",
-        function () {
-
-            if (!resultsSection) {
-
-                return;
-
-            }
-
-
-            /*
-             * If currently maximized, restore the previous
-             * compact height instead of hiding the results.
-             */
-
-            if (
-                resultsSection.classList.contains(
-                    "results-maximized"
-                )
-            ) {
-
-                resultsSection.classList.remove(
-                    "results-maximized"
-                );
-
-
-                resultsSection.classList.remove(
-                    "results-minimized"
-                );
-
-
-                resultsSection.style.height =
-                    previousResultsHeight +
-                    "px";
-
-
-                resultsSection.style.flexBasis =
-                    previousResultsHeight +
-                    "px";
-
-
-                return;
-
-            }
-
-
-            /*
-             * Store current height before minimizing.
-             */
-
-            const currentHeight =
-                resultsSection.offsetHeight;
-
-
-            if (
-                currentHeight >
-                MIN_RESULTS_HEIGHT
-            ) {
-
-                previousResultsHeight =
-                    currentHeight;
-
-            }
-
-
-            resultsSection.classList.add(
-                "results-minimized"
-            );
-
-        }
-    );
-
-}
-
-
-/* ============================================================
- * MAXIMIZE RESULTS
- * ============================================================ */
-
-if (maximizeResultsButton) {
-
-    maximizeResultsButton.addEventListener(
-        "click",
-        function () {
-
-            if (!resultsSection) {
-
-                return;
-
-            }
-
-
-            /*
-             * If already maximized, restore the previous
-             * height.
-             */
-
-            if (
-                resultsSection.classList.contains(
-                    "results-maximized"
-                )
-            ) {
-
-                resultsSection.classList.remove(
-                    "results-maximized"
-                );
-
-
-                resultsSection.style.height =
-                    previousResultsHeight +
-                    "px";
-
-
-                resultsSection.style.flexBasis =
-                    previousResultsHeight +
-                    "px";
-
-
-                return;
-
-            }
-
-
-            /*
-             * Save current height before maximizing.
-             */
-
-            const currentHeight =
-                resultsSection.offsetHeight;
-
-
-            if (
-                currentHeight >
-                MIN_RESULTS_HEIGHT
-            ) {
-
-                previousResultsHeight =
-                    currentHeight;
-
-            }
-
-
-            resultsSection.classList.remove(
-                "results-minimized"
-            );
-
-
-            resultsSection.classList.add(
-                "results-maximized"
-            );
-
-        }
-    );
-
-}
-
-
-/* ============================================================
- * DRAGGABLE RESULTS RESIZE
- * ============================================================ */
-
-if (resultsResizeHandle) {
-
-    resultsResizeHandle.addEventListener(
-        "mousedown",
-        startResultsResize
-    );
-
-}
-
 
 /*
- * Start vertical resize.
+ * Generate a unique ID for each database.
+ *
+ * We do not use the database name as the ID because the name
+ * may later be renamed.
  */
 
-function startResultsResize(event) {
+function generateDatabaseId() {
 
-    if (!resultsSection) {
+    return (
+        "db_" +
+        Date.now() +
+        "_" +
+        Math.random()
+            .toString(36)
+            .substring(2, 9)
+    );
+
+}
+
+
+/* ============================================================
+ * GET ACTIVE DATABASE
+ * ============================================================ */
+
+function getActiveDatabase() {
+
+    if (
+        !sandboxState.activeDatabaseId
+    ) {
+
+        return null;
+
+    }
+
+
+    return (
+        sandboxState.databases.find(
+            function (database) {
+
+                return (
+                    database.id ===
+                    sandboxState.activeDatabaseId
+                );
+
+            }
+        ) || null
+    );
+
+}
+
+
+/* ============================================================
+ * UPDATE ACTIVE DATABASE LABEL
+ * ============================================================ */
+
+function updateActiveDatabaseLabel() {
+
+    if (!activeDatabaseLabel) {
+
+        return;
+
+    }
+
+
+    const activeDatabase =
+        getActiveDatabase();
+
+
+    if (activeDatabase) {
+
+        activeDatabaseLabel.textContent =
+            activeDatabase.name;
+
+    }
+
+    else {
+
+        /*
+         * The current HTML does not display this label,
+         * but keeping this function makes the code compatible
+         * if the label is added later.
+         */
+
+        activeDatabaseLabel.textContent =
+            "No database selected";
+
+    }
+
+}
+
+
+/* ============================================================
+ * DATABASE TREE RENDERING
+ * ============================================================ */
+
+/*
+ * Rebuild the entire Database Explorer from sandboxState.
+ *
+ * This is important because:
+ *
+ *     localStorage
+ *          ↓
+ *     sandboxState
+ *          ↓
+ *     renderDatabaseTree()
+ *          ↓
+ *     left Database Explorer
+ *
+ * Therefore the UI always reflects the saved state.
+ */
+
+function renderDatabaseTree() {
+
+    if (!databaseTree) {
 
         return;
 
@@ -1043,166 +476,415 @@ function startResultsResize(event) {
 
 
     /*
-     * Do not resize while maximized or minimized.
+     * Remove dynamically generated database items.
+     *
+     * Keep the original empty-state element.
+     */
+
+    databaseTree
+        .querySelectorAll(
+            ".database-item"
+        )
+        .forEach(
+            function (item) {
+
+                item.remove();
+
+            }
+        );
+
+
+    /*
+     * No databases.
      */
 
     if (
-        resultsSection.classList.contains(
-            "results-maximized"
-        ) ||
-        resultsSection.classList.contains(
-            "results-minimized"
+        sandboxState.databases.length === 0
+    ) {
+
+        if (emptyDatabaseMessage) {
+
+            emptyDatabaseMessage.style.display =
+                "block";
+
+        }
+
+
+        updateActiveDatabaseLabel();
+
+        return;
+
+    }
+
+
+    /*
+     * Databases exist.
+     */
+
+    if (emptyDatabaseMessage) {
+
+        emptyDatabaseMessage.style.display =
+            "none";
+
+    }
+
+
+    sandboxState.databases.forEach(
+        function (database) {
+
+            createDatabaseTreeItem(
+                database
+            );
+
+        }
+    );
+
+
+    updateActiveDatabaseLabel();
+
+
+    attachDatabaseTreeEvents();
+
+}
+
+
+/* ============================================================
+ * CREATE DATABASE TREE ITEM
+ * ============================================================ */
+
+/*
+ * Creates one database section inside the left sidebar.
+ *
+ * Example:
+ *
+ * ▼ HealthcareDB
+ *     🗃 Patients
+ *     🗃 Doctors
+ */
+
+function createDatabaseTreeItem(
+    database
+) {
+
+    const databaseItem =
+        document.createElement(
+            "div"
+        );
+
+
+    databaseItem.className =
+        "database-item";
+
+
+    databaseItem.dataset.databaseId =
+        database.id;
+
+
+    const databaseHeader =
+        document.createElement(
+            "div"
+        );
+
+
+    databaseHeader.className =
+        "database-header";
+
+
+    databaseHeader.innerHTML = `
+
+        <span class="database-arrow">
+            ▼
+        </span>
+
+        <span class="database-icon">
+            🗄️
+        </span>
+
+        <span class="database-name">
+            ${escapeHTML(database.name)}
+        </span>
+
+    `;
+
+
+    const tableList =
+        document.createElement(
+            "div"
+        );
+
+
+    tableList.className =
+        "table-list";
+
+
+    /*
+     * Render tables belonging to this database.
+     */
+
+    if (
+        Array.isArray(
+            database.tables
         )
     ) {
 
-        return;
+        database.tables.forEach(
+            function (table) {
+
+                const tableItem =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                tableItem.className =
+                    "table-item";
+
+
+                tableItem.dataset.table =
+                    table.name;
+
+
+                tableItem.dataset.databaseId =
+                    database.id;
+
+
+                tableItem.innerHTML = `
+
+                    <span>
+                        🗃️
+                    </span>
+
+                    <span>
+                        ${escapeHTML(table.name)}
+                    </span>
+
+                `;
+
+
+                tableList.appendChild(
+                    tableItem
+                );
+
+            }
+        );
 
     }
 
 
-    event.preventDefault();
-
-
-    isResizingResults =
-        true;
-
-
-    document.body.style.cursor =
-        "ns-resize";
-
-
-    document.body.style.userSelect =
-        "none";
-
-
-    document.addEventListener(
-        "mousemove",
-        resizeResultsPanel
+    databaseItem.appendChild(
+        databaseHeader
     );
 
 
-    document.addEventListener(
-        "mouseup",
-        stopResultsResize
+    databaseItem.appendChild(
+        tableList
+    );
+
+
+    databaseTree.appendChild(
+        databaseItem
     );
 
 }
 
 
+/* ============================================================
+ * DATABASE TREE EVENTS
+ * ============================================================ */
+
 /*
- * Calculate the new results height while dragging.
+ * Attach events after every database tree refresh.
  */
 
-function resizeResultsPanel(event) {
+function attachDatabaseTreeEvents() {
 
-    if (!isResizingResults) {
 
-        return;
-
-    }
-
-/*
-     * Results are attached to the bottom of the workspace.
-     *
-     * Therefore:
-     *
-     * Mouse moves upward → results become taller.
-     * Mouse moves downward → results become smaller.
+    /*
+     * Database expand/collapse.
      */
 
-    const workspace =
-        document.querySelector(
-            ".sandbox-workspace"
+    document
+        .querySelectorAll(
+            ".database-header"
+        )
+        .forEach(
+            function (header) {
+
+                header.addEventListener(
+                    "click",
+                    function () {
+
+                        const databaseItem =
+                            header.parentElement;
+
+
+                        const databaseId =
+                            databaseItem.dataset.databaseId;
+
+
+                        const tableList =
+                            databaseItem.querySelector(
+                                ".table-list"
+                            );
+
+
+                        const arrow =
+                            header.querySelector(
+                                ".database-arrow"
+                            );
+
+
+                        /*
+                         * Make clicked database active.
+                         */
+
+                        if (
+                            sandboxState.activeDatabaseId !==
+                            databaseId
+                        ) {
+
+                            sandboxState.activeDatabaseId =
+                                databaseId;
+
+
+                            saveSandboxState();
+
+                            updateActiveDatabaseLabel();
+
+                        }
+
+
+                        if (!tableList) {
+
+                            return;
+
+                        }
+
+
+                        const isHidden =
+                            tableList.style.display ===
+                            "none";
+
+
+                        tableList.style.display =
+                            isHidden
+                                ? "block"
+                                : "none";
+
+
+                        if (arrow) {
+
+                            arrow.textContent =
+                                isHidden
+                                    ? "▼"
+                                    : "▶";
+
+                        }
+
+                    }
+                );
+
+            }
         );
 
 
-    if (!workspace) {
+    /*
+     * Table click.
+     */
 
-        return;
+    document
+        .querySelectorAll(
+            ".table-item"
+        )
+        .forEach(
+            function (table) {
 
-    }
+                table.addEventListener(
+                    "click",
+                    function () {
 
-
-    const workspaceRect =
-        workspace.getBoundingClientRect();
-
-
-    const desiredHeight =
-        workspaceRect.bottom -
-        event.clientY;
-
-
-    const workspaceHeight =
-        workspaceRect.height;
+                        const tableName =
+                            table.dataset.table;
 
 
-    const maximumAllowed =
-        Math.min(
-            MAX_RESULTS_HEIGHT,
-            workspaceHeight - 180
+                        const databaseId =
+                            table.dataset.databaseId;
+
+
+                        /*
+                         * Make the table's database active.
+                         */
+
+                        sandboxState.activeDatabaseId =
+                            databaseId;
+
+
+                        saveSandboxState();
+
+
+                        updateActiveDatabaseLabel();
+
+
+                        /*
+                         * Populate the SQL editor.
+                         */
+
+                        if (sqlEditor) {
+
+                            sqlEditor.value =
+                                "SELECT *\n" +
+                                "FROM " +
+                                tableName +
+                                ";";
+
+
+                            sqlEditor.focus();
+
+                        }
+
+
+                        /*
+                         * Close mobile sidebar.
+                         */
+
+                        if (databaseSidebar) {
+
+                            databaseSidebar.classList.remove(
+                                "mobile-open"
+                            );
+
+                        }
+
+
+                        showStatus(
+                            "ℹ️ Table '" +
+                            tableName +
+                            "' selected.",
+                            "info"
+                        );
+
+                    }
+                );
+
+            }
         );
-
-
-    const newHeight =
-        Math.max(
-            MIN_RESULTS_HEIGHT,
-            Math.min(
-                desiredHeight,
-                maximumAllowed
-            )
-        );
-
-
-    previousResultsHeight =
-        newHeight;
-
-
-    resultsSection.style.height =
-        newHeight +
-        "px";
-
-
-    resultsSection.style.flexBasis =
-        newHeight +
-        "px";
 
 }
 
 
-/*
- * Stop vertical resize.
- */
+/* ============================================================
+ * CREATE DATABASE
+ * ============================================================ */
 
-function stopResultsResize() {
+if (createDatabaseButton) {
 
-    if (!isResizingResults) {
+    createDatabaseButton.addEventListener(
+        "click",
+        function () {
 
-        return;
+            openDatabaseModal();
 
-    }
-
-
-    isResizingResults =
-        false;
-
-
-    document.body.style.cursor =
-        "";
-
-
-    document.body.style.userSelect =
-        "";
-
-
-    document.removeEventListener(
-        "mousemove",
-        resizeResultsPanel
-    );
-
-
-    document.removeEventListener(
-        "mouseup",
-        stopResultsResize
+        }
     );
 
 }
@@ -1211,16 +893,6 @@ function stopResultsResize() {
 /* ============================================================
  * DATABASE MODAL
  * ============================================================ */
-
-if (createDatabaseButton) {
-
-    createDatabaseButton.addEventListener(
-        "click",
-        openDatabaseModal
-    );
-
-}
-
 
 if (closeDatabaseModal) {
 
@@ -1241,6 +913,21 @@ if (cancelDatabaseButton) {
 
 }
 
+
+/* ============================================================
+ * SAVE DATABASE
+ * ============================================================ */
+
+/*
+ * Creates a new persistent database entry.
+ *
+ * Important:
+ *
+ * This currently creates the Sandbox database structure.
+ *
+ * Actual SQLite database creation will be connected in the
+ * SQLite integration step.
+ */
 
 if (saveDatabaseButton) {
 
@@ -1264,57 +951,100 @@ if (saveDatabaseButton) {
 
 
             /*
-             * For this first SQLite step, creating a database
-             * means creating a fresh in-memory SQLite database.
-             *
-             * Persistent database storage will be added later.
+             * Prevent duplicate database names.
              */
 
-            if (sqliteEngine) {
+            const duplicate =
+                sandboxState.databases.some(
+                    function (database) {
 
-                if (activeSqliteDatabase) {
+                        return (
+                            database.name
+                                .toLowerCase() ===
+                            name.toLowerCase()
+                        );
 
-                    activeSqliteDatabase.close();
+                    }
+                );
 
-                }
 
+            if (duplicate) {
 
-                activeSqliteDatabase =
-                    new sqliteEngine.Database();
+                showModalError(
+                    "A database with this name already exists."
+                );
+
+                return;
 
             }
 
 
-            closeDatabaseModalWindow();
+            /*
+             * Create database object.
+             */
+
+            const database = {
+
+                id:
+                    generateDatabaseId(),
+
+                name:
+                    name,
+
+                tables:
+                    []
+
+            };
 
 
-            showStatus(
-                "✅ Database '" +
-                name +
-                "' created.",
-                "success"
+            /*
+             * Add to Sandbox state.
+             */
+
+            sandboxState.databases.push(
+                database
             );
 
 
             /*
-             * Clear any old query results because the active
-             * database has changed.
+             * Automatically select the new database.
              */
 
-            latestResults =
-                null;
-
-
-            closeResultsPanel();
-
-
-            clearResultsDisplay();
+            sandboxState.activeDatabaseId =
+                database.id;
 
 
             /*
-             * Database explorer will be populated by SQLite
-             * metadata in a later refinement.
+             * Persist immediately.
              */
+
+            saveSandboxState();
+
+
+            /*
+             * Refresh left Database Explorer.
+             */
+
+            renderDatabaseTree();
+
+
+            /*
+             * Close modal.
+             */
+
+            closeDatabaseModalWindow();
+
+
+            /*
+             * Tell user what happened.
+             */
+
+            showStatus(
+                "✅ Database '" +
+                name +
+                "' created successfully.",
+                "success"
+            );
 
         }
     );
@@ -1368,6 +1098,23 @@ function closeDatabaseModalWindow() {
         "hidden"
     );
 
+
+    /*
+     * Remove previous modal error.
+     */
+
+    const existingError =
+        document.querySelector(
+            ".modal-error"
+        );
+
+
+    if (existingError) {
+
+        existingError.remove();
+
+    }
+
 }
 
 
@@ -1375,7 +1122,9 @@ function closeDatabaseModalWindow() {
  * MODAL ERROR
  * ============================================================ */
 
-function showModalError(message) {
+function showModalError(
+    message
+) {
 
     const existing =
         document.querySelector(
@@ -1401,7 +1150,7 @@ function showModalError(message) {
 
 
     error.style.color =
-        "#f87171";
+        "#ef4444";
 
 
     error.style.fontSize =
@@ -1416,10 +1165,7 @@ function showModalError(message) {
         message;
 
 
-    if (
-        databaseNameInput &&
-        databaseNameInput.parentElement
-    ) {
+    if (databaseNameInput) {
 
         databaseNameInput
             .parentElement
@@ -1428,6 +1174,56 @@ function showModalError(message) {
             );
 
     }
+
+}
+
+
+/* ============================================================
+ * RUN QUERY
+ * ============================================================ */
+
+/*
+ * At this stage the actual SQLite engine is not connected.
+ *
+ * This handler is intentionally kept ready for the next
+ * SQLite integration step.
+ */
+
+if (runQueryButton) {
+
+    runQueryButton.addEventListener(
+        "click",
+        function () {
+
+            const query =
+                sqlEditor
+                    ? sqlEditor.value.trim()
+                    : "";
+
+
+            if (!query) {
+
+                showStatus(
+                    "❌ Please enter a SQL query.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * SQLite execution will be connected here.
+             */
+
+            showStatus(
+                "ℹ️ SQL engine connection will be added next.",
+                "info"
+            );
+
+        }
+    );
 
 }
 
@@ -1454,25 +1250,27 @@ function showStatus(
 
     sandboxStatus.className =
         "sandbox-status " +
-        (
-            type ||
-            ""
-        );
+        (type || "");
 
 }
 
 
 /* ============================================================
- * CLEAR RESULTS DISPLAY
- * ============================================================
+ * CLEAR RESULTS
+ * ============================================================ */
 
- * This does NOT clear the SQL editor.
+/*
+ * Results are NOT automatically cleared when the user types.
  *
- * The user's query is intentionally preserved.
- * ============================================================
+ * This protects the user's previous result until another query
+ * is executed.
  */
 
-function clearResultsDisplay() {
+function clearResults() {
+
+    latestResults =
+        null;
+
 
     if (resultsContainer) {
 
@@ -1544,12 +1342,18 @@ if (downloadResultsButton) {
  * CSV DOWNLOAD
  * ============================================================ */
 
-function downloadCSV(data) {
+function downloadCSV(
+    data
+) {
 
     if (
         !data ||
-        !Array.isArray(data.columns) ||
-        !Array.isArray(data.rows)
+        !Array.isArray(
+            data.columns
+        ) ||
+        !Array.isArray(
+            data.rows
+        )
     ) {
 
         return;
@@ -1561,7 +1365,7 @@ function downloadCSV(data) {
 
 
     /*
-     * Header
+     * CSV header.
      */
 
     lines.push(
@@ -1572,7 +1376,7 @@ function downloadCSV(data) {
 
 
     /*
-     * Rows
+     * CSV rows.
      */
 
     data.rows.forEach(
@@ -1652,7 +1456,9 @@ function downloadCSV(data) {
  * CSV ESCAPE
  * ============================================================ */
 
-function csvEscape(value) {
+function csvEscape(
+    value
+) {
 
     if (
         value === null ||
@@ -1668,12 +1474,14 @@ function csvEscape(value) {
         String(value);
 
 
-    return '"' +
+    return (
+        '"' +
         stringValue.replace(
             /"/g,
             '""'
         ) +
-        '"';
+        '"'
+    );
 
 }
 
@@ -1723,172 +1531,15 @@ if (closeSidebarButton) {
 
 
 /* ============================================================
- * DATABASE TREE
- * ============================================================ */
-
-function attachDatabaseTreeEvents() {
-
-    document
-        .querySelectorAll(
-            ".database-header"
-        )
-        .forEach(
-            function (header) {
-
-                /*
-                 * Prevent duplicate listeners when the tree
-                 * is refreshed.
-                 */
-
-                if (
-                    header.dataset.bound ===
-                    "true"
-                ) {
-
-                    return;
-
-                }
-
-
-                header.dataset.bound =
-                    "true";
-
-
-                header.addEventListener(
-                    "click",
-                    function () {
-
-                        const databaseItem =
-                            header.parentElement;
-
-
-                        const tableList =
-                            databaseItem.querySelector(
-                                ".table-list"
-                            );
-
-
-                        const arrow =
-                            header.querySelector(
-                                ".database-arrow"
-                            );
-
-
-                        if (!tableList) {
-
-                            return;
-
-                        }
-
-
-                        const isHidden =
-                            tableList.style.display ===
-                            "none";
-
-
-                        tableList.style.display =
-                            isHidden
-                                ? "block"
-                                : "none";
-
-
-                        if (arrow) {
-
-                            arrow.textContent =
-                                isHidden
-                                    ? "▼"
-                                    : "▶";
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-
-    attachTableClickEvents();
-
-}
-
-
-/* ============================================================
- * TABLE CLICK
- * ============================================================ */
-
-function attachTableClickEvents() {
-
-    document
-        .querySelectorAll(
-            ".table-item"
-        )
-        .forEach(
-            function (table) {
-
-                if (
-                    table.dataset.bound ===
-                    "true"
-                ) {
-
-                    return;
-
-                }
-
-
-                table.dataset.bound =
-                    "true";
-
-
-                table.addEventListener(
-                    "click",
-                    function () {
-
-                        const tableName =
-                            table.dataset.table;
-
-
-                        if (!tableName) {
-
-                            return;
-
-                        }
-
-
-                        if (sqlEditor) {
-
-                            sqlEditor.value =
-                                "SELECT *\n" +
-                                "FROM " +
-                                tableName +
-                                ";";
-
-
-                            sqlEditor.focus();
-
-                        }
-
-
-                        if (databaseSidebar) {
-
-                            databaseSidebar.classList.remove(
-                                "mobile-open"
-                            );
-
-                        }
-
-                    }
-                );
-
-            }
-        );
-
-}
-
-
-/* ============================================================
  * TABLE SEARCH
  * ============================================================ */
+
+/*
+ * Search works against dynamically generated tables.
+ *
+ * Therefore the listener is attached to the search box and
+ * searches the current DOM every time the user types.
+ */
 
 if (databaseSearchInput) {
 
@@ -1904,24 +1555,81 @@ if (databaseSearchInput) {
 
             document
                 .querySelectorAll(
-                    ".table-item"
+                    ".database-item"
                 )
                 .forEach(
-                    function (table) {
+                    function (databaseItem) {
 
-                        const tableName =
-                            (
-                                table.dataset.table ||
-                                ""
-                            )
-                            .toLowerCase();
+                        const databaseName =
+                            databaseItem
+                                .querySelector(
+                                    ".database-name"
+                                )
+                                ?.textContent
+                                .toLowerCase() ||
+                            "";
 
 
-                        table.style.display =
-                            tableName.includes(
+                        let databaseMatches =
+                            databaseName.includes(
                                 search
+                            );
+
+
+                        let visibleTableCount =
+                            0;
+
+
+                        databaseItem
+                            .querySelectorAll(
+                                ".table-item"
                             )
-                                ? "flex"
+                            .forEach(
+                                function (table) {
+
+                                    const tableName =
+                                        (
+                                            table.dataset.table ||
+                                            ""
+                                        ).toLowerCase();
+
+
+                                    const matches =
+                                        tableName.includes(
+                                            search
+                                        );
+
+
+                                    table.style.display =
+                                        matches
+                                            ? "flex"
+                                            : "none";
+
+
+                                    if (matches) {
+
+                                        visibleTableCount++;
+
+                                    }
+
+                                }
+                            );
+
+
+                        /*
+                         * Show the database if either:
+                         *
+                         * - database name matches
+                         * - at least one table matches
+                         */
+
+                        databaseItem.style.display =
+                            (
+                                search === "" ||
+                                databaseMatches ||
+                                visibleTableCount > 0
+                            )
+                                ? "block"
                                 : "none";
 
                     }
@@ -1934,98 +1642,27 @@ if (databaseSearchInput) {
 
 
 /* ============================================================
- * REFRESH DATABASE EXPLORER
- * ============================================================
+ * GLOBAL SANDBOX RESULT RENDERER
+ * ============================================================ */
 
- * Reads SQLite metadata and updates the table list.
+/*
+ * SQLite will call:
  *
- * This is intentionally simple for Step 2.
- * The full multi-database explorer will be implemented later.
- * ============================================================
+ *     window.displaySandboxResults(data)
+ *
+ * Example data:
+ *
+ * {
+ *     columns: ["id", "name"],
+ *     rows: [
+ *         {
+ *             id: 1,
+ *             name: "Jayant"
+ *         }
+ *     ],
+ *     executionTime: 12
+ * }
  */
-
-function refreshDatabaseExplorer() {
-
-    if (
-        !activeSqliteDatabase ||
-        !databaseTreeAvailable()
-    ) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const queryResult =
-            activeSqliteDatabase.exec(
-                `
-                SELECT
-                    name
-                FROM sqlite_master
-                WHERE type = 'table'
-                AND name NOT LIKE 'sqlite_%'
-                ORDER BY name;
-                `
-            );
-
-
-        const tableNames =
-            queryResult.length > 0
-                ? queryResult[0].values.map(
-                    function (row) {
-
-                        return row[0];
-
-                    }
-                )
-                : [];
-
-
-        /*
-         * At this point we only refresh the tree when there
-         * is an existing database tree structure.
-         *
-         * Full dynamic database rendering comes next.
-         */
-
-        console.log(
-            "SQLite tables:",
-            tableNames
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            "Failed to refresh database explorer:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ============================================================
- * DATABASE TREE CHECK
- * ============================================================ */
-
-function databaseTreeAvailable() {
-
-    return Boolean(
-        document.getElementById(
-            "database-tree"
-        )
-    );
-
-}
-
-
-/* ============================================================
- * GLOBAL RESULT RENDERER
- * ============================================================ */
 
 window.displaySandboxResults =
     function (data) {
@@ -2042,19 +1679,23 @@ window.displaySandboxResults =
 
 
         const columns =
-            Array.isArray(data.columns)
+            Array.isArray(
+                data.columns
+            )
                 ? data.columns
                 : [];
 
 
         const rows =
-            Array.isArray(data.rows)
+            Array.isArray(
+                data.rows
+            )
                 ? data.rows
                 : [];
 
 
         /*
-         * Update summary.
+         * Update result summary.
          */
 
         if (resultsSummary) {
@@ -2085,7 +1726,7 @@ window.displaySandboxResults =
 
 
         /*
-         * No rows returned.
+         * Query executed but returned no rows.
          */
 
         if (rows.length === 0) {
@@ -2095,7 +1736,7 @@ window.displaySandboxResults =
                 <div class="empty-results">
 
                     <div class="empty-results-icon">
-                        ✓
+                        ◫
                     </div>
 
                     <p>
@@ -2210,6 +1851,10 @@ window.displaySandboxResults =
         }
 
 
+        /*
+         * Enable CSV download only when rows exist.
+         */
+
         if (downloadResultsButton) {
 
             downloadResultsButton.disabled =
@@ -2224,30 +1869,27 @@ window.displaySandboxResults =
  * HTML ESCAPE
  * ============================================================ */
 
-function escapeHTML(value) {
+function escapeHTML(
+    value
+) {
 
     return String(value)
-
         .replace(
             /&/g,
             "&amp;"
         )
-
         .replace(
             /</g,
             "&lt;"
         )
-
         .replace(
             />/g,
             "&gt;"
         )
-
         .replace(
             /"/g,
             "&quot;"
         )
-
         .replace(
             /'/g,
             "&#039;"
@@ -2255,29 +1897,32 @@ function escapeHTML(value) {
 
 }
 
+
 /* ============================================================
- * INITIAL STATE
+ * INITIALIZE SANDBOX
  * ============================================================ */
 
 /*
- * Results are hidden when the page initially loads.
+ * Important initialization order:
  *
- * This gives the SQL editor maximum available space.
+ * 1. Load saved state
+ * 2. Render Database Explorer
+ * 3. Update active database
+ * 4. Reset query-result UI
+ *
+ * This means refreshing sandbox.html will NOT remove the
+ * databases created by the user.
  */
 
-clearResultsDisplay();
+loadSandboxState();
 
+renderDatabaseTree();
 
-closeResultsPanel();
+updateActiveDatabaseLabel();
 
-
-/*
- * Start SQLite.
- */
-
-initializeSQLite();
+clearResults();
 
 
 console.log(
-    "✅ SQL Sandbox UI loaded."
+    "✅ Sandbox UI and persistent state loaded successfully."
 );
