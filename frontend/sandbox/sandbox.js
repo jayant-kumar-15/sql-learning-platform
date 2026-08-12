@@ -3,10 +3,16 @@
  * SQL SANDBOX
  * ============================================================
  *
- * Step 1:
- * UI behaviour only.
+ * Current step:
+ * - UI behaviour
+ * - Query editor
+ * - Query results open/close behaviour
+ * - Database modal
+ * - Database sidebar
+ * - Table selection
+ * - CSV download
  *
- * SQLite connection will be added in the next step.
+ * SQLite execution will be connected in the next step.
  * ============================================================
  */
 
@@ -16,111 +22,79 @@
  * ============================================================ */
 
 const sqlEditor =
-    document.getElementById(
-        "sql-editor"
-    );
+    document.getElementById("sql-editor");
 
 
 const runQueryButton =
-    document.getElementById(
-        "run-query-button"
-    );
-
-
-const clearQueryButton =
-    document.getElementById(
-        "clear-query-button"
-    );
+    document.getElementById("run-query-button");
 
 
 const sandboxStatus =
-    document.getElementById(
-        "sandbox-status"
-    );
+    document.getElementById("sandbox-status");
+
+
+const resultsSection =
+    document.getElementById("results-section");
 
 
 const resultsContainer =
-    document.getElementById(
-        "results-container"
-    );
+    document.getElementById("results-container");
 
 
 const resultsSummary =
-    document.getElementById(
-        "results-summary"
-    );
+    document.getElementById("results-summary");
 
 
 const downloadResultsButton =
-    document.getElementById(
-        "download-results-button"
-    );
+    document.getElementById("download-results-button");
+
+
+const closeResultsButton =
+    document.getElementById("close-results-button");
 
 
 const databaseModal =
-    document.getElementById(
-        "database-modal"
-    );
+    document.getElementById("database-modal");
 
 
 const createDatabaseButton =
-    document.getElementById(
-        "create-database-button"
-    );
+    document.getElementById("create-database-button");
 
 
 const closeDatabaseModal =
-    document.getElementById(
-        "close-database-modal"
-    );
+    document.getElementById("close-database-modal");
 
 
 const cancelDatabaseButton =
-    document.getElementById(
-        "cancel-database-button"
-    );
+    document.getElementById("cancel-database-button");
 
 
 const saveDatabaseButton =
-    document.getElementById(
-        "save-database-button"
-    );
+    document.getElementById("save-database-button");
 
 
 const databaseNameInput =
-    document.getElementById(
-        "database-name-input"
-    );
+    document.getElementById("database-name-input");
 
 
 const activeDatabaseLabel =
-    document.getElementById(
-        "active-database-label"
-    );
+    document.getElementById("active-database-label");
 
 
 const mobileSidebarButton =
-    document.getElementById(
-        "mobile-sidebar-button"
-    );
+    document.getElementById("mobile-sidebar-button");
 
 
 const closeSidebarButton =
-    document.getElementById(
-        "close-sidebar-button"
-    );
+    document.getElementById("close-sidebar-button");
 
 
 const databaseSidebar =
-    document.getElementById(
-        "database-sidebar"
-    );
+    document.getElementById("database-sidebar");
 
 
 const databaseSearchInput =
-    document.getElementById(
-        "database-search-input"
-    );
+    document.getElementById("database-search-input");
 
 
 /* ============================================================
@@ -128,6 +102,97 @@ const databaseSearchInput =
  * ============================================================ */
 
 let latestResults = null;
+
+
+/* ============================================================
+ * RESULTS PANEL STATE
+ * ============================================================ */
+
+/*
+ * Open the Query Results panel.
+ *
+ * CSS will use the "results-open" class to reduce the
+ * SQL editor height and give space to the results.
+ */
+
+function openResultsPanel() {
+
+    if (!resultsSection) {
+        return;
+    }
+
+
+    resultsSection.hidden = false;
+
+    resultsSection.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "results-open"
+    );
+
+}
+
+
+/*
+ * Close the Query Results panel.
+ *
+ * The SQL editor automatically gets the released
+ * space through CSS.
+ */
+
+function closeResultsPanel() {
+
+    if (!resultsSection) {
+        return;
+    }
+
+
+    resultsSection.hidden = true;
+
+    resultsSection.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.classList.remove(
+        "results-open"
+    );
+
+
+    /*
+     * Return cursor to SQL editor.
+     */
+
+    if (sqlEditor) {
+
+        sqlEditor.focus();
+
+    }
+
+}
+
+
+/* ============================================================
+ * CLOSE RESULTS BUTTON
+ * ============================================================ */
+
+if (closeResultsButton) {
+
+    closeResultsButton.addEventListener(
+        "click",
+        function () {
+
+            closeResultsPanel();
+
+        }
+    );
+
+}
 
 
 /* ============================================================
@@ -140,9 +205,19 @@ if (runQueryButton) {
         "click",
         function () {
 
+            if (!sqlEditor) {
+                return;
+            }
+
+
             const query =
                 sqlEditor.value.trim();
 
+
+            /*
+             * Do not open results if
+             * the query editor is empty.
+             */
 
             if (!query) {
 
@@ -151,14 +226,24 @@ if (runQueryButton) {
                     "error"
                 );
 
+                sqlEditor.focus();
+
                 return;
 
             }
 
 
             /*
-             * SQLite will be connected
-             * here in Step 2.
+             * Open results ONLY after
+             * the user clicks Run Query.
+             */
+
+            openResultsPanel();
+
+
+            /*
+             * SQLite will be connected here
+             * in the next development step.
              */
 
             showStatus(
@@ -166,32 +251,53 @@ if (runQueryButton) {
                 "info"
             );
 
-        }
-    );
 
-}
+            /*
+             * Temporary result state.
+             *
+             * This prevents the old result from
+             * remaining visible when a new query
+             * is executed.
+             */
+
+            latestResults = null;
 
 
-/* ============================================================
- * CLEAR QUERY
- * ============================================================ */
+            if (resultsSummary) {
 
-if (clearQueryButton) {
+                resultsSummary.textContent =
+                    "Waiting for SQL engine...";
 
-    clearQueryButton.addEventListener(
-        "click",
-        function () {
+            }
 
-            sqlEditor.value = "";
 
-            sqlEditor.focus();
+            if (downloadResultsButton) {
 
-            clearResults();
+                downloadResultsButton.disabled =
+                    true;
 
-            showStatus(
-                "",
-                ""
-            );
+            }
+
+
+            if (resultsContainer) {
+
+                resultsContainer.innerHTML = `
+
+                    <div class="empty-results">
+
+                        <div class="empty-results-icon">
+                            ◫
+                        </div>
+
+                        <p>
+                            SQL engine connection will be added next.
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
 
         }
     );
@@ -237,11 +343,20 @@ if (cancelDatabaseButton) {
 }
 
 
+/* ============================================================
+ * SAVE DATABASE
+ * ============================================================ */
+
 if (saveDatabaseButton) {
 
     saveDatabaseButton.addEventListener(
         "click",
         function () {
+
+            if (!databaseNameInput) {
+                return;
+            }
+
 
             const name =
                 databaseNameInput.value.trim();
@@ -253,6 +368,8 @@ if (saveDatabaseButton) {
                     "Please enter a database name."
                 );
 
+                databaseNameInput.focus();
+
                 return;
 
             }
@@ -261,14 +378,20 @@ if (saveDatabaseButton) {
             /*
              * Temporary UI behaviour.
              *
-             * Actual IndexedDB/SQLite
-             * creation comes in Step 2.
+             * Actual SQLite/database storage
+             * will be added in the next step.
              */
 
-            activeDatabaseLabel.textContent =
-                name;
+            if (activeDatabaseLabel) {
+
+                activeDatabaseLabel.textContent =
+                    name;
+
+            }
+
 
             closeDatabaseModalWindow();
+
 
             showStatus(
                 "✅ Database '" +
@@ -289,13 +412,23 @@ if (saveDatabaseButton) {
 
 function openDatabaseModal() {
 
+    if (!databaseModal) {
+        return;
+    }
+
+
     databaseModal.classList.remove(
         "hidden"
     );
 
-    databaseNameInput.value = "";
 
-    databaseNameInput.focus();
+    if (databaseNameInput) {
+
+        databaseNameInput.value = "";
+
+        databaseNameInput.focus();
+
+    }
 
 }
 
@@ -306,8 +439,38 @@ function openDatabaseModal() {
 
 function closeDatabaseModalWindow() {
 
+    if (!databaseModal) {
+        return;
+    }
+
+
     databaseModal.classList.add(
         "hidden"
+    );
+
+}
+
+
+/* ============================================================
+ * CLOSE MODAL WHEN CLICKING OVERLAY
+ * ============================================================ */
+
+if (databaseModal) {
+
+    databaseModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                databaseModal
+            ) {
+
+                closeDatabaseModalWindow();
+
+            }
+
+        }
     );
 
 }
@@ -318,6 +481,11 @@ function closeDatabaseModalWindow() {
  * ============================================================ */
 
 function showModalError(message) {
+
+    if (!databaseNameInput) {
+        return;
+    }
+
 
     const existing =
         document.querySelector(
@@ -343,7 +511,7 @@ function showModalError(message) {
 
 
     error.style.color =
-        "#dc2626";
+        "#ef4444";
 
 
     error.style.fontSize =
@@ -377,9 +545,7 @@ function showStatus(
 ) {
 
     if (!sandboxStatus) {
-
         return;
-
     }
 
 
@@ -402,6 +568,17 @@ function clearResults() {
 
     latestResults = null;
 
+
+    /*
+     * Close results panel completely.
+     */
+
+    closeResultsPanel();
+
+
+    /*
+     * Reset result content.
+     */
 
     if (resultsContainer) {
 
@@ -453,9 +630,7 @@ if (downloadResultsButton) {
         function () {
 
             if (!latestResults) {
-
                 return;
-
             }
 
 
@@ -611,7 +786,10 @@ function csvEscape(value) {
  * MOBILE SIDEBAR
  * ============================================================ */
 
-if (mobileSidebarButton) {
+if (
+    mobileSidebarButton &&
+    databaseSidebar
+) {
 
     mobileSidebarButton.addEventListener(
         "click",
@@ -627,7 +805,10 @@ if (mobileSidebarButton) {
 }
 
 
-if (closeSidebarButton) {
+if (
+    closeSidebarButton &&
+    databaseSidebar
+) {
 
     closeSidebarButton.addEventListener(
         "click",
@@ -645,106 +826,153 @@ if (closeSidebarButton) {
 
 /* ============================================================
  * DATABASE TREE
+ *
+ * Event delegation is used here so that databases/tables
+ * created dynamically by sandbox.js will also work.
  * ============================================================ */
 
-document
-    .querySelectorAll(
-        ".database-header"
-    )
-    .forEach(
-        function (header) {
+if (databaseSidebar) {
 
-            header.addEventListener(
-                "click",
-                function () {
+    databaseSidebar.addEventListener(
+        "click",
+        function (event) {
 
-                    const databaseItem =
-                        header.parentElement;
+            const header =
+                event.target.closest(
+                    ".database-header"
+                );
 
 
-                    const tableList =
-                        databaseItem.querySelector(
-                            ".table-list"
-                        );
+            if (header) {
+
+                toggleDatabaseTree(
+                    header
+                );
+
+                return;
+
+            }
 
 
-                    const arrow =
-                        header.querySelector(
-                            ".database-arrow"
-                        );
+            const table =
+                event.target.closest(
+                    ".table-item"
+                );
 
 
-                    if (!tableList) {
+            if (table) {
 
-                        return;
+                selectTable(
+                    table
+                );
 
-                    }
-
-
-                    const isHidden =
-                        tableList.style.display ===
-                        "none";
-
-
-                    tableList.style.display =
-                        isHidden
-                            ? "block"
-                            : "none";
-
-
-                    arrow.textContent =
-                        isHidden
-                            ? "▼"
-                            : "▶";
-
-                }
-            );
+            }
 
         }
     );
+
+}
 
 
 /* ============================================================
- * TABLE CLICK
+ * DATABASE TREE TOGGLE
  * ============================================================ */
 
-document
-    .querySelectorAll(
-        ".table-item"
-    )
-    .forEach(
-        function (table) {
+function toggleDatabaseTree(header) {
 
-            table.addEventListener(
-                "click",
-                function () {
-
-                    const tableName =
-                        table.dataset.table;
+    const databaseItem =
+        header.parentElement;
 
 
-                    sqlEditor.value =
-                        "SELECT *\nFROM " +
-                        tableName +
-                        ";";
+    if (!databaseItem) {
+        return;
+    }
 
 
-                    sqlEditor.focus();
+    const tableList =
+        databaseItem.querySelector(
+            ".table-list"
+        );
 
 
-                    /*
-                     * Close mobile sidebar.
-                     */
+    const arrow =
+        header.querySelector(
+            ".database-arrow"
+        );
 
-                    databaseSidebar.classList.remove(
-                        "mobile-open"
-                    );
 
-                }
-            );
+    if (!tableList) {
+        return;
+    }
 
-        }
-    );
+
+    const isHidden =
+        tableList.style.display ===
+        "none";
+
+
+    tableList.style.display =
+        isHidden
+            ? "block"
+            : "none";
+
+
+    if (arrow) {
+
+        arrow.textContent =
+            isHidden
+                ? "▼"
+                : "▶";
+
+    }
+
+}
+
+
+/* ============================================================
+ * TABLE SELECTION
+ * ============================================================ */
+
+function selectTable(table) {
+
+    if (!sqlEditor) {
+        return;
+    }
+
+
+    const tableName =
+        table.dataset.table;
+
+
+    if (!tableName) {
+        return;
+    }
+
+
+    sqlEditor.value =
+        "SELECT *\n" +
+        "FROM " +
+        tableName +
+        ";";
+
+
+    sqlEditor.focus();
+
+
+    /*
+     * If mobile sidebar is open,
+     * close it after table selection.
+     */
+
+    if (databaseSidebar) {
+
+        databaseSidebar.classList.remove(
+            "mobile-open"
+        );
+
+    }
+
+}
 
 
 /* ============================================================
@@ -763,6 +991,10 @@ if (databaseSearchInput) {
                     .toLowerCase();
 
 
+            /*
+             * Search tables.
+             */
+
             document
                 .querySelectorAll(
                     ".table-item"
@@ -770,16 +1002,62 @@ if (databaseSearchInput) {
                 .forEach(
                     function (table) {
 
-                        const name =
-                            table
-                                .dataset
-                                .table
-                                .toLowerCase();
+                        const tableName =
+                            (
+                                table.dataset.table ||
+                                ""
+                            ).toLowerCase();
 
 
                         table.style.display =
-                            name.includes(search)
+                            tableName.includes(search)
                                 ? "flex"
+                                : "none";
+
+                    }
+                );
+
+
+            /*
+             * Search database names too.
+             */
+
+            document
+                .querySelectorAll(
+                    ".database-item"
+                )
+                .forEach(
+                    function (databaseItem) {
+
+                        const databaseNameElement =
+                            databaseItem.querySelector(
+                                ".database-name"
+                            );
+
+
+                        const databaseName =
+                            databaseNameElement
+                                ? databaseNameElement.textContent
+                                    .trim()
+                                    .toLowerCase()
+                                : "";
+
+
+                        const matchingTable =
+                            databaseItem.querySelector(
+                                ".table-item:not([style*='display: none'])"
+                            );
+
+
+                        const shouldShow =
+                            !search ||
+                            databaseName.includes(search) ||
+                            !!matchingTable;
+
+
+                        databaseItem.style.display =
+                            shouldShow
+                                ? ""
                                 : "none";
 
                     }
@@ -795,17 +1073,29 @@ if (databaseSearchInput) {
  * GLOBAL SANDBOX RESULT RENDERER
  * ============================================================
  *
- * SQLite engine will call this later.
- */
+ * SQLite engine will call this function later:
+ *
+ * window.displaySandboxResults({
+ *     columns: [...],
+ *     rows: [...],
+ *     executionTime: 12
+ * });
+ * ============================================================ */
 
 window.displaySandboxResults =
     function (data) {
 
         if (!data) {
-
             return;
-
         }
+
+
+        /*
+         * Open results automatically when actual
+         * query data is received.
+         */
+
+        openResultsPanel();
 
 
         latestResults =
@@ -824,7 +1114,17 @@ window.displaySandboxResults =
                 : [];
 
 
+        /*
+         * Update summary.
+         */
+
         if (resultsSummary) {
+
+            const executionTime =
+                Number(
+                    data.executionTime || 0
+                );
+
 
             resultsSummary.textContent =
                 rows.length +
@@ -835,185 +1135,4 @@ window.displaySandboxResults =
                         : "s"
                 ) +
                 " • " +
-                (
-                    data.executionTime ||
-                    0
-                ) +
-                " ms";
-
-        }
-
-
-        if (!resultsContainer) {
-
-            return;
-
-        }
-
-
-        if (rows.length === 0) {
-
-            resultsContainer.innerHTML = `
-
-                <div class="empty-results">
-
-                    <div class="empty-results-icon">
-                        ◫
-                    </div>
-
-                    <p>
-                        Query executed successfully.
-                        No rows returned.
-                    </p>
-
-                </div>
-
-            `;
-
-        }
-
-
-        else {
-
-            let html = `
-
-                <table class="results-table">
-
-                    <thead>
-
-                        <tr>
-            `;
-
-
-            columns.forEach(
-                function (column) {
-
-                    html +=
-                        "<th>" +
-                        escapeHTML(
-                            column
-                        ) +
-                        "</th>";
-
-                }
-            );
-
-
-            html += `
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-            `;
-
-
-            rows.forEach(
-                function (row) {
-
-                    html += "<tr>";
-
-
-                    columns.forEach(
-                        function (column) {
-
-                            let value =
-                                row[column];
-
-
-                            if (
-                                value === null ||
-                                value === undefined
-                            ) {
-
-                                value =
-                                    "NULL";
-
-                            }
-
-
-                            html +=
-                                "<td>" +
-                                escapeHTML(
-                                    value
-                                ) +
-                                "</td>";
-
-                        }
-                    );
-
-
-                    html += "</tr>";
-
-                }
-            );
-
-
-            html += `
-
-                    </tbody>
-
-                </table>
-
-            `;
-
-
-            resultsContainer.innerHTML =
-                html;
-
-        }
-
-
-        if (downloadResultsButton) {
-
-            downloadResultsButton.disabled =
-                rows.length === 0;
-
-        }
-
-    };
-
-
-/* ============================================================
- * HTML ESCAPE
- * ============================================================ */
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* ============================================================
- * INITIAL STATE
- * ============================================================ */
-
-clearResults();
-
-
-console.log(
-    "✅ Sandbox UI loaded successfully."
-);
+                executio
