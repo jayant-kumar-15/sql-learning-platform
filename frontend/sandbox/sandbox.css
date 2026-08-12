@@ -1,12 +1,11 @@
 /* ============================================================
    SQL SANDBOX
-   Dark theme
+   Dark theme — Snowflake-style worksheet layout
    ============================================================ */
 
 * {
     box-sizing: border-box;
 }
-
 
 html,
 body {
@@ -15,8 +14,9 @@ body {
 
     width: 100%;
     height: 100%;
-}
 
+    overflow: hidden;
+}
 
 body {
     font-family:
@@ -27,10 +27,7 @@ body {
         sans-serif;
 
     background: #0b1120;
-
     color: #e5e7eb;
-
-    overflow: hidden;
 }
 
 
@@ -41,6 +38,7 @@ body {
 .platform-header {
 
     height: 58px;
+    min-height: 58px;
 
     display: flex;
     align-items: center;
@@ -51,17 +49,13 @@ body {
     background: #0f172a;
 
     border-bottom: 1px solid #263247;
-
-    overflow: hidden;
 }
-
 
 .platform-header h1 {
 
     margin: 0;
 
     font-size: 18px;
-
     font-weight: 700;
 
     color: #f8fafc;
@@ -69,20 +63,24 @@ body {
     white-space: nowrap;
 }
 
-
 .platform-nav {
 
     display: flex;
-
     align-items: center;
 
     gap: 22px;
 
-    flex-shrink: 0;
+    min-width: 0;
 
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: none;
 }
 
+.platform-nav::-webkit-scrollbar {
+    display: none;
+}
 
 .platform-nav a {
 
@@ -91,23 +89,16 @@ body {
     text-decoration: none;
 
     font-size: 13px;
-
     font-weight: 600;
 
     white-space: nowrap;
-
-    transition: color .15s ease;
 }
 
-
 .platform-nav a:hover {
-
     color: #60a5fa;
 }
 
-
 .platform-nav a[href="sandbox.html"] {
-
     color: #60a5fa;
 }
 
@@ -119,6 +110,7 @@ body {
 .sandbox-header {
 
     height: 42px;
+    min-height: 42px;
 
     display: flex;
     align-items: center;
@@ -128,44 +120,33 @@ body {
     background: #0f172a;
 
     border-bottom: 1px solid #263247;
-
-    overflow: hidden;
 }
-
 
 .header-left {
 
     display: flex;
-
     align-items: center;
 }
-
 
 .page-title {
 
     font-size: 13px;
-
     font-weight: 700;
 
     color: #dbeafe;
 }
 
-
 .header-right {
-
     margin-left: auto;
 }
-
 
 .active-database-label {
 
     color: #93c5fd;
 
     font-size: 12px;
-
     font-weight: 600;
 }
-
 
 .mobile-sidebar-button {
 
@@ -182,9 +163,7 @@ body {
     cursor: pointer;
 }
 
-
 .close-sidebar-button {
-
     display: none;
 }
 
@@ -214,33 +193,27 @@ body {
 .database-sidebar {
 
     width: 260px;
-
     min-width: 260px;
 
-    height: 100%;
-
     display: flex;
-
     flex-direction: column;
 
     background: #0f172a;
 
     border-right: 1px solid #263247;
-}
 
+    min-height: 0;
+}
 
 .sidebar-header {
 
     height: 46px;
-
     min-height: 46px;
 
     padding: 0 14px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     border-bottom: 1px solid #263247;
@@ -248,29 +221,23 @@ body {
     color: #94a3b8;
 
     font-size: 11px;
-
     font-weight: 700;
 
     letter-spacing: .06em;
 }
 
-
 .database-search {
-
     padding: 10px;
 }
-
 
 .database-search input {
 
     width: 100%;
-
     height: 34px;
 
     padding: 0 10px;
 
     border: 1px solid #334155;
-
     border-radius: 6px;
 
     outline: none;
@@ -282,12 +249,9 @@ body {
     font-size: 13px;
 }
 
-
 .database-search input::placeholder {
-
     color: #64748b;
 }
-
 
 .database-search input:focus {
 
@@ -297,7 +261,6 @@ body {
         0 0 0 2px rgba(59, 130, 246, .12);
 }
 
-
 .database-tree {
 
     flex: 1;
@@ -305,12 +268,10 @@ body {
     min-height: 0;
 
     overflow-y: auto;
-
     overflow-x: hidden;
 
     padding: 5px 8px;
 }
-
 
 .empty-database-message {
 
@@ -321,14 +282,12 @@ body {
     color: #64748b;
 }
 
-
 .empty-database-icon {
 
     font-size: 30px;
 
     margin-bottom: 9px;
 }
-
 
 .empty-database-message p {
 
@@ -337,10 +296,8 @@ body {
     color: #94a3b8;
 
     font-size: 13px;
-
     font-weight: 600;
 }
-
 
 .empty-database-message span {
 
@@ -355,21 +312,18 @@ body {
 
 
 /* ============================================================
-   DATABASE
+   DATABASE TREE
    ============================================================ */
 
 .database-item {
-
     margin-bottom: 5px;
 }
-
 
 .database-header {
 
     height: 34px;
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
@@ -381,18 +335,14 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 
     color: #e2e8f0;
 }
 
-
 .database-header:hover {
-
     background: #172338;
 }
-
 
 .database-arrow {
 
@@ -403,31 +353,23 @@ body {
     font-size: 10px;
 }
 
-
 .database-icon {
-
     font-size: 14px;
 }
 
-
 .database-name {
-
     color: #e2e8f0;
 }
 
-
 .table-list {
-
     padding-left: 26px;
 }
-
 
 .table-item {
 
     height: 32px;
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
@@ -443,7 +385,6 @@ body {
     cursor: pointer;
 }
 
-
 .table-item:hover {
 
     background: #172338;
@@ -458,16 +399,14 @@ body {
 
 .sidebar-actions {
 
-    padding: 9px;
+    padding: 11px;
 
     border-top: 1px solid #263247;
 }
 
-
 .create-database-button {
 
     width: 100%;
-
     height: 36px;
 
     border: 1px solid #334155;
@@ -481,10 +420,8 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 }
-
 
 .create-database-button:hover {
 
@@ -497,7 +434,7 @@ body {
 
 
 /* ============================================================
-   WORKSPACE
+   MAIN WORKSPACE
    ============================================================ */
 
 .sandbox-workspace {
@@ -505,11 +442,9 @@ body {
     flex: 1;
 
     min-width: 0;
-
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
 
     background: #0b1120;
@@ -524,38 +459,28 @@ body {
 
 .sandbox-info-banner {
 
-    min-height: 54px;
-
-    height: 54px;
+    height: 58px;
+    min-height: 58px;
 
     display: flex;
-
     align-items: center;
 
     gap: 11px;
 
-    padding: 7px 15px;
+    padding: 8px 15px;
 
     background: #111c31;
 
     border-bottom: 1px solid #263247;
-
-    overflow: hidden;
 }
-
 
 .sandbox-info-icon {
 
     width: 34px;
-
     height: 34px;
 
-    min-width: 34px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     border-radius: 7px;
@@ -567,18 +492,15 @@ body {
     font-size: 16px;
 }
 
-
 .sandbox-info-content {
 
     display: flex;
-
     flex-direction: column;
 
     gap: 2px;
 
     min-width: 0;
 }
-
 
 .sandbox-info-content strong {
 
@@ -587,37 +509,26 @@ body {
     font-size: 13px;
 }
 
-
 .sandbox-info-content span {
 
-    color: #aebbd0;
+    color: #b9c7dc;
 
     font-size: 11px;
 
     line-height: 1.4;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
 }
 
 
 /* ============================================================
    QUERY TABS
-   IMPORTANT:
-   NO HORIZONTAL SCROLLER HERE
    ============================================================ */
 
 .query-tabs-container {
 
     height: 40px;
-
     min-height: 40px;
 
     display: flex;
-
     align-items: stretch;
 
     background: #0f172a;
@@ -627,26 +538,35 @@ body {
     overflow: hidden;
 }
 
-
 .query-tabs {
 
     display: flex;
-
     align-items: stretch;
 
     min-width: 0;
 
-    /*
-     * IMPORTANT:
-     * Do NOT use overflow-x:auto here.
-     * That was creating the unwanted scrollbar
-     * beside Query 1.
-     */
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scrollbar-width: thin;
 }
 
+.query-tabs::-webkit-scrollbar {
+    height: 5px;
+}
+
+.query-tabs::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+.query-tabs::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 5px;
+}
 
 .query-tab {
+
+    flex: 0 0 auto;
 
     min-width: 90px;
 
@@ -665,12 +585,10 @@ body {
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
 
     white-space: nowrap;
 }
-
 
 .query-tab:hover {
 
@@ -678,7 +596,6 @@ body {
 
     color: #dbeafe;
 }
-
 
 .query-tab.active {
 
@@ -688,7 +605,6 @@ body {
 
     border-top: 2px solid #3b82f6;
 }
-
 
 .query-tab-name {
 
@@ -707,7 +623,6 @@ body {
 .new-query-button {
 
     width: 40px;
-
     min-width: 40px;
 
     height: 40px;
@@ -723,10 +638,7 @@ body {
     font-size: 18px;
 
     cursor: pointer;
-
-    flex-shrink: 0;
 }
-
 
 .new-query-button:hover {
 
@@ -740,17 +652,23 @@ body {
    SQL EDITOR SECTION
    ============================================================ */
 
+/*
+   IMPORTANT:
+
+   The editor owns ALL available vertical space when
+   results are closed.
+
+   Results are completely removed from layout until
+   JavaScript adds .results-open to the workspace.
+*/
+
 .sql-editor-section {
 
-    /*
-     * The editor takes most of the workspace.
-     */
     flex: 1;
 
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
 
     background: #0b1120;
@@ -762,19 +680,28 @@ body {
 
 
 /* ============================================================
+   WHEN RESULTS ARE OPEN
+   ============================================================ */
+
+.sandbox-workspace.results-open .sql-editor-section {
+
+    flex: 0 0 62%;
+
+    min-height: 0;
+}
+
+
+/* ============================================================
    WORKSPACE TOOLBAR
    ============================================================ */
 
 .workspace-toolbar {
 
     height: 46px;
-
     min-height: 46px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     padding: 0 13px;
@@ -782,36 +709,27 @@ body {
     background: #0f172a;
 
     border-bottom: 1px solid #263247;
-
-    overflow: hidden;
 }
-
 
 .workspace-title {
 
     color: #cbd5e1;
 
     font-size: 11px;
-
     font-weight: 700;
 
     letter-spacing: .05em;
-
-    white-space: nowrap;
 }
-
 
 .workspace-actions {
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
 
-    flex-shrink: 0;
+    min-width: 0;
 }
-
 
 .toolbar-button,
 .run-query-button {
@@ -825,12 +743,10 @@ body {
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
 
     white-space: nowrap;
 }
-
 
 .toolbar-button {
 
@@ -841,20 +757,14 @@ body {
     color: #d1d9e6;
 }
 
-
 .toolbar-button:hover {
 
     background: #172338;
 
-    border-color: #4b6b9b;
+    border-color: #60a5fa;
 
     color: #ffffff;
 }
-
-
-/* ============================================================
-   DESCRIBE / SCHEMA / RELATIONSHIPS
-   ============================================================ */
 
 #describe-table-button,
 #view-schema-button,
@@ -867,7 +777,6 @@ body {
     color: #dbeafe;
 }
 
-
 #describe-table-button:hover,
 #view-schema-button:hover,
 #view-relationships-button:hover {
@@ -879,11 +788,6 @@ body {
     color: #ffffff;
 }
 
-
-/* ============================================================
-   RUN QUERY
-   ============================================================ */
-
 .run-query-button {
 
     border: 0;
@@ -893,16 +797,12 @@ body {
     color: #ffffff;
 
     padding-left: 15px;
-
     padding-right: 15px;
 }
 
-
 .run-query-button:hover {
-
     background: #3b82f6;
 }
-
 
 .run-query-button:disabled {
 
@@ -922,35 +822,25 @@ body {
 
     min-height: 0;
 
-    padding: 8px 10px 5px;
+    padding: 8px;
 
     background: #0b1120;
 
     overflow: hidden;
 }
 
-
-/*
- * THIS is the actual SQL editor.
- *
- * The scrollbar belongs here.
- */
-
 .sql-editor {
 
     display: block;
 
     width: 100%;
-
     height: 100%;
-
-    min-height: 0;
 
     resize: none;
 
     padding: 16px;
 
-    border: 1px solid #3b82f6;
+    border: 1px solid #334155;
 
     border-radius: 8px;
 
@@ -958,7 +848,7 @@ body {
 
     background: #111c31;
 
-    color: #f8fafc;
+    color: #f1f5f9;
 
     caret-color: #60a5fa;
 
@@ -972,71 +862,62 @@ body {
 
     line-height: 1.65;
 
-    /*
-     * Vertical and horizontal scrolling happens
-     * INSIDE THIS BOX.
-     */
-    overflow-y: auto;
-
-    overflow-x: auto;
-
     white-space: pre;
 
     tab-size: 4;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+
+    scrollbar-color: #475569 #0f172a;
 
     box-shadow:
         inset 0 1px 2px rgba(0, 0, 0, .25);
 }
 
-
 .sql-editor::placeholder {
 
-    color: #64748b;
+    color: #718096;
 
     opacity: 1;
 }
 
-
 .sql-editor:focus {
 
-    border-color: #60a5fa;
+    border-color: #3b82f6;
 
     box-shadow:
-        0 0 0 2px rgba(59, 130, 246, .15),
+        0 0 0 2px rgba(59, 130, 246, .12),
         inset 0 1px 2px rgba(0, 0, 0, .25);
 }
 
 
 /* ============================================================
    SQL EDITOR SCROLLBAR
-   THIS IS WHERE THE SCROLLER WILL APPEAR
+   ONLY THE QUERY EDITOR GETS THIS SCROLLBAR
    ============================================================ */
 
 .sql-editor::-webkit-scrollbar {
 
     width: 10px;
-
     height: 10px;
 }
 
-
 .sql-editor::-webkit-scrollbar-track {
 
-    background: #0b1120;
+    background: #0f172a;
 
     border-radius: 8px;
 }
-
 
 .sql-editor::-webkit-scrollbar-thumb {
 
     background: #475569;
 
     border-radius: 8px;
-
-    border: 2px solid #0b1120;
 }
-
 
 .sql-editor::-webkit-scrollbar-thumb:hover {
 
@@ -1045,24 +926,21 @@ body {
 
 
 /* ============================================================
-   SANDBOX STATUS
+   STATUS
    ============================================================ */
 
 .sandbox-status {
 
-    height: 25px;
+    height: 26px;
+    min-height: 26px;
 
-    min-height: 25px;
-
-    padding: 3px 13px;
+    padding: 4px 13px;
 
     background: #0b1120;
 
     color: #94a3b8;
 
     font-size: 12px;
-
-    overflow: hidden;
 }
 
 
@@ -1070,45 +948,62 @@ body {
    QUERY RESULTS
    ============================================================ */
 
+/*
+   CRITICAL:
+
+   Results are NOT displayed by default.
+
+   This means the SQL editor gets all available
+   vertical space.
+*/
+
 .results-section {
 
-    /*
-     * Results get only the remaining space.
-     * This removes the unnecessary gap below the editor.
-     */
-    height: 32%;
+    display: none;
 
-    min-height: 130px;
+    flex: 0 0 38%;
 
-    display: flex;
+    min-height: 0;
 
     flex-direction: column;
 
     background: #0f172a;
 
+    border-top: 1px solid #334155;
+
     overflow: hidden;
 }
 
 
+/*
+   JavaScript adds this class after Run Query.
+*/
+
+.sandbox-workspace.results-open .results-section {
+
+    display: flex;
+}
+
+
+/* ============================================================
+   RESULTS HEADER
+   ============================================================ */
+
 .results-header {
 
     height: 48px;
-
     min-height: 48px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    padding: 5px 13px;
+    padding: 6px 13px;
 
     background: #0f172a;
 
     border-bottom: 1px solid #263247;
 }
-
 
 .results-header h2 {
 
@@ -1119,7 +1014,6 @@ body {
     font-size: 14px;
 }
 
-
 .results-summary {
 
     color: #94a3b8;
@@ -1127,6 +1021,19 @@ body {
     font-size: 11px;
 }
 
+.results-header-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+
+/* ============================================================
+   DOWNLOAD BUTTON
+   ============================================================ */
 
 .download-button {
 
@@ -1145,10 +1052,8 @@ body {
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
 }
-
 
 .download-button:hover:not(:disabled) {
 
@@ -1159,12 +1064,49 @@ body {
     color: #ffffff;
 }
 
-
 .download-button:disabled {
 
     opacity: .45;
 
     cursor: not-allowed;
+}
+
+
+/* ============================================================
+   CLOSE RESULTS BUTTON
+   ============================================================ */
+
+.close-results-button {
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #334155;
+
+    border-radius: 6px;
+
+    background: #111c31;
+
+    color: #cbd5e1;
+
+    font-size: 20px;
+
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.close-results-button:hover {
+
+    background: #172338;
+
+    border-color: #60a5fa;
+
+    color: #ffffff;
 }
 
 
@@ -1192,19 +1134,14 @@ body {
 
     height: 100%;
 
-    min-height: 80px;
-
     display: flex;
-
     flex-direction: column;
 
     align-items: center;
-
     justify-content: center;
 
     color: #64748b;
 }
-
 
 .empty-results-icon {
 
@@ -1214,7 +1151,6 @@ body {
 
     color: #475569;
 }
-
 
 .empty-results p {
 
@@ -1239,7 +1175,6 @@ body {
     font-size: 13px;
 }
 
-
 .results-table th {
 
     position: sticky;
@@ -1263,7 +1198,6 @@ body {
     white-space: nowrap;
 }
 
-
 .results-table td {
 
     padding: 8px 12px;
@@ -1275,9 +1209,7 @@ body {
     white-space: nowrap;
 }
 
-
 .results-table tr:hover td {
-
     background: #172338;
 }
 
@@ -1292,13 +1224,11 @@ body {
     width: 9px;
 }
 
-
 .results-container::-webkit-scrollbar-track,
 .database-tree::-webkit-scrollbar-track {
 
     background: #0b1120;
 }
-
 
 .results-container::-webkit-scrollbar-thumb,
 .database-tree::-webkit-scrollbar-thumb {
@@ -1307,7 +1237,6 @@ body {
 
     border-radius: 8px;
 }
-
 
 .results-container::-webkit-scrollbar-thumb:hover,
 .database-tree::-webkit-scrollbar-thumb:hover {
@@ -1329,7 +1258,6 @@ body {
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
     background: rgba(2, 6, 23, .72);
@@ -1337,12 +1265,9 @@ body {
     z-index: 1000;
 }
 
-
 .modal-overlay.hidden {
-
     display: none;
 }
-
 
 .modal {
 
@@ -1360,20 +1285,17 @@ body {
         0 20px 50px rgba(0, 0, 0, .5);
 }
 
-
 .modal-header {
 
     display: flex;
 
     align-items: center;
-
     justify-content: space-between;
 
     padding: 16px 18px;
 
     border-bottom: 1px solid #263247;
 }
-
 
 .modal-header h2 {
 
@@ -1383,7 +1305,6 @@ body {
 
     font-size: 16px;
 }
-
 
 .modal-close {
 
@@ -1398,18 +1319,13 @@ body {
     cursor: pointer;
 }
 
-
 .modal-close:hover {
-
     color: #ffffff;
 }
 
-
 .modal-body {
-
     padding: 18px;
 }
-
 
 .modal-body label {
 
@@ -1420,15 +1336,12 @@ body {
     color: #cbd5e1;
 
     font-size: 13px;
-
     font-weight: 600;
 }
-
 
 .modal-body input {
 
     width: 100%;
-
     height: 38px;
 
     padding: 0 10px;
@@ -1444,12 +1357,9 @@ body {
     color: #f1f5f9;
 }
 
-
 .modal-body input:focus {
-
     border-color: #3b82f6;
 }
-
 
 .modal-help {
 
@@ -1461,7 +1371,6 @@ body {
 
     line-height: 1.5;
 }
-
 
 .modal-footer {
 
@@ -1476,7 +1385,6 @@ body {
     border-top: 1px solid #263247;
 }
 
-
 .secondary-button,
 .primary-button {
 
@@ -1489,10 +1397,8 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 }
-
 
 .secondary-button {
 
@@ -1503,12 +1409,9 @@ body {
     color: #cbd5e1;
 }
 
-
 .secondary-button:hover {
-
     background: #172338;
 }
-
 
 .primary-button {
 
@@ -1519,9 +1422,7 @@ body {
     color: #ffffff;
 }
 
-
 .primary-button:hover {
-
     background: #3b82f6;
 }
 
@@ -1533,90 +1434,10 @@ body {
 @media (max-width: 800px) {
 
     body {
-
         overflow: hidden;
     }
-
 
     .platform-header {
 
         height: 54px;
-
-        padding: 0 12px;
-    }
-
-
-    .platform-header h1 {
-
-        font-size: 15px;
-    }
-
-
-    .platform-nav {
-
-        gap: 10px;
-
-        overflow: hidden;
-    }
-
-
-    .platform-nav a {
-
-        font-size: 11px;
-    }
-
-
-    .sandbox-header {
-
-        height: 42px;
-    }
-
-
-    .sandbox-layout {
-
-        height: calc(100vh - 96px);
-    }
-
-
-    .mobile-sidebar-button {
-
-        display: block;
-
-        margin-right: 8px;
-    }
-
-
-    .database-sidebar {
-
-        position: fixed;
-
-        left: 0;
-
-        top: 96px;
-
-        bottom: 0;
-
-        z-index: 500;
-
-        transform: translateX(-100%);
-
-        transition: transform .2s ease;
-
-        box-shadow:
-            5px 0 20px rgba(0, 0, 0, .5);
-    }
-
-
-    .database-sidebar.mobile-open {
-
-        transform: translateX(0);
-    }
-
-
-    .close-sidebar-button {
-
-        display: block;
-
-        border: 0;
-
-        backg
+        min-height: 54px
