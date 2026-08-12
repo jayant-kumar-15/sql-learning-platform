@@ -1113,8 +1113,7 @@ window.displaySandboxResults =
                 ? data.rows
                 : [];
 
-
-        /*
+/*
          * Update summary.
          */
 
@@ -1135,4 +1134,311 @@ window.displaySandboxResults =
                         : "s"
                 ) +
                 " • " +
-                executio
+                executionTime +
+                " ms";
+
+        }
+
+
+        if (!resultsContainer) {
+            return;
+        }
+
+
+        /*
+         * No rows.
+         */
+
+        if (rows.length === 0) {
+
+            resultsContainer.innerHTML = `
+
+                <div class="empty-results">
+
+                    <div class="empty-results-icon">
+                        ◫
+                    </div>
+
+                    <p>
+                        Query executed successfully.
+                        No rows returned.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+
+        /*
+         * Rows returned.
+         */
+
+        else {
+
+            let html = `
+
+                <table class="results-table">
+
+                    <thead>
+
+                        <tr>
+
+            `;
+
+
+            columns.forEach(
+                function (column) {
+
+                    html +=
+                        "<th>" +
+                        escapeHTML(
+                            column
+                        ) +
+                        "</th>";
+
+                }
+            );
+
+
+            html += `
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+            `;
+
+
+            rows.forEach(
+                function (row) {
+
+                    html +=
+                        "<tr>";
+
+
+                    columns.forEach(
+                        function (column) {
+
+                            let value =
+                                row[column];
+
+
+                            if (
+                                value === null ||
+                                value === undefined
+                            ) {
+
+                                value =
+                                    "NULL";
+
+                            }
+
+
+                            html +=
+                                "<td>" +
+                                escapeHTML(
+                                    value
+                                ) +
+                                "</td>";
+
+                        }
+                    );
+
+
+                    html +=
+                        "</tr>";
+
+                }
+            );
+
+
+            html += `
+
+                    </tbody>
+
+                </table>
+
+            `;
+
+
+            resultsContainer.innerHTML =
+                html;
+
+        }
+
+
+        /*
+         * Enable CSV only when rows exist.
+         */
+
+        if (downloadResultsButton) {
+
+            downloadResultsButton.disabled =
+                rows.length === 0;
+
+        }
+
+    };
+
+
+/* ============================================================
+ * HTML ESCAPE
+ * ============================================================ */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* ============================================================
+ * KEYBOARD SHORTCUT
+ *
+ * Ctrl + Enter / Cmd + Enter
+ * runs the query.
+ * ============================================================ */
+
+if (sqlEditor) {
+
+    sqlEditor.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                (event.ctrlKey || event.metaKey) &&
+                event.key === "Enter"
+            ) {
+
+                event.preventDefault();
+
+
+                if (runQueryButton) {
+
+                    runQueryButton.click();
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ============================================================
+ * ESC KEY
+ *
+ * Close results or modal.
+ * ============================================================ */
+
+document.addEventListener(
+    "keydown",
+    function (event) {
+
+        if (event.key !== "Escape") {
+            return;
+        }
+
+
+        /*
+         * Close results first.
+         */
+
+        if (
+            resultsSection &&
+            !resultsSection.hidden
+        ) {
+
+            closeResultsPanel();
+
+            return;
+
+        }
+
+
+        /*
+         * Close database modal.
+         */
+
+        if (
+            databaseModal &&
+            !databaseModal.classList.contains(
+                "hidden"
+            )
+        ) {
+
+            closeDatabaseModalWindow();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+ * INITIAL STATE
+ * ============================================================ */
+
+/*
+ * Results MUST be closed when page loads.
+ */
+
+closeResultsPanel();
+
+
+/*
+ * Reset result data.
+ */
+
+clearResults();
+
+
+/*
+ * Make sure editor receives focus.
+ */
+
+if (sqlEditor) {
+
+    sqlEditor.focus();
+
+}
+
+
+/* ============================================================
+ * READY
+ * ============================================================ */
+
+console.log(
+    "✅ SQL Sandbox UI loaded successfully."
+);
