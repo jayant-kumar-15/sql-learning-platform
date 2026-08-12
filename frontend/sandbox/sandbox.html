@@ -19,7 +19,7 @@
 
     <link
         rel="stylesheet"
-        href="sandbox.css?v=3"
+        href="sandbox.css?v=4"
     >
 
 </head>
@@ -34,11 +34,12 @@
 
     <header class="platform-header">
 
-    <h1>
-        SQL Learning Platform
-    </h1>
+        <h1>
+            SQL Learning Platform
+        </h1>
 
-    <nav class="platform-nav">
+
+        <nav class="platform-nav">
 
             <a href="../pages/home.html">
                 Home
@@ -70,58 +71,14 @@
 
 
     <!-- =====================================================
-         SANDBOX HEADER
-         ===================================================== -->
-
-    <div class="sandbox-header">
-
-
-        <div class="header-left">
-
-
-            <button
-                id="mobile-sidebar-button"
-                class="mobile-sidebar-button"
-                type="button"
-            >
-                ☰
-            </button>
-
-
-            <span class="page-title">
-                SQL Sandbox
-            </span>
-
-
-        </div>
-
-
-        <div class="header-right">
-
-
-            <span
-                id="active-database-label"
-                class="active-database-label"
-            >
-                Banking
-            </span>
-
-
-        </div>
-
-
-    </div>
-
-
-    <!-- =====================================================
-         MAIN SANDBOX
+         SANDBOX
          ===================================================== -->
 
     <main class="sandbox-layout">
 
 
         <!-- =================================================
-             DATABASE SIDEBAR
+             LEFT DATABASE EXPLORER
              ================================================= -->
 
         <aside
@@ -131,7 +88,6 @@
 
 
             <div class="sidebar-header">
-
 
                 <span>
                     DATABASE EXPLORER
@@ -146,7 +102,6 @@
                     ×
                 </button>
 
-
             </div>
 
 
@@ -157,117 +112,57 @@
                 <input
                     id="database-search-input"
                     type="text"
-                    placeholder="Search tables..."
+                    placeholder="Search databases or tables..."
                     autocomplete="off"
                 >
 
             </div>
 
 
-            <!-- Database Tree -->
+            <!-- =================================================
+                 USER DATABASE TREE
+                 ================================================= -->
 
             <div
                 id="database-tree"
                 class="database-tree"
             >
 
-
-                <!-- =================================================
-                     BANKING DATABASE
-                     ================================================= -->
-
-                <div
-                    class="database-item expanded"
-                    data-database="Banking"
-                >
-
-
-                    <div class="database-header">
-
-
-                        <span class="database-arrow">
-                            ▼
-                        </span>
-
-
-                        <span class="database-icon">
-                            🗄️
-                        </span>
-
-
-                        <span class="database-name">
-                            Banking
-                        </span>
-
-
-                    </div>
-
-
-                    <div class="table-list">
-
-
-                        <div
-                            class="table-item"
-                            data-table="customers"
-                        >
-
-                            <span>
-                                ▦
-                            </span>
-
-                            customers
-
-                        </div>
-
-
-                        <div
-                            class="table-item"
-                            data-table="accounts"
-                        >
-
-                            <span>
-                                ▦
-                            </span>
-
-                            accounts
-
-                        </div>
-
-
-                        <div
-                            class="table-item"
-                            data-table="transactions"
-                        >
-
-                            <span>
-                                ▦
-                            </span>
-
-                            transactions
-
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
                 <!--
-                    User-created databases
-                    will be inserted here
-                    by sandbox.js.
+                    IMPORTANT:
+
+                    No Banking database is hard-coded here.
+
+                    User-created databases and tables will be
+                    inserted by sandbox.js.
+
                 -->
 
+                <div class="sandbox-empty-database">
+
+                    <div class="sandbox-empty-icon">
+                        🗄️
+                    </div>
+
+                    <div class="sandbox-empty-title">
+                        No databases yet
+                    </div>
+
+                    <div class="sandbox-empty-text">
+                        Create a database to start building
+                        your own tables.
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <!-- Sidebar Actions -->
+            <!-- =================================================
+                 SIDEBAR ACTIONS
+                 ================================================= -->
 
             <div class="sidebar-actions">
-
 
                 <button
                     id="create-database-button"
@@ -276,7 +171,6 @@
                 >
                     ＋ Create Database
                 </button>
-
 
             </div>
 
@@ -292,7 +186,7 @@
 
 
             <!-- =================================================
-                 SANDBOX INFORMATION MESSAGE
+                 SANDBOX INFORMATION
                  ================================================= -->
 
             <section class="sandbox-info-banner">
@@ -305,7 +199,6 @@
 
                 <div class="sandbox-info-content">
 
-
                     <strong>
                         Your SQL Sandbox
                     </strong>
@@ -313,11 +206,11 @@
 
                     <span>
                         Create your own databases and tables
-                        here for personal practice and
-                        experimentation. Your Sandbox data
-                        is stored locally in your browser.
+                        here for personal practice,
+                        experimentation and SQL development.
+                        Your Sandbox data is stored locally
+                        in your browser.
                     </span>
-
 
                 </div>
 
@@ -371,22 +264,22 @@
 
 
             <!-- =================================================
-                 SQL EDITOR
+                 SQL WORKSHEET
                  ================================================= -->
 
             <section class="sql-editor-section">
 
+
+                <!-- Toolbar -->
 
                 <div class="workspace-toolbar">
 
 
                     <div class="workspace-title">
 
-
                         <span>
                             SQL WORKSHEET
                         </span>
-
 
                     </div>
 
@@ -436,7 +329,9 @@
                 </div>
 
 
-                <!-- SQL Editor -->
+                <!-- =================================================
+                     SQL EDITOR
+                     ================================================= -->
 
                 <div class="editor-wrapper">
 
@@ -445,10 +340,18 @@
                         id="sql-editor"
                         class="sql-editor"
                         spellcheck="false"
-                        placeholder="-- Write your SQL query here
+                        placeholder="-- Create your tables and write your SQL here
+
+-- Example:
+
+CREATE TABLE employees (
+    employee_id INTEGER,
+    employee_name TEXT,
+    department TEXT
+);
 
 SELECT *
-FROM customers;"
+FROM employees;"
                     ></textarea>
 
 
@@ -481,7 +384,6 @@ FROM customers;"
 
                     <div>
 
-
                         <h2>
                             Query Results
                         </h2>
@@ -493,7 +395,6 @@ FROM customers;"
                         >
                             No query executed
                         </span>
-
 
                     </div>
 
@@ -511,7 +412,7 @@ FROM customers;"
                 </div>
 
 
-                <!-- Results -->
+                <!-- Results container -->
 
                 <div
                     id="results-container"
@@ -562,7 +463,6 @@ FROM customers;"
 
             <div class="modal-header">
 
-
                 <h2>
                     Create Database
                 </h2>
@@ -575,7 +475,6 @@ FROM customers;"
                 >
                     ×
                 </button>
-
 
             </div>
 
@@ -601,8 +500,9 @@ FROM customers;"
 
                 <p class="modal-help">
 
-                    Your Sandbox database will be stored
-                    locally in your browser.
+                    Your Sandbox database is stored locally
+                    in your browser. It does not use
+                    server-side database storage.
 
                 </p>
 
@@ -645,7 +545,7 @@ FROM customers;"
          ===================================================== -->
 
     <script
-        src="sandbox.js?v=1"
+        src="sandbox.js?v=2"
     ></script>
 
 
