@@ -1,11 +1,11 @@
 /* ============================================================
-   SANDBOX
+   SQL SANDBOX
+   Dark theme — aligned with SQL Learning Platform
    ============================================================ */
 
 * {
     box-sizing: border-box;
 }
-
 
 html,
 body {
@@ -15,7 +15,6 @@ body {
     height: 100%;
 }
 
-
 body {
     font-family:
         Inter,
@@ -24,9 +23,8 @@ body {
         "Segoe UI",
         sans-serif;
 
-    background: #f7f9fc;
-
-    color: #172033;
+    background: #0b1120;
+    color: #e5e7eb;
 
     overflow: hidden;
 }
@@ -41,18 +39,14 @@ body {
     height: 58px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     padding: 0 22px;
 
-    background: #ffffff;
+    background: #0f172a;
 
-    border-bottom:
-        1px solid #dfe4ec;
-
+    border-bottom: 1px solid #263247;
 }
 
 
@@ -61,52 +55,49 @@ body {
     margin: 0;
 
     font-size: 18px;
-
     font-weight: 700;
 
-    color: #172033;
+    color: #f8fafc;
 
     white-space: nowrap;
-
 }
 
 
 .platform-nav {
 
     display: flex;
-
     align-items: center;
 
     gap: 22px;
 
+    overflow-x: auto;
 }
 
 
 .platform-nav a {
 
-    color: #536074;
+    color: #cbd5e1;
 
     text-decoration: none;
 
     font-size: 13px;
-
     font-weight: 600;
 
     white-space: nowrap;
 
+    transition: color .15s ease;
 }
 
 
 .platform-nav a:hover {
 
-    color: #2563eb;
-
+    color: #60a5fa;
 }
 
 
 .platform-nav a[href="sandbox.html"] {
 
-    color: #2563eb;
+    color: #60a5fa;
 
 }
 
@@ -117,39 +108,47 @@ body {
 
 .sandbox-header {
 
-    height: 44px;
+    height: 42px;
 
     display: flex;
-
     align-items: center;
 
     padding: 0 18px;
 
-    background: #ffffff;
+    background: #0f172a;
 
-    border-bottom:
-        1px solid #edf0f5;
-
+    border-bottom: 1px solid #263247;
 }
 
 
 .header-left {
 
     display: flex;
-
     align-items: center;
-
 }
 
 
 .page-title {
 
     font-size: 13px;
-
     font-weight: 700;
 
-    color: #475569;
+    color: #dbeafe;
+}
 
+
+.header-right {
+
+    margin-left: auto;
+}
+
+
+.active-database-label {
+
+    color: #93c5fd;
+
+    font-size: 12px;
+    font-weight: 600;
 }
 
 
@@ -161,19 +160,17 @@ body {
 
     background: transparent;
 
+    color: #e5e7eb;
+
     font-size: 21px;
 
     cursor: pointer;
-
-    color: #475569;
-
 }
 
 
 .close-sidebar-button {
 
     display: none;
-
 }
 
 
@@ -185,9 +182,9 @@ body {
 
     display: flex;
 
-    height:
-        calc(100vh - 102px);
+    height: calc(100vh - 100px);
 
+    min-height: 0;
 }
 
 
@@ -198,18 +195,14 @@ body {
 .database-sidebar {
 
     width: 260px;
-
     min-width: 260px;
 
     display: flex;
-
     flex-direction: column;
 
-    background: #ffffff;
+    background: #0f172a;
 
-    border-right:
-        1px solid #dfe4ec;
-
+    border-right: 1px solid #263247;
 }
 
 
@@ -220,53 +213,49 @@ body {
     padding: 0 14px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    border-bottom:
-        1px solid #edf0f5;
+    border-bottom: 1px solid #263247;
 
-    color: #64748b;
+    color: #94a3b8;
 
     font-size: 11px;
-
     font-weight: 700;
 
     letter-spacing: .06em;
-
 }
 
 
 .database-search {
 
     padding: 10px;
-
 }
 
 
 .database-search input {
 
     width: 100%;
-
     height: 34px;
 
     padding: 0 10px;
 
-    border:
-        1px solid #d9dee8;
-
+    border: 1px solid #334155;
     border-radius: 6px;
 
     outline: none;
 
-    background: #ffffff;
+    background: #111c31;
 
-    color: #172033;
+    color: #e5e7eb;
 
     font-size: 13px;
+}
 
+
+.database-search input::placeholder {
+
+    color: #64748b;
 }
 
 
@@ -274,6 +263,8 @@ body {
 
     border-color: #3b82f6;
 
+    box-shadow:
+        0 0 0 2px rgba(59, 130, 246, .12);
 }
 
 
@@ -286,7 +277,6 @@ body {
     overflow-y: auto;
 
     padding: 5px 8px;
-
 }
 
 
@@ -296,8 +286,7 @@ body {
 
     text-align: center;
 
-    color: #94a3b8;
-
+    color: #64748b;
 }
 
 
@@ -306,7 +295,6 @@ body {
     font-size: 30px;
 
     margin-bottom: 9px;
-
 }
 
 
@@ -314,12 +302,10 @@ body {
 
     margin: 0 0 4px;
 
-    color: #64748b;
+    color: #94a3b8;
 
     font-size: 13px;
-
     font-weight: 600;
-
 }
 
 
@@ -327,19 +313,21 @@ body {
 
     display: block;
 
+    color: #64748b;
+
     font-size: 11px;
 
     line-height: 1.5;
-
 }
 
 
-/* Database */
+/* ============================================================
+   DATABASE
+   ============================================================ */
 
 .database-item {
 
     margin-bottom: 5px;
-
 }
 
 
@@ -348,7 +336,6 @@ body {
     height: 34px;
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
@@ -360,16 +347,15 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 
+    color: #e2e8f0;
 }
 
 
 .database-header:hover {
 
-    background: #f1f5f9;
-
+    background: #172338;
 }
 
 
@@ -377,24 +363,27 @@ body {
 
     width: 12px;
 
-    color: #64748b;
+    color: #94a3b8;
 
     font-size: 10px;
-
 }
 
 
 .database-icon {
 
     font-size: 14px;
+}
 
+
+.database-name {
+
+    color: #e2e8f0;
 }
 
 
 .table-list {
 
     padding-left: 26px;
-
 }
 
 
@@ -403,7 +392,6 @@ body {
     height: 32px;
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
@@ -412,66 +400,61 @@ body {
 
     border-radius: 5px;
 
-    color: #536074;
+    color: #94a3b8;
 
     font-size: 13px;
 
     cursor: pointer;
-
 }
 
 
 .table-item:hover {
 
-    background: #eef5ff;
+    background: #172338;
 
-    color: #2563eb;
-
+    color: #60a5fa;
 }
 
 
-/* Sidebar */
+/* ============================================================
+   SIDEBAR ACTIONS
+   ============================================================ */
 
 .sidebar-actions {
 
     padding: 11px;
 
-    border-top:
-        1px solid #edf0f5;
-
+    border-top: 1px solid #263247;
 }
 
 
 .create-database-button {
 
     width: 100%;
-
     height: 36px;
 
-    border:
-        1px solid #cfd7e5;
+    border: 1px solid #334155;
 
     border-radius: 6px;
 
-    background: #ffffff;
+    background: #111c31;
 
-    color: #334155;
+    color: #cbd5e1;
 
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
-
 }
 
 
 .create-database-button:hover {
 
-    background: #f8fafc;
+    background: #172338;
 
-    border-color: #b9c4d5;
+    border-color: #475569;
 
+    color: #ffffff;
 }
 
 
@@ -484,13 +467,12 @@ body {
     flex: 1;
 
     min-width: 0;
+    min-height: 0;
 
     display: flex;
-
     flex-direction: column;
 
-    background: #f7f9fc;
-
+    background: #0b1120;
 }
 
 
@@ -500,59 +482,66 @@ body {
 
 .sandbox-info-banner {
 
-    min-height: 52px;
+    min-height: 54px;
 
     display: flex;
-
     align-items: center;
 
-    gap: 10px;
+    gap: 11px;
 
-    padding: 7px 15px;
+    padding: 8px 15px;
 
-    background: #eef5ff;
+    background: #111c31;
 
-    border-bottom:
-        1px solid #dbeafe;
-
+    border-bottom: 1px solid #263247;
 }
 
 
 .sandbox-info-icon {
 
-    font-size: 18px;
+    width: 34px;
+    height: 34px;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-size: 16px;
 }
 
 
 .sandbox-info-content {
 
     display: flex;
-
     flex-direction: column;
 
-    gap: 1px;
+    gap: 2px;
 
+    min-width: 0;
 }
 
 
 .sandbox-info-content strong {
 
-    font-size: 12px;
+    color: #f1f5f9;
 
-    color: #1e3a8a;
-
+    font-size: 13px;
 }
 
 
 .sandbox-info-content span {
 
+    color: #aebbd0;
+
     font-size: 11px;
 
     line-height: 1.4;
-
-    color: #526174;
-
 }
 
 
@@ -562,30 +551,26 @@ body {
 
 .query-tabs-container {
 
-    height: 38px;
+    height: 40px;
+    min-height: 40px;
 
     display: flex;
-
     align-items: stretch;
 
-    background: #f1f5f9;
+    background: #0f172a;
 
-    border-bottom:
-        1px solid #dfe4ec;
-
+    border-bottom: 1px solid #263247;
 }
 
 
 .query-tabs {
 
     display: flex;
-
     align-items: stretch;
 
     min-width: 0;
 
     overflow-x: auto;
-
 }
 
 
@@ -593,48 +578,42 @@ body {
 
     min-width: 90px;
 
-    height: 38px;
+    height: 40px;
 
-    padding: 0 14px;
+    padding: 0 15px;
 
     border: 0;
 
-    border-right:
-        1px solid #dfe4ec;
+    border-right: 1px solid #263247;
 
-    background: #e9eef5;
+    background: #111c31;
 
-    color: #64748b;
+    color: #94a3b8;
 
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
 
     white-space: nowrap;
-
 }
 
 
 .query-tab:hover {
 
-    background: #ffffff;
+    background: #172338;
 
-    color: #334155;
-
+    color: #dbeafe;
 }
 
 
 .query-tab.active {
 
-    background: #ffffff;
+    background: #0b1120;
 
-    color: #2563eb;
+    color: #60a5fa;
 
-    border-top:
-        2px solid #2563eb;
-
+    border-top: 2px solid #3b82f6;
 }
 
 
@@ -645,42 +624,40 @@ body {
     overflow: hidden;
 
     text-overflow: ellipsis;
-
 }
 
 
-/* + button immediately beside tabs */
+/* ============================================================
+   NEW QUERY BUTTON
+   Immediately beside Query 1
+   ============================================================ */
 
 .new-query-button {
 
-    width: 38px;
+    width: 40px;
+    min-width: 40px;
 
-    min-width: 38px;
-
-    height: 38px;
+    height: 40px;
 
     border: 0;
 
-    border-right:
-        1px solid #dfe4ec;
+    border-right: 1px solid #263247;
 
-    background: #e9eef5;
+    background: #111c31;
 
-    color: #475569;
+    color: #cbd5e1;
 
-    font-size: 17px;
+    font-size: 18px;
 
     cursor: pointer;
-
 }
 
 
 .new-query-button:hover {
 
-    background: #ffffff;
+    background: #172338;
 
-    color: #2563eb;
-
+    color: #60a5fa;
 }
 
 
@@ -690,102 +667,120 @@ body {
 
 .sql-editor-section {
 
-    height: 53%;
+    /*
+     * Give the query editor considerably more space.
+     */
+    height: 64%;
 
-    min-height: 280px;
+    min-height: 350px;
 
     display: flex;
-
     flex-direction: column;
 
-    background: #ffffff;
+    background: #0b1120;
 
-    border-bottom:
-        1px solid #dfe4ec;
+    border-bottom: 1px solid #263247;
 
+    min-height: 0;
 }
 
 
 .workspace-toolbar {
 
     height: 46px;
-
     min-height: 46px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     padding: 0 13px;
 
-    border-bottom:
-        1px solid #edf0f5;
+    background: #0f172a;
 
+    border-bottom: 1px solid #263247;
 }
 
 
 .workspace-title {
 
-    color: #64748b;
+    color: #cbd5e1;
 
     font-size: 11px;
-
     font-weight: 700;
 
     letter-spacing: .05em;
-
 }
 
 
 .workspace-actions {
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
-
 }
 
 
 .toolbar-button,
 .run-query-button {
 
-    height: 32px;
+    height: 34px;
 
-    padding: 0 11px;
+    padding: 0 13px;
 
-    border-radius: 6px;
+    border-radius: 7px;
 
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
-
 }
 
 
 .toolbar-button {
 
-    border:
-        1px solid #d6dce6;
+    border: 1px solid #3b4a63;
 
-    background: #ffffff;
+    background: #111c31;
 
-    color: #475569;
-
+    color: #d1d9e6;
 }
 
 
 .toolbar-button:hover {
 
-    background: #f8fafc;
+    background: #172338;
 
-    color: #2563eb;
+    border-color: #4b6b9b;
 
+    color: #ffffff;
+}
+
+
+/* Describe / Schema / Relationships */
+
+#describe-table-button,
+#view-schema-button,
+#view-relationships-button {
+
+    border: 1px solid #3b4a63;
+
+    background: #111c31;
+
+    color: #dbeafe;
+}
+
+
+#describe-table-button:hover,
+#view-schema-button:hover,
+#view-relationships-button:hover {
+
+    background: #172338;
+
+    border-color: #60a5fa;
+
+    color: #ffffff;
 }
 
 
@@ -797,13 +792,14 @@ body {
 
     color: #ffffff;
 
+    padding-left: 15px;
+    padding-right: 15px;
 }
 
 
 .run-query-button:hover {
 
-    background: #1d4ed8;
-
+    background: #3b82f6;
 }
 
 
@@ -812,9 +808,12 @@ body {
     opacity: .6;
 
     cursor: not-allowed;
-
 }
 
+
+/* ============================================================
+   QUERY EDITOR
+   ============================================================ */
 
 .editor-wrapper {
 
@@ -824,41 +823,60 @@ body {
 
     padding: 10px;
 
-    background: #f8fafc;
-
+    background: #0b1120;
 }
 
 
 .sql-editor {
 
     width: 100%;
-
     height: 100%;
 
     resize: none;
 
-    padding: 14px;
+    padding: 16px;
 
-    border:
-        1px solid #d8dee9;
+    border: 1px solid #334155;
 
-    border-radius: 6px;
+    border-radius: 8px;
 
     outline: none;
 
-    background: #ffffff;
+    background: #111c31;
 
-    color: #172033;
+    color: #f1f5f9;
+
+    caret-color: #60a5fa;
 
     font-family:
         Consolas,
         Monaco,
+        "Courier New",
         monospace;
 
     font-size: 14px;
 
-    line-height: 1.6;
+    line-height: 1.65;
 
+    /*
+     * Long SQL stays inside the editor.
+     */
+    overflow: auto;
+
+    white-space: pre;
+
+    tab-size: 4;
+
+    box-shadow:
+        inset 0 1px 2px rgba(0, 0, 0, .25);
+}
+
+
+.sql-editor::placeholder {
+
+    color: #64748b;
+
+    opacity: 1;
 }
 
 
@@ -866,6 +884,40 @@ body {
 
     border-color: #3b82f6;
 
+    box-shadow:
+        0 0 0 2px rgba(59, 130, 246, .12),
+        inset 0 1px 2px rgba(0, 0, 0, .25);
+}
+
+
+/* ============================================================
+   SQL EDITOR SCROLLBAR
+   ============================================================ */
+
+.sql-editor::-webkit-scrollbar {
+
+    width: 9px;
+    height: 9px;
+}
+
+
+.sql-editor::-webkit-scrollbar-track {
+
+    background: #0f172a;
+}
+
+
+.sql-editor::-webkit-scrollbar-thumb {
+
+    background: #334155;
+
+    border-radius: 8px;
+}
+
+
+.sql-editor::-webkit-scrollbar-thumb:hover {
+
+    background: #475569;
 }
 
 
@@ -875,29 +927,31 @@ body {
 
     padding: 5px 13px;
 
-    color: #64748b;
+    background: #0b1120;
+
+    color: #94a3b8;
 
     font-size: 12px;
-
 }
 
 
 /* ============================================================
-   RESULTS
+   QUERY RESULTS
    ============================================================ */
 
 .results-section {
 
+    /*
+     * Remaining space goes to results.
+     */
     flex: 1;
 
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
 
-    background: #ffffff;
-
+    background: #0f172a;
 }
 
 
@@ -906,16 +960,14 @@ body {
     min-height: 52px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
     padding: 7px 13px;
 
-    border-bottom:
-        1px solid #edf0f5;
+    background: #0f172a;
 
+    border-bottom: 1px solid #263247;
 }
 
 
@@ -923,19 +975,17 @@ body {
 
     margin: 0 0 2px;
 
-    color: #172033;
+    color: #f1f5f9;
 
     font-size: 14px;
-
 }
 
 
 .results-summary {
 
-    color: #7a8496;
+    color: #94a3b8;
 
     font-size: 11px;
-
 }
 
 
@@ -945,30 +995,28 @@ body {
 
     padding: 0 11px;
 
-    border:
-        1px solid #d6dce6;
+    border: 1px solid #334155;
 
     border-radius: 6px;
 
-    background: #ffffff;
+    background: #111c31;
 
-    color: #475569;
+    color: #cbd5e1;
 
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
-
 }
 
 
 .download-button:hover:not(:disabled) {
 
-    background: #f8fafc;
+    background: #172338;
 
-    color: #2563eb;
+    border-color: #475569;
 
+    color: #ffffff;
 }
 
 
@@ -977,7 +1025,6 @@ body {
     opacity: .45;
 
     cursor: not-allowed;
-
 }
 
 
@@ -989,23 +1036,27 @@ body {
 
     overflow: auto;
 
+    background: #0f172a;
 }
 
+
+/* ============================================================
+   EMPTY RESULTS
+   ============================================================ */
 
 .empty-results {
 
     height: 100%;
 
-    display: flex;
+    min-height: 120px;
 
+    display: flex;
     flex-direction: column;
 
     align-items: center;
-
     justify-content: center;
 
-    color: #94a3b8;
-
+    color: #64748b;
 }
 
 
@@ -1015,6 +1066,7 @@ body {
 
     margin-bottom: 8px;
 
+    color: #475569;
 }
 
 
@@ -1022,8 +1074,9 @@ body {
 
     margin: 0;
 
-    font-size: 12px;
+    color: #94a3b8;
 
+    font-size: 12px;
 }
 
 
@@ -1038,7 +1091,6 @@ body {
     border-collapse: collapse;
 
     font-size: 13px;
-
 }
 
 
@@ -1052,19 +1104,17 @@ body {
 
     padding: 9px 12px;
 
-    background: #f8fafc;
+    background: #172338;
 
-    color: #475569;
+    color: #dbeafe;
 
     text-align: left;
 
     font-weight: 700;
 
-    border-bottom:
-        1px solid #dfe4ec;
+    border-bottom: 1px solid #334155;
 
     white-space: nowrap;
-
 }
 
 
@@ -1072,20 +1122,51 @@ body {
 
     padding: 8px 12px;
 
-    color: #334155;
+    color: #cbd5e1;
 
-    border-bottom:
-        1px solid #edf0f5;
+    border-bottom: 1px solid #263247;
 
     white-space: nowrap;
-
 }
 
 
 .results-table tr:hover td {
 
-    background: #f8fafc;
+    background: #172338;
+}
 
+
+/* ============================================================
+   RESULTS SCROLLBAR
+   ============================================================ */
+
+.results-container::-webkit-scrollbar,
+.database-tree::-webkit-scrollbar {
+
+    width: 9px;
+}
+
+
+.results-container::-webkit-scrollbar-track,
+.database-tree::-webkit-scrollbar-track {
+
+    background: #0b1120;
+}
+
+
+.results-container::-webkit-scrollbar-thumb,
+.database-tree::-webkit-scrollbar-thumb {
+
+    background: #334155;
+
+    border-radius: 8px;
+}
+
+
+.results-container::-webkit-scrollbar-thumb:hover,
+.database-tree::-webkit-scrollbar-thumb:hover {
+
+    background: #475569;
 }
 
 
@@ -1102,21 +1183,17 @@ body {
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    background:
-        rgba(15, 23, 42, .45);
+    background: rgba(2, 6, 23, .72);
 
     z-index: 1000;
-
 }
 
 
 .modal-overlay.hidden {
 
     display: none;
-
 }
 
 
@@ -1126,13 +1203,14 @@ body {
 
     max-width: calc(100vw - 30px);
 
-    background: #ffffff;
+    background: #111c31;
+
+    border: 1px solid #334155;
 
     border-radius: 10px;
 
     box-shadow:
-        0 20px 50px rgba(0, 0, 0, .2);
-
+        0 20px 50px rgba(0, 0, 0, .5);
 }
 
 
@@ -1141,14 +1219,11 @@ body {
     display: flex;
 
     align-items: center;
-
     justify-content: space-between;
 
     padding: 16px 18px;
 
-    border-bottom:
-        1px solid #edf0f5;
-
+    border-bottom: 1px solid #263247;
 }
 
 
@@ -1156,8 +1231,9 @@ body {
 
     margin: 0;
 
-    font-size: 16px;
+    color: #f1f5f9;
 
+    font-size: 16px;
 }
 
 
@@ -1167,19 +1243,23 @@ body {
 
     background: transparent;
 
-    color: #64748b;
+    color: #94a3b8;
 
     font-size: 22px;
 
     cursor: pointer;
+}
 
+
+.modal-close:hover {
+
+    color: #ffffff;
 }
 
 
 .modal-body {
 
     padding: 18px;
-
 }
 
 
@@ -1189,30 +1269,35 @@ body {
 
     margin-bottom: 7px;
 
-    color: #334155;
+    color: #cbd5e1;
 
     font-size: 13px;
-
     font-weight: 600;
-
 }
 
 
 .modal-body input {
 
     width: 100%;
-
     height: 38px;
 
     padding: 0 10px;
 
-    border:
-        1px solid #d6dce6;
+    border: 1px solid #334155;
 
     border-radius: 6px;
 
     outline: none;
 
+    background: #0f172a;
+
+    color: #f1f5f9;
+}
+
+
+.modal-body input:focus {
+
+    border-color: #3b82f6;
 }
 
 
@@ -1220,12 +1305,11 @@ body {
 
     margin: 9px 0 0;
 
-    color: #64748b;
+    color: #94a3b8;
 
     font-size: 12px;
 
     line-height: 1.5;
-
 }
 
 
@@ -1239,9 +1323,7 @@ body {
 
     padding: 14px 18px;
 
-    border-top:
-        1px solid #edf0f5;
-
+    border-top: 1px solid #263247;
 }
 
 
@@ -1257,21 +1339,23 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
-
 }
 
 
 .secondary-button {
 
-    border:
-        1px solid #d6dce6;
+    border: 1px solid #334155;
 
-    background: #ffffff;
+    background: #111c31;
 
-    color: #475569;
+    color: #cbd5e1;
+}
 
+
+.secondary-button:hover {
+
+    background: #172338;
 }
 
 
@@ -1282,7 +1366,12 @@ body {
     background: #2563eb;
 
     color: #ffffff;
+}
 
+
+.primary-button:hover {
+
+    background: #3b82f6;
 }
 
 
@@ -1295,7 +1384,6 @@ body {
     body {
 
         overflow: hidden;
-
     }
 
 
@@ -1304,14 +1392,12 @@ body {
         height: 54px;
 
         padding: 0 12px;
-
     }
 
 
     .platform-header h1 {
 
         font-size: 15px;
-
     }
 
 
@@ -1320,29 +1406,24 @@ body {
         gap: 10px;
 
         overflow-x: auto;
-
     }
 
 
     .platform-nav a {
 
         font-size: 11px;
-
     }
 
 
     .sandbox-header {
 
         height: 42px;
-
     }
 
 
     .sandbox-layout {
 
-        height:
-            calc(100vh - 96px);
-
+        height: calc(100vh - 96px);
     }
 
 
@@ -1351,7 +1432,6 @@ body {
         display: block;
 
         margin-right: 8px;
-
     }
 
 
@@ -1367,24 +1447,18 @@ body {
 
         z-index: 500;
 
-        transform:
-            translateX(-100%);
+        transform: translateX(-100%);
 
-        transition:
-            transform .2s ease;
+        transition: transform .2s ease;
 
         box-shadow:
-            5px 0 20px
-            rgba(0, 0, 0, .12);
-
+            5px 0 20px rgba(0, 0, 0, .5);
     }
 
 
     .database-sidebar.mobile-open {
 
-        transform:
-            translateX(0);
-
+        transform: translateX(0);
     }
 
 
@@ -1396,26 +1470,23 @@ body {
 
         background: transparent;
 
-        color: #64748b;
+        color: #94a3b8;
 
         font-size: 22px;
 
         cursor: pointer;
-
     }
 
 
     .sandbox-info-banner {
 
         padding: 7px 10px;
-
     }
 
 
     .sandbox-info-content span {
 
         font-size: 10px;
-
     }
 
 
@@ -1424,21 +1495,24 @@ body {
         min-width: 85px;
 
         padding: 0 12px;
-
     }
 
 
+    /*
+     * Still give the SQL editor priority on mobile.
+     */
+
     .sql-editor-section {
 
-        height: 52%;
+        height: 60%;
 
+        min-height: 280px;
     }
 
 
     .workspace-toolbar {
 
         padding: 0 9px;
-
     }
 
 
@@ -1446,34 +1520,33 @@ body {
 
         gap: 4px;
 
+        overflow-x: auto;
     }
 
 
     .toolbar-button {
 
-        display: none;
+        display: block;
 
+        padding: 0 8px;
     }
 
 
     .run-query-button {
 
         padding: 0 9px;
-
     }
 
 
     .results-header {
 
         padding: 7px 9px;
-
     }
 
 
     .download-button {
 
         padding: 0 8px;
-
     }
 
 }
