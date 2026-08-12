@@ -1,11 +1,17 @@
 /* ============================================================
    SQL SANDBOX
-   Snowflake-like dark workspace
+   Dark UI — aligned with Challenges page
+   ============================================================ */
+
+
+/* ============================================================
+   GLOBAL
    ============================================================ */
 
 * {
     box-sizing: border-box;
 }
+
 
 html,
 body {
@@ -15,7 +21,9 @@ body {
     height: 100%;
 }
 
+
 body {
+
     font-family:
         Inter,
         -apple-system,
@@ -24,88 +32,189 @@ body {
         sans-serif;
 
     background: #0f172a;
-    color: #e2e8f0;
+
+    color: #f8fafc;
 
     overflow: hidden;
 }
 
 
 /* ============================================================
-   HEADER
+   PLATFORM NAVBAR
    ============================================================ */
 
-.sandbox-header {
+.platform-header {
 
-    height: 58px;
+    height: 68px;
+
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 28px;
 
     background: #111827;
 
     border-bottom:
         1px solid #263244;
 
-    display: flex;
-
-    align-items: center;
-
-    padding: 0 20px;
-
-}
-
-
-.header-left {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-}
-
-
-.brand {
-
     color: #f8fafc;
 
-    text-decoration: none;
+    flex-shrink: 0;
+
+}
+
+
+.platform-header h1 {
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 21px;
+
+    line-height: 1;
 
     font-weight: 700;
 
-    font-size: 16px;
+    white-space: nowrap;
+
+    color: #f8fafc;
 
 }
 
 
-.page-title {
+.platform-nav {
 
-    color: #64748b;
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 26px;
+
+    height: 100%;
+
+    white-space: nowrap;
+
+}
+
+
+.platform-nav a {
+
+    display: flex;
+
+    align-items: center;
+
+    height: 100%;
+
+    padding: 0;
+
+    color: #cbd5e1;
+
+    text-decoration: none;
 
     font-size: 14px;
 
+    font-weight: 600;
+
+    transition:
+        color .15s ease,
+        background .15s ease;
+
 }
 
 
-.header-right {
+.platform-nav a:hover {
 
-    margin-left: auto;
+    color: #ffffff;
 
 }
 
 
-/* No active database label needed */
+.platform-nav a[href="sandbox.html"] {
 
-.active-database-label {
-
-    display: none;
+    color: #60a5fa;
 
 }
 
 
 /* ============================================================
-   MOBILE BUTTON
+   MAIN SANDBOX LAYOUT
    ============================================================ */
 
-.mobile-sidebar-button {
+.sandbox-layout {
+
+    display: flex;
+
+    width: 100%;
+
+    height:
+        calc(100vh - 68px);
+
+    min-height: 0;
+
+    background: #0f172a;
+
+}
+
+
+/* ============================================================
+   DATABASE SIDEBAR
+   ============================================================ */
+
+.database-sidebar {
+
+    width: 270px;
+
+    min-width: 270px;
+
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    background: #111827;
+
+    border-right:
+        1px solid #263244;
+
+}
+
+
+.sidebar-header {
+
+    height: 48px;
+
+    padding: 0 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    border-bottom:
+        1px solid #263244;
+
+    color: #e2e8f0;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .07em;
+
+}
+
+
+.close-sidebar-button {
 
     display: none;
 
@@ -122,78 +231,13 @@ body {
 }
 
 
-.close-sidebar-button {
-
-    display: none;
-
-}
-
-
 /* ============================================================
-   MAIN LAYOUT
+   DATABASE SEARCH
    ============================================================ */
-
-.sandbox-layout {
-
-    display: flex;
-
-    height:
-        calc(100vh - 58px);
-
-}
-
-
-/* ============================================================
-   DATABASE SIDEBAR
-   ============================================================ */
-
-.database-sidebar {
-
-    width: 260px;
-
-    min-width: 260px;
-
-    background: #111827;
-
-    border-right:
-        1px solid #263244;
-
-    display: flex;
-
-    flex-direction: column;
-
-}
-
-
-.sidebar-header {
-
-    height: 48px;
-
-    padding: 0 15px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    border-bottom:
-        1px solid #263244;
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    color: #94a3b8;
-
-    letter-spacing: .06em;
-
-}
-
 
 .database-search {
 
-    padding: 10px;
+    padding: 11px;
 
 }
 
@@ -202,20 +246,20 @@ body {
 
     width: 100%;
 
-    height: 34px;
+    height: 36px;
+
+    padding: 0 11px;
 
     border:
         1px solid #334155;
 
     border-radius: 6px;
 
-    padding: 0 10px;
-
     outline: none;
 
     background: #0f172a;
 
-    color: #e2e8f0;
+    color: #f8fafc;
 
     font-size: 13px;
 
@@ -224,64 +268,14 @@ body {
 
 .database-search input::placeholder {
 
-    color: #64748b;
+    color: #94a3b8;
 
 }
 
 
 .database-search input:focus {
 
-    border-color: #2563eb;
-
-}
-
-
-.database-tree {
-
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 8px;
-
-}
-
-
-/* ============================================================
-   USER DATABASE EMPTY STATE
-   ============================================================ */
-
-.sandbox-database-empty {
-
-    padding: 22px 14px;
-
-    text-align: center;
-
-    color: #64748b;
-
-    font-size: 12px;
-
-    line-height: 1.5;
-
-}
-
-
-.sandbox-database-empty-icon {
-
-    font-size: 25px;
-
-    margin-bottom: 8px;
-
-}
-
-
-.sandbox-database-empty strong {
-
-    display: block;
-
-    color: #cbd5e1;
-
-    margin-bottom: 4px;
+    border-color: #3b82f6;
 
 }
 
@@ -289,6 +283,19 @@ body {
 /* ============================================================
    DATABASE TREE
    ============================================================ */
+
+.database-tree {
+
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 5px 9px;
+
+}
+
 
 .database-item {
 
@@ -299,25 +306,25 @@ body {
 
 .database-header {
 
+    height: 35px;
+
     display: flex;
 
     align-items: center;
 
-    gap: 7px;
+    gap: 8px;
 
-    height: 34px;
+    padding: 0 8px;
 
-    padding: 0 7px;
-
-    border-radius: 5px;
+    border-radius: 6px;
 
     cursor: pointer;
+
+    color: #f1f5f9;
 
     font-size: 13px;
 
     font-weight: 600;
-
-    color: #e2e8f0;
 
 }
 
@@ -333,7 +340,7 @@ body {
 
     width: 12px;
 
-    color: #64748b;
+    color: #cbd5e1;
 
     font-size: 10px;
 
@@ -349,37 +356,33 @@ body {
 
 .database-name {
 
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
+    color: #f8fafc;
 
 }
 
 
 .table-list {
 
-    padding-left: 26px;
+    padding-left: 27px;
 
 }
 
 
 .table-item {
 
+    height: 33px;
+
     display: flex;
 
     align-items: center;
 
-    gap: 7px;
-
-    height: 32px;
+    gap: 8px;
 
     padding: 0 8px;
 
     border-radius: 5px;
 
-    color: #94a3b8;
+    color: #cbd5e1;
 
     font-size: 13px;
 
@@ -397,11 +400,50 @@ body {
 }
 
 
-.table-item.active {
+/* ============================================================
+   EMPTY DATABASE MESSAGE
+   ============================================================ */
 
-    background: #172554;
+.sandbox-empty-database {
 
-    color: #60a5fa;
+    padding: 24px 12px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+}
+
+
+.sandbox-empty-icon {
+
+    font-size: 25px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.sandbox-empty-title {
+
+    color: #e2e8f0;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    margin-bottom: 5px;
+
+}
+
+
+.sandbox-empty-text {
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+    line-height: 1.5;
 
 }
 
@@ -424,16 +466,16 @@ body {
 
     width: 100%;
 
-    height: 36px;
+    height: 38px;
 
     border:
-        1px solid #334155;
+        1px solid #3b4a61;
+
+    border-radius: 6px;
 
     background: #172033;
 
-    color: #cbd5e1;
-
-    border-radius: 6px;
+    color: #e2e8f0;
 
     cursor: pointer;
 
@@ -448,7 +490,7 @@ body {
 
     background: #1e293b;
 
-    border-color: #475569;
+    border-color: #4b6080;
 
     color: #ffffff;
 
@@ -456,7 +498,7 @@ body {
 
 
 /* ============================================================
-   WORKSPACE
+   MAIN WORKSPACE
    ============================================================ */
 
 .sandbox-workspace {
@@ -464,6 +506,8 @@ body {
     flex: 1;
 
     min-width: 0;
+
+    min-height: 0;
 
     display: flex;
 
@@ -475,7 +519,7 @@ body {
 
 
 /* ============================================================
-   INFORMATION BANNER
+   SANDBOX INFORMATION BANNER
    ============================================================ */
 
 .sandbox-info-banner {
@@ -484,11 +528,11 @@ body {
 
     align-items: center;
 
-    gap: 10px;
+    gap: 12px;
 
-    min-height: 52px;
+    min-height: 64px;
 
-    padding: 8px 15px;
+    padding: 10px 18px;
 
     background: #172033;
 
@@ -500,9 +544,9 @@ body {
 
 .sandbox-info-icon {
 
-    width: 28px;
+    width: 32px;
 
-    height: 28px;
+    height: 32px;
 
     display: flex;
 
@@ -510,11 +554,11 @@ body {
 
     justify-content: center;
 
-    background: #1e3a8a;
+    border-radius: 7px;
 
-    border-radius: 6px;
+    background: #1d4ed8;
 
-    font-size: 14px;
+    font-size: 16px;
 
 }
 
@@ -525,25 +569,25 @@ body {
 
     flex-direction: column;
 
-    gap: 2px;
+    gap: 3px;
 
 }
 
 
 .sandbox-info-content strong {
 
-    font-size: 13px;
+    color: #f8fafc;
 
-    color: #e2e8f0;
+    font-size: 13px;
 
 }
 
 
 .sandbox-info-content span {
 
-    font-size: 12px;
+    color: #cbd5e1;
 
-    color: #94a3b8;
+    font-size: 12px;
 
     line-height: 1.4;
 
@@ -556,7 +600,7 @@ body {
 
 .query-tabs-container {
 
-    height: 42px;
+    height: 43px;
 
     display: flex;
 
@@ -567,10 +611,16 @@ body {
     border-bottom:
         1px solid #263244;
 
+    flex-shrink: 0;
+
 }
 
 
 .query-tabs {
+
+    flex: 1;
+
+    min-width: 0;
 
     display: flex;
 
@@ -578,14 +628,12 @@ body {
 
     overflow-x: auto;
 
-    min-width: 0;
-
 }
 
 
 .query-tab {
 
-    min-width: 100px;
+    min-width: 105px;
 
     max-width: 180px;
 
@@ -598,7 +646,7 @@ body {
 
     background: #172033;
 
-    color: #64748b;
+    color: #94a3b8;
 
     cursor: pointer;
 
@@ -615,7 +663,7 @@ body {
 
     background: #1e293b;
 
-    color: #cbd5e1;
+    color: #e2e8f0;
 
 }
 
@@ -627,7 +675,7 @@ body {
     color: #60a5fa;
 
     border-top:
-        2px solid #2563eb;
+        2px solid #3b82f6;
 
 }
 
@@ -645,9 +693,9 @@ body {
 
 .new-query-button {
 
-    width: 42px;
+    width: 45px;
 
-    min-width: 42px;
+    min-width: 45px;
 
     border: 0;
 
@@ -656,7 +704,7 @@ body {
 
     background: #111827;
 
-    color: #94a3b8;
+    color: #cbd5e1;
 
     font-size: 18px;
 
@@ -675,35 +723,34 @@ body {
 
 
 /* ============================================================
-   SQL EDITOR
+   SQL EDITOR SECTION
    ============================================================ */
 
 .sql-editor-section {
 
-    height: 58%;
+    height: 52%;
 
-    min-height: 350px;
+    min-height: 320px;
+
+    display: flex;
+
+    flex-direction: column;
 
     background: #0f172a;
 
     border-bottom:
         1px solid #263244;
 
-    display: flex;
-
-    flex-direction: column;
-
 }
 
 
 .workspace-toolbar {
 
-    height: 48px;
+    height: 52px;
 
-    padding: 0 15px;
+    min-height: 52px;
 
-    border-bottom:
-        1px solid #263244;
+    padding: 0 16px;
 
     display: flex;
 
@@ -711,18 +758,23 @@ body {
 
     justify-content: space-between;
 
+    background: #111827;
+
+    border-bottom:
+        1px solid #263244;
+
 }
 
 
 .workspace-title {
 
+    color: #e2e8f0;
+
     font-size: 12px;
 
     font-weight: 700;
 
-    letter-spacing: .05em;
-
-    color: #94a3b8;
+    letter-spacing: .06em;
 
 }
 
@@ -738,10 +790,14 @@ body {
 }
 
 
+/* ============================================================
+   TOOLBAR BUTTONS
+   ============================================================ */
+
 .toolbar-button,
 .run-query-button {
 
-    height: 34px;
+    height: 35px;
 
     padding: 0 13px;
 
@@ -749,7 +805,7 @@ body {
 
     cursor: pointer;
 
-    font-size: 13px;
+    font-size: 12px;
 
     font-weight: 600;
 
@@ -759,11 +815,11 @@ body {
 .toolbar-button {
 
     border:
-        1px solid #334155;
+        1px solid #3b4a61;
 
     background: #172033;
 
-    color: #cbd5e1;
+    color: #dbeafe;
 
 }
 
@@ -771,6 +827,10 @@ body {
 .toolbar-button:hover {
 
     background: #1e293b;
+
+    border-color: #526987;
+
+    color: #ffffff;
 
 }
 
@@ -788,14 +848,14 @@ body {
 
 .run-query-button:hover {
 
-    background: #1d4ed8;
+    background: #3b82f6;
 
 }
 
 
 .run-query-button:disabled {
 
-    opacity: .6;
+    opacity: .55;
 
     cursor: not-allowed;
 
@@ -803,14 +863,16 @@ body {
 
 
 /* ============================================================
-   EDITOR
+   SQL EDITOR
    ============================================================ */
 
 .editor-wrapper {
 
     flex: 1;
 
-    padding: 12px;
+    min-height: 0;
+
+    padding: 14px;
 
     background: #0f172a;
 
@@ -825,18 +887,20 @@ body {
 
     resize: none;
 
+    padding: 16px;
+
     border:
         1px solid #334155;
 
-    border-radius: 6px;
-
-    padding: 15px;
+    border-radius: 7px;
 
     outline: none;
 
-    background: #020617;
+    background: #111827;
 
-    color: #e2e8f0;
+    color: #f1f5f9;
+
+    caret-color: #60a5fa;
 
     font-family:
         "Consolas",
@@ -845,21 +909,25 @@ body {
 
     font-size: 14px;
 
-    line-height: 1.6;
+    line-height: 1.65;
 
 }
 
 
 .sql-editor::placeholder {
 
-    color: #475569;
+    color: #64748b;
 
 }
 
 
 .sql-editor:focus {
 
-    border-color: #2563eb;
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 1px
+        rgba(59, 130, 246, .25);
 
 }
 
@@ -868,8 +936,9 @@ body {
 
     min-height: 30px;
 
-    padding:
-        6px 14px;
+    padding: 6px 14px;
+
+    color: #cbd5e1;
 
     font-size: 12px;
 
@@ -886,11 +955,11 @@ body {
 
     min-height: 0;
 
-    background: #111827;
-
     display: flex;
 
     flex-direction: column;
+
+    background: #111827;
 
 }
 
@@ -899,13 +968,15 @@ body {
 
     min-height: 58px;
 
-    padding: 8px 15px;
+    padding: 8px 16px;
 
     display: flex;
 
     align-items: center;
 
     justify-content: space-between;
+
+    background: #111827;
 
     border-bottom:
         1px solid #263244;
@@ -917,34 +988,38 @@ body {
 
     margin: 0 0 3px 0;
 
-    font-size: 14px;
+    color: #f1f5f9;
 
-    color: #e2e8f0;
+    font-size: 14px;
 
 }
 
 
 .results-summary {
 
-    font-size: 12px;
+    color: #94a3b8;
 
-    color: #64748b;
+    font-size: 12px;
 
 }
 
 
+/* ============================================================
+   DOWNLOAD
+   ============================================================ */
+
 .download-button {
 
-    height: 34px;
+    height: 35px;
 
     padding: 0 12px;
 
     border:
-        1px solid #334155;
-
-    background: #172033;
+        1px solid #3b4a61;
 
     border-radius: 6px;
+
+    background: #172033;
 
     color: #cbd5e1;
 
@@ -968,12 +1043,16 @@ body {
 
 .download-button:disabled {
 
-    opacity: .45;
+    opacity: .4;
 
     cursor: not-allowed;
 
 }
 
+
+/* ============================================================
+   RESULTS CONTAINER
+   ============================================================ */
 
 .results-container {
 
@@ -990,7 +1069,7 @@ body {
 
     height: 100%;
 
-    min-height: 120px;
+    min-height: 130px;
 
     display: flex;
 
@@ -1007,9 +1086,11 @@ body {
 
 .empty-results-icon {
 
-    font-size: 30px;
+    margin-bottom: 9px;
 
-    margin-bottom: 8px;
+    color: #64748b;
+
+    font-size: 32px;
 
 }
 
@@ -1017,6 +1098,8 @@ body {
 .empty-results p {
 
     margin: 0;
+
+    color: #94a3b8;
 
     font-size: 13px;
 
@@ -1033,6 +1116,8 @@ body {
 
     border-collapse: collapse;
 
+    color: #e2e8f0;
+
     font-size: 13px;
 
 }
@@ -1046,9 +1131,11 @@ body {
 
     z-index: 1;
 
+    padding: 10px 12px;
+
     background: #172033;
 
-    color: #cbd5e1;
+    color: #e2e8f0;
 
     text-align: left;
 
@@ -1057,8 +1144,6 @@ body {
     border-bottom:
         1px solid #334155;
 
-    padding: 9px 12px;
-
     white-space: nowrap;
 
 }
@@ -1066,12 +1151,12 @@ body {
 
 .results-table td {
 
-    padding: 8px 12px;
+    padding: 9px 12px;
+
+    color: #cbd5e1;
 
     border-bottom:
         1px solid #1e293b;
-
-    color: #94a3b8;
 
     white-space: nowrap;
 
@@ -1082,11 +1167,13 @@ body {
 
     background: #172033;
 
+    color: #f8fafc;
+
 }
 
 
 /* ============================================================
-   MODAL
+   CREATE DATABASE MODAL
    ============================================================ */
 
 .modal-overlay {
@@ -1095,14 +1182,14 @@ body {
 
     inset: 0;
 
-    background:
-        rgba(2, 6, 23, .72);
-
     display: flex;
 
     align-items: center;
 
     justify-content: center;
+
+    background:
+        rgba(2, 6, 23, .72);
 
     z-index: 1000;
 
@@ -1130,7 +1217,7 @@ body {
     border-radius: 10px;
 
     box-shadow:
-        0 20px 50px
+        0 20px 60px
         rgba(0, 0, 0, .45);
 
 }
@@ -1156,9 +1243,9 @@ body {
 
     margin: 0;
 
-    font-size: 16px;
-
     color: #f8fafc;
+
+    font-size: 16px;
 
 }
 
@@ -1169,11 +1256,18 @@ body {
 
     background: transparent;
 
+    color: #94a3b8;
+
     font-size: 22px;
 
     cursor: pointer;
 
-    color: #94a3b8;
+}
+
+
+.modal-close:hover {
+
+    color: #ffffff;
 
 }
 
@@ -1191,11 +1285,11 @@ body {
 
     margin-bottom: 7px;
 
+    color: #e2e8f0;
+
     font-size: 13px;
 
     font-weight: 600;
-
-    color: #cbd5e1;
 
 }
 
@@ -1206,35 +1300,41 @@ body {
 
     height: 38px;
 
+    padding: 0 10px;
+
     border:
         1px solid #334155;
 
     border-radius: 6px;
 
-    padding: 0 10px;
-
     outline: none;
 
-    background: #020617;
+    background: #0f172a;
 
-    color: #e2e8f0;
+    color: #f8fafc;
+
+}
+
+
+.modal-body input::placeholder {
+
+    color: #64748b;
 
 }
 
 
 .modal-body input:focus {
 
-    border-color: #2563eb;
+    border-color: #3b82f6;
 
 }
 
 
 .modal-help {
 
-    margin:
-        9px 0 0;
+    margin: 9px 0 0;
 
-    color: #64748b;
+    color: #94a3b8;
 
     font-size: 12px;
 
@@ -1282,9 +1382,18 @@ body {
     background: #172033;
 
     border:
-        1px solid #334155;
+        1px solid #3b4a61;
 
     color: #cbd5e1;
+
+}
+
+
+.secondary-button:hover {
+
+    background: #1e293b;
+
+    color: #ffffff;
 
 }
 
@@ -1300,29 +1409,76 @@ body {
 }
 
 
+.primary-button:hover {
+
+    background: #3b82f6;
+
+}
+
+
 /* ============================================================
    MOBILE
    ============================================================ */
 
-@media (max-width: 800px) {
+.mobile-sidebar-button {
 
-    body {
+    display: none;
 
-        overflow: hidden;
+    border: 0;
+
+    background: transparent;
+
+    color: #e2e8f0;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+}
+
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+
+    .platform-header {
+
+        height: 60px;
+
+        padding: 0 15px;
 
     }
 
 
-    .mobile-sidebar-button {
+    .platform-header h1 {
 
-        display: block;
+        font-size: 17px;
 
     }
 
 
-    .page-title {
+    .platform-nav {
 
-        display: none;
+        gap: 12px;
+
+        overflow-x: auto;
+
+    }
+
+
+    .platform-nav a {
+
+        font-size: 12px;
+
+    }
+
+
+    .sandbox-layout {
+
+        height:
+            calc(100vh - 60px);
 
     }
 
@@ -1333,7 +1489,7 @@ body {
 
         left: 0;
 
-        top: 58px;
+        top: 60px;
 
         bottom: 0;
 
@@ -1346,7 +1502,7 @@ body {
             transform .2s ease;
 
         box-shadow:
-            5px 0 20px
+            8px 0 25px
             rgba(0, 0, 0, .4);
 
     }
@@ -1360,28 +1516,39 @@ body {
     }
 
 
-    .close-sidebar-button {
+    .mobile-sidebar-button {
 
         display: block;
-
-        border: 0;
-
-        background: transparent;
-
-        font-size: 22px;
-
-        cursor: pointer;
-
-        color: #94a3b8;
 
     }
 
 
-    .sql-editor-section {
+    .close-sidebar-button {
 
-        height: 55%;
+        display: block;
 
-        min-height: 300px;
+    }
+
+
+    .sandbox-info-banner {
+
+        padding: 10px 12px;
+
+    }
+
+
+    .sandbox-info-content span {
+
+        font-size: 11px;
+
+    }
+
+
+    .query-tab {
+
+        min-width: 85px;
+
+        padding: 0 12px;
 
     }
 
@@ -1413,41 +1580,71 @@ body {
 
     }
 
+}
 
-    .download-button {
 
-        padding: 0 8px;
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 600px) {
+
+    .platform-header h1 {
+
+        display: none;
 
     }
 
 
-    .sandbox-info-banner {
+    .platform-header {
 
-        padding: 8px 10px;
+        justify-content: center;
 
     }
 
 
-    .sandbox-info-content span {
+    .platform-nav {
+
+        width: 100%;
+
+        justify-content: center;
+
+        gap: 10px;
+
+    }
+
+
+    .platform-nav a {
 
         font-size: 11px;
 
     }
 
 
-    .query-tab {
+    .sandbox-info-content span {
 
-        min-width: 85px;
-
-        padding: 0 12px;
+        display: none;
 
     }
 
 
-    #view-schema-button,
-    #view-relationships-button {
+    .sandbox-info-banner {
 
-        display: none;
+        min-height: 48px;
+
+    }
+
+
+    .sql-editor-section {
+
+        height: 55%;
+
+    }
+
+
+    .results-header h2 {
+
+        font-size: 13px;
 
     }
 
