@@ -643,20 +643,44 @@ FROM your_table;"
 
     </div>
 
+<!-- =====================================================
+     SQLITE WASM
+     =====================================================
 
-    <!-- =====================================================
-         SANDBOX JAVASCRIPT
-         =====================================================
+     sql.js provides SQLite inside the browser.
 
-         sql.js is loaded above first.
+     IMPORTANT:
+     - No backend/server is required for SQLite execution.
+     - sandbox.js uses this library to create databases,
+       execute SQL, and return query results.
+     - Keep this script BEFORE sandbox.js so the SQL engine
+       is available when sandbox.js starts.
+     ===================================================== -->
 
-         sandbox.js can therefore access the global
-         initSqlJs function.
-         ===================================================== -->
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"
+></script>
 
-    <script
-        src="sandbox.js?v=3"
-    ></script>
+
+<!-- =====================================================
+     SANDBOX JAVASCRIPT
+     =====================================================
+
+     Handles:
+     - Database Explorer
+     - Database creation
+     - Query tabs
+     - SQL editor
+     - Query execution
+     - Results panel
+     - CSV download
+     - Describe / Schema / Relationships
+     - Browser persistence
+     ===================================================== -->
+
+<script
+    src="sandbox.js?v=2"
+></script>
 
 </body>
 
