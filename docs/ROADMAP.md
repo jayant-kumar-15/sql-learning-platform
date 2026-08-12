@@ -104,3 +104,41 @@
         ┌─────────────────────┐
         │ Admin + security    │
         └─────────────────────┘
+for 12 Aug 2026
+
+Sandbox UI — Snowflake-style layout you described:
+Left: databases → tables
+Right: SQL editor
+Run Query
+Results below
+Download CSV
+Browser-side SQLite Sandbox engine
+Create database
+Create tables
+Insert/update/delete/select
+IndexedDB persistence
+Create Database/Table UI
+Tutorial pages
+Home/navigation polish
+Guest-mode experience
+Security limits + query protection
+SEO
+Final testing + deployment 
+
+                    sqllearning.com
+                          │
+                          ▼
+                    GitHub Pages
+                          │
+        ┌─────────────────┼──────────────────┐
+        │                 │                  │
+    Tutorials         Challenges          Sandbox
+        │                 │                  │
+   Static content    Browser SQLite     Browser SQLite
+                          │                  │
+                          └─────────┬────────┘
+                                    │
+                              Render Backend
+                              (only when needed)
+
+
