@@ -19,7 +19,7 @@
 
     <link
         rel="stylesheet"
-        href="sandbox.css?v=4"
+        href="sandbox.css?v=5"
     >
 
 </head>
@@ -36,6 +36,7 @@
         <h1>
             SQL Learning Platform
         </h1>
+
 
         <nav class="platform-nav">
 
@@ -69,11 +70,6 @@
 
 
     <!-- =====================================================
-         SANDBOX HEADER
-         ===================================================== -->
-
-
-    <!-- =====================================================
          MAIN SANDBOX
          ===================================================== -->
 
@@ -95,10 +91,12 @@
                     DATABASE EXPLORER
                 </span>
 
+
                 <button
                     id="close-sidebar-button"
                     class="close-sidebar-button"
                     type="button"
+                    aria-label="Close database explorer"
                 >
                     ×
                 </button>
@@ -106,7 +104,9 @@
             </div>
 
 
-            <!-- Search -->
+            <!-- =================================================
+                 DATABASE SEARCH
+                 ================================================= -->
 
             <div class="database-search">
 
@@ -120,19 +120,14 @@
             </div>
 
 
-            <!-- Database Tree -->
+            <!-- =================================================
+                 DATABASE TREE
+                 ================================================= -->
 
             <div
                 id="database-tree"
                 class="database-tree"
             >
-
-                <!--
-                    Sandbox starts empty.
-
-                    User-created databases and tables
-                    will be inserted here by sandbox.js.
-                -->
 
                 <div
                     id="empty-database-message"
@@ -143,9 +138,11 @@
                         🗄️
                     </div>
 
+
                     <p>
                         No databases yet
                     </p>
+
 
                     <span>
                         Create a database to get started.
@@ -156,7 +153,9 @@
             </div>
 
 
-            <!-- Sidebar Actions -->
+            <!-- =================================================
+                 SIDEBAR ACTIONS
+                 ================================================= -->
 
             <div class="sidebar-actions">
 
@@ -190,11 +189,13 @@
                     🗄️
                 </div>
 
+
                 <div class="sandbox-info-content">
 
                     <strong>
                         Your SQL Sandbox
                     </strong>
+
 
                     <span>
                         Create your own databases and tables
@@ -209,17 +210,17 @@
 
 
             <!-- =================================================
-                 QUERY SHEETS
+                 QUERY TABS
                  ================================================= -->
 
             <div
-                class="query-tabs-container"
                 id="query-tabs-container"
+                class="query-tabs-container"
             >
 
                 <div
-                    class="query-tabs"
                     id="query-tabs"
+                    class="query-tabs"
                 >
 
                     <button
@@ -235,13 +236,17 @@
                     </button>
 
 
-                    <!-- + stays beside Query 1 -->
+                    <!--
+                        New Query button stays immediately
+                        beside Query 1.
+                    -->
 
                     <button
                         id="new-query-button"
                         class="new-query-button"
                         type="button"
                         title="New Query"
+                        aria-label="Create new query"
                     >
                         ＋
                     </button>
@@ -255,8 +260,15 @@
                  SQL EDITOR
                  ================================================= -->
 
-            <section class="sql-editor-section">
+            <section
+                id="sql-editor-section"
+                class="sql-editor-section"
+            >
 
+
+                <!-- =================================================
+                     WORKSPACE TOOLBAR
+                     ================================================= -->
 
                 <div class="workspace-toolbar">
 
@@ -306,7 +318,7 @@
                         </button>
 
 
-                        <!-- Run -->
+                        <!-- Run Query -->
 
                         <button
                             id="run-query-button"
@@ -316,13 +328,14 @@
                             ▶ Run Query
                         </button>
 
-
                     </div>
 
                 </div>
 
 
-                <!-- SQL Editor -->
+                <!-- =================================================
+                     SQL EDITOR
+                     ================================================= -->
 
                 <div class="editor-wrapper">
 
@@ -330,6 +343,10 @@
                         id="sql-editor"
                         class="sql-editor"
                         spellcheck="false"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        wrap="off"
                         placeholder="-- Write your SQL query here
 
 -- Example:
@@ -340,11 +357,14 @@ FROM your_table;"
                 </div>
 
 
-                <!-- Status -->
+                <!-- =================================================
+                     SQL STATUS
+                     ================================================= -->
 
                 <div
                     id="sandbox-status"
                     class="sandbox-status"
+                    aria-live="polite"
                 ></div>
 
 
@@ -353,20 +373,35 @@ FROM your_table;"
 
             <!-- =================================================
                  QUERY RESULTS
+
+                 IMPORTANT:
+                 Results are hidden when the page loads.
+
+                 JavaScript will show this section only after
+                 the user clicks Run Query.
                  ================================================= -->
 
             <section
                 id="results-section"
                 class="results-section"
+                hidden
+                aria-hidden="true"
             >
+
+
+                <!-- =================================================
+                     RESULTS HEADER
+                     ================================================= -->
 
                 <div class="results-header">
 
-                    <div>
+
+                    <div class="results-title-block">
 
                         <h2>
                             Query Results
                         </h2>
+
 
                         <span
                             id="results-summary"
@@ -378,17 +413,41 @@ FROM your_table;"
                     </div>
 
 
-                    <button
-                        id="download-results-button"
-                        class="download-button"
-                        type="button"
-                        disabled
-                    >
-                        ↓ Download CSV
-                    </button>
+                    <div class="results-actions">
+
+
+                        <!-- Close Results -->
+
+                        <button
+                            id="close-results-button"
+                            class="close-results-button"
+                            type="button"
+                            title="Close query results"
+                            aria-label="Close query results"
+                        >
+                            ×
+                        </button>
+
+
+                        <!-- Download CSV -->
+
+                        <button
+                            id="download-results-button"
+                            class="download-button"
+                            type="button"
+                            disabled
+                        >
+                            ↓ Download CSV
+                        </button>
+
+                    </div>
 
                 </div>
 
+
+                <!-- =================================================
+                     RESULTS CONTENT
+                     ================================================= -->
 
                 <div
                     id="results-container"
@@ -400,6 +459,7 @@ FROM your_table;"
                         <div class="empty-results-icon">
                             ◫
                         </div>
+
 
                         <p>
                             Run a SQL query to see results here.
@@ -429,22 +489,32 @@ FROM your_table;"
         <div class="modal">
 
 
+            <!-- =================================================
+                 MODAL HEADER
+                 ================================================= -->
+
             <div class="modal-header">
 
                 <h2>
                     Create Database
                 </h2>
 
+
                 <button
                     id="close-database-modal"
                     class="modal-close"
                     type="button"
+                    aria-label="Close create database dialog"
                 >
                     ×
                 </button>
 
             </div>
 
+
+            <!-- =================================================
+                 MODAL BODY
+                 ================================================= -->
 
             <div class="modal-body">
 
@@ -454,6 +524,7 @@ FROM your_table;"
                     Database name
                 </label>
 
+
                 <input
                     id="database-name-input"
                     type="text"
@@ -461,6 +532,7 @@ FROM your_table;"
                     maxlength="50"
                     autocomplete="off"
                 >
+
 
                 <p class="modal-help">
 
@@ -472,6 +544,10 @@ FROM your_table;"
             </div>
 
 
+            <!-- =================================================
+                 MODAL FOOTER
+                 ================================================= -->
+
             <div class="modal-footer">
 
                 <button
@@ -481,6 +557,7 @@ FROM your_table;"
                 >
                     Cancel
                 </button>
+
 
                 <button
                     id="save-database-button"
@@ -502,7 +579,7 @@ FROM your_table;"
          ===================================================== -->
 
     <script
-        src="sandbox.js?v=1"
+        src="sandbox.js?v=2"
     ></script>
 
 </body>
