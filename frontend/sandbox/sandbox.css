@@ -1,6 +1,6 @@
 /* ============================================================
    SQL SANDBOX
-   Dark theme — aligned with SQL Learning Platform
+   Dark theme — optimized SQL workspace
    ============================================================ */
 
 * {
@@ -11,15 +11,11 @@ html,
 body {
     margin: 0;
     padding: 0;
-
     width: 100%;
     height: 100%;
-
-    background: #0b1120;
 }
 
 body {
-
     font-family:
         Inter,
         -apple-system,
@@ -28,7 +24,6 @@ body {
         sans-serif;
 
     background: #0b1120;
-
     color: #e5e7eb;
 
     overflow: hidden;
@@ -52,9 +47,7 @@ body {
 
     background: #0f172a;
 
-    border-bottom:
-        1px solid #263247;
-
+    border-bottom: 1px solid #263247;
 }
 
 
@@ -63,7 +56,6 @@ body {
     margin: 0;
 
     font-size: 18px;
-
     font-weight: 700;
 
     color: #f8fafc;
@@ -79,21 +71,7 @@ body {
 
     gap: 22px;
 
-    min-width: 0;
-
     overflow-x: auto;
-
-    overflow-y: hidden;
-
-    scrollbar-width: none;
-}
-
-
-/* Hide navbar scrollbar */
-
-.platform-nav::-webkit-scrollbar {
-
-    display: none;
 }
 
 
@@ -104,13 +82,11 @@ body {
     text-decoration: none;
 
     font-size: 13px;
-
     font-weight: 600;
 
     white-space: nowrap;
 
-    transition:
-        color .15s ease;
+    transition: color .15s ease;
 }
 
 
@@ -127,78 +103,13 @@ body {
 
 
 /* ============================================================
-   SANDBOX HEADER
+   OLD SANDBOX HEADER
+   Hidden because "Your SQL Sandbox" is already shown below.
    ============================================================ */
 
 .sandbox-header {
 
-    height: 42px;
-    min-height: 42px;
-
-    display: flex;
-    align-items: center;
-
-    padding: 0 18px;
-
-    background: #0f172a;
-
-    border-bottom:
-        1px solid #263247;
-}
-
-
-.header-left {
-
-    display: flex;
-    align-items: center;
-}
-
-
-.header-right {
-
-    margin-left: auto;
-}
-
-
-.page-title {
-
-    font-size: 13px;
-
-    font-weight: 700;
-
-    color: #dbeafe;
-}
-
-
-.active-database-label {
-
-    color: #93c5fd;
-
-    font-size: 12px;
-
-    font-weight: 600;
-}
-
-
-.mobile-sidebar-button {
-
-    display: none;
-
-    border: 0;
-
-    background: transparent;
-
-    color: #e5e7eb;
-
-    font-size: 21px;
-
-    cursor: pointer;
-}
-
-
-.close-sidebar-button {
-
-    display: none;
+    display: none !important;
 }
 
 
@@ -210,14 +121,12 @@ body {
 
     display: flex;
 
-    width: 100%;
-
-    height:
-        calc(100vh - 100px);
+    /*
+     * Only the main platform navbar remains above the sandbox.
+     */
+    height: calc(100vh - 58px);
 
     min-height: 0;
-
-    overflow: hidden;
 }
 
 
@@ -228,41 +137,33 @@ body {
 .database-sidebar {
 
     width: 260px;
-
     min-width: 260px;
 
     display: flex;
-
     flex-direction: column;
 
     background: #0f172a;
 
-    border-right:
-        1px solid #263247;
+    border-right: 1px solid #263247;
 }
 
 
 .sidebar-header {
 
     height: 46px;
-
     min-height: 46px;
 
     padding: 0 14px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    border-bottom:
-        1px solid #263247;
+    border-bottom: 1px solid #263247;
 
     color: #94a3b8;
 
     font-size: 11px;
-
     font-weight: 700;
 
     letter-spacing: .06em;
@@ -278,13 +179,11 @@ body {
 .database-search input {
 
     width: 100%;
-
     height: 34px;
 
     padding: 0 10px;
 
-    border:
-        1px solid #334155;
+    border: 1px solid #334155;
 
     border-radius: 6px;
 
@@ -309,8 +208,7 @@ body {
     border-color: #3b82f6;
 
     box-shadow:
-        0 0 0 2px
-        rgba(59, 130, 246, .12);
+        0 0 0 2px rgba(59, 130, 246, .12);
 }
 
 
@@ -321,8 +219,6 @@ body {
     min-height: 0;
 
     overflow-y: auto;
-
-    overflow-x: hidden;
 
     padding: 5px 8px;
 }
@@ -353,7 +249,6 @@ body {
     color: #94a3b8;
 
     font-size: 13px;
-
     font-weight: 600;
 }
 
@@ -385,7 +280,6 @@ body {
     height: 34px;
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
@@ -397,7 +291,6 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 
     color: #e2e8f0;
@@ -443,7 +336,6 @@ body {
     height: 32px;
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
@@ -474,21 +366,18 @@ body {
 
 .sidebar-actions {
 
-    padding: 11px;
+    padding: 9px;
 
-    border-top:
-        1px solid #263247;
+    border-top: 1px solid #263247;
 }
 
 
 .create-database-button {
 
     width: 100%;
-
     height: 36px;
 
-    border:
-        1px solid #334155;
+    border: 1px solid #334155;
 
     border-radius: 6px;
 
@@ -499,7 +388,6 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 }
 
@@ -523,16 +411,12 @@ body {
     flex: 1;
 
     min-width: 0;
-
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
 
     background: #0b1120;
-
-    overflow: hidden;
 }
 
 
@@ -542,35 +426,29 @@ body {
 
 .sandbox-info-banner {
 
-    min-height: 54px;
+    height: 52px;
+    min-height: 52px;
 
     display: flex;
-
     align-items: center;
 
     gap: 11px;
 
-    padding: 8px 15px;
+    padding: 6px 15px;
 
     background: #111c31;
 
-    border-bottom:
-        1px solid #263247;
+    border-bottom: 1px solid #263247;
 }
 
 
 .sandbox-info-icon {
 
     width: 34px;
-
     height: 34px;
 
-    flex: 0 0 34px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     border-radius: 7px;
@@ -586,10 +464,9 @@ body {
 .sandbox-info-content {
 
     display: flex;
-
     flex-direction: column;
 
-    gap: 2px;
+    gap: 1px;
 
     min-width: 0;
 }
@@ -605,11 +482,11 @@ body {
 
 .sandbox-info-content span {
 
-    color: #b8c5d9;
+    color: #aebbd0;
 
     font-size: 11px;
 
-    line-height: 1.4;
+    line-height: 1.35;
 }
 
 
@@ -619,47 +496,26 @@ body {
 
 .query-tabs-container {
 
-    height: 40px;
-
-    min-height: 40px;
+    height: 38px;
+    min-height: 38px;
 
     display: flex;
-
     align-items: stretch;
 
     background: #0f172a;
 
-    border-bottom:
-        1px solid #263247;
-
-    overflow: hidden;
+    border-bottom: 1px solid #263247;
 }
 
 
 .query-tabs {
 
     display: flex;
-
     align-items: stretch;
 
     min-width: 0;
 
     overflow-x: auto;
-
-    overflow-y: hidden;
-
-    scrollbar-width: none;
-}
-
-
-/*
-   IMPORTANT:
-   Hide the horizontal scrollbar under Query 1.
-*/
-
-.query-tabs::-webkit-scrollbar {
-
-    display: none;
 }
 
 
@@ -667,18 +523,13 @@ body {
 
     min-width: 90px;
 
-    max-width: 180px;
-
-    height: 40px;
+    height: 38px;
 
     padding: 0 15px;
 
-    flex: 0 0 auto;
-
     border: 0;
 
-    border-right:
-        1px solid #263247;
+    border-right: 1px solid #263247;
 
     background: #111c31;
 
@@ -687,7 +538,6 @@ body {
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
 
     white-space: nowrap;
@@ -708,8 +558,7 @@ body {
 
     color: #60a5fa;
 
-    border-top:
-        2px solid #3b82f6;
+    border-top: 2px solid #3b82f6;
 }
 
 
@@ -725,26 +574,18 @@ body {
 
 /* ============================================================
    NEW QUERY BUTTON
-   Immediately beside Query 1
    ============================================================ */
 
 .new-query-button {
 
     width: 40px;
-
     min-width: 40px;
 
-    height: 40px;
-
-    flex: 0 0 40px;
+    height: 38px;
 
     border: 0;
 
-    border-left:
-        1px solid #263247;
-
-    border-right:
-        1px solid #263247;
+    border-right: 1px solid #263247;
 
     background: #111c31;
 
@@ -768,127 +609,85 @@ body {
    SQL EDITOR SECTION
    ============================================================ */
 
-/*
-   IMPORTANT:
-   The editor gets approximately 70% of the
-   remaining workspace height.
-
-   Results use the remaining space below.
-*/
-
 .sql-editor-section {
 
-    flex: 0 0 68%;
+    /*
+     * Main priority:
+     * Give most of the workspace to the SQL editor.
+     */
+    height: 72%;
 
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
 
     background: #0b1120;
 
-    border-bottom:
-        1px solid #263247;
-
-    overflow: hidden;
+    border-bottom: 1px solid #263247;
 }
 
 
 /* ============================================================
-   WORKSPACE TOOLBAR
+   SQL WORKSHEET TOOLBAR
    ============================================================ */
 
 .workspace-toolbar {
 
-    height: 48px;
-
-    min-height: 48px;
+    height: 42px;
+    min-height: 42px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    gap: 10px;
-
-    padding: 0 13px;
+    padding: 0 10px;
 
     background: #0f172a;
 
-    border-bottom:
-        1px solid #263247;
+    border-bottom: 1px solid #263247;
 }
 
 
 .workspace-title {
 
-    color: #dbe7ff;
+    color: #cbd5e1;
 
     font-size: 11px;
-
     font-weight: 700;
 
     letter-spacing: .05em;
-
-    white-space: nowrap;
 }
 
 
 .workspace-actions {
 
     display: flex;
-
     align-items: center;
 
     gap: 7px;
-
-    min-width: 0;
-
-    overflow-x: auto;
-
-    overflow-y: hidden;
-
-    scrollbar-width: none;
 }
 
-
-.workspace-actions::-webkit-scrollbar {
-
-    display: none;
-}
-
-
-/* ============================================================
-   TOOLBAR BUTTONS
-   ============================================================ */
 
 .toolbar-button,
 .run-query-button {
 
-    height: 34px;
+    height: 32px;
 
     padding: 0 13px;
-
-    flex: 0 0 auto;
 
     border-radius: 7px;
 
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
-
-    white-space: nowrap;
 }
 
 
 .toolbar-button {
 
-    border:
-        1px solid #3b4a63;
+    border: 1px solid #3b4a63;
 
     background: #111c31;
 
@@ -912,8 +711,7 @@ body {
 #view-schema-button,
 #view-relationships-button {
 
-    border:
-        1px solid #3b4a63;
+    border: 1px solid #3b4a63;
 
     background: #111c31;
 
@@ -933,8 +731,6 @@ body {
 }
 
 
-/* Run Query */
-
 .run-query-button {
 
     border: 0;
@@ -944,7 +740,6 @@ body {
     color: #ffffff;
 
     padding-left: 15px;
-
     padding-right: 15px;
 }
 
@@ -969,41 +764,31 @@ body {
 
 .editor-wrapper {
 
+    /*
+     * This area now consumes all remaining editor-section space.
+     */
     flex: 1;
 
     min-height: 0;
 
-    padding: 12px;
+    padding: 6px;
 
     background: #0b1120;
-
-    overflow: hidden;
 }
 
-
-/*
-   IMPORTANT:
-   This textarea owns the scrollbar.
-
-   Long queries will scroll INSIDE this box.
-*/
 
 .sql-editor {
 
     display: block;
 
     width: 100%;
-
     height: 100%;
-
-    min-height: 0;
 
     resize: none;
 
-    padding: 18px;
+    padding: 15px;
 
-    border:
-        1px solid #3b82f6;
+    border: 1px solid #334155;
 
     border-radius: 8px;
 
@@ -1023,10 +808,13 @@ body {
 
     font-size: 14px;
 
-    line-height: 1.7;
+    line-height: 1.65;
 
+    /*
+     * IMPORTANT:
+     * Scroll belongs INSIDE the query editor.
+     */
     overflow-y: auto;
-
     overflow-x: auto;
 
     white-space: pre;
@@ -1034,14 +822,13 @@ body {
     tab-size: 4;
 
     box-shadow:
-        inset 0 1px 2px
-        rgba(0, 0, 0, .25);
+        inset 0 1px 2px rgba(0, 0, 0, .25);
 }
 
 
 .sql-editor::placeholder {
 
-    color: #71809a;
+    color: #64748b;
 
     opacity: 1;
 }
@@ -1049,14 +836,11 @@ body {
 
 .sql-editor:focus {
 
-    border-color: #60a5fa;
+    border-color: #3b82f6;
 
     box-shadow:
-        0 0 0 2px
-        rgba(96, 165, 250, .12),
-
-        inset 0 1px 2px
-        rgba(0, 0, 0, .25);
+        0 0 0 2px rgba(59, 130, 246, .12),
+        inset 0 1px 2px rgba(0, 0, 0, .25);
 }
 
 
@@ -1067,65 +851,47 @@ body {
 .sql-editor::-webkit-scrollbar {
 
     width: 10px;
-
     height: 10px;
 }
 
 
 .sql-editor::-webkit-scrollbar-track {
 
-    background: #0b1120;
-
-    border-radius: 8px;
+    background: #0f172a;
 }
 
 
 .sql-editor::-webkit-scrollbar-thumb {
 
-    background: #475569;
+    background: #3b4a63;
 
     border-radius: 8px;
-
-    border:
-        2px solid #0b1120;
 }
 
 
 .sql-editor::-webkit-scrollbar-thumb:hover {
 
-    background: #64748b;
-}
-
-
-.sql-editor {
-
-    scrollbar-width: thin;
-
-    scrollbar-color:
-        #475569
-        #0b1120;
+    background: #60a5fa;
 }
 
 
 /* ============================================================
-   SANDBOX STATUS
+   STATUS
+   Keep this very small so it doesn't waste editor space.
    ============================================================ */
 
 .sandbox-status {
 
-    min-height: 28px;
+    height: 18px;
+    min-height: 18px;
 
-    height: 28px;
-
-    padding: 5px 13px;
+    padding: 2px 10px;
 
     background: #0b1120;
 
     color: #94a3b8;
 
-    font-size: 12px;
-
-    overflow: hidden;
+    font-size: 11px;
 }
 
 
@@ -1135,46 +901,40 @@ body {
 
 .results-section {
 
-    flex: 1 1 auto;
+    /*
+     * Results receive the remaining space.
+     */
+    flex: 1;
 
     min-height: 0;
 
     display: flex;
-
     flex-direction: column;
 
     background: #0f172a;
-
-    overflow: hidden;
 }
 
 
 .results-header {
 
-    min-height: 52px;
-
-    height: 52px;
+    height: 44px;
+    min-height: 44px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
 
-    gap: 10px;
-
-    padding: 7px 13px;
+    padding: 5px 10px;
 
     background: #0f172a;
 
-    border-bottom:
-        1px solid #263247;
+    border-bottom: 1px solid #263247;
 }
 
 
 .results-header h2 {
 
-    margin: 0 0 2px;
+    margin: 0 0 1px;
 
     color: #f1f5f9;
 
@@ -1192,12 +952,11 @@ body {
 
 .download-button {
 
-    height: 32px;
+    height: 30px;
 
     padding: 0 11px;
 
-    border:
-        1px solid #334155;
+    border: 1px solid #334155;
 
     border-radius: 6px;
 
@@ -1208,10 +967,7 @@ body {
     cursor: pointer;
 
     font-size: 12px;
-
     font-weight: 600;
-
-    white-space: nowrap;
 }
 
 
@@ -1233,10 +989,6 @@ body {
 }
 
 
-/* ============================================================
-   RESULTS CONTAINER
-   ============================================================ */
-
 .results-container {
 
     flex: 1;
@@ -1255,16 +1007,14 @@ body {
 
 .empty-results {
 
-    min-height: 120px;
-
     height: 100%;
 
-    display: flex;
+    min-height: 80px;
 
+    display: flex;
     flex-direction: column;
 
     align-items: center;
-
     justify-content: center;
 
     color: #64748b;
@@ -1273,9 +1023,9 @@ body {
 
 .empty-results-icon {
 
-    font-size: 32px;
+    font-size: 30px;
 
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 
     color: #475569;
 }
@@ -1323,8 +1073,7 @@ body {
 
     font-weight: 700;
 
-    border-bottom:
-        1px solid #334155;
+    border-bottom: 1px solid #334155;
 
     white-space: nowrap;
 }
@@ -1336,8 +1085,7 @@ body {
 
     color: #cbd5e1;
 
-    border-bottom:
-        1px solid #263247;
+    border-bottom: 1px solid #263247;
 
     white-space: nowrap;
 }
@@ -1350,15 +1098,13 @@ body {
 
 
 /* ============================================================
-   RESULTS + SIDEBAR SCROLLBARS
+   SCROLLBARS
    ============================================================ */
 
 .results-container::-webkit-scrollbar,
 .database-tree::-webkit-scrollbar {
 
     width: 9px;
-
-    height: 9px;
 }
 
 
@@ -1398,11 +1144,9 @@ body {
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    background:
-        rgba(2, 6, 23, .72);
+    background: rgba(2, 6, 23, .72);
 
     z-index: 1000;
 }
@@ -1418,19 +1162,16 @@ body {
 
     width: 420px;
 
-    max-width:
-        calc(100vw - 30px);
+    max-width: calc(100vw - 30px);
 
     background: #111c31;
 
-    border:
-        1px solid #334155;
+    border: 1px solid #334155;
 
     border-radius: 10px;
 
     box-shadow:
-        0 20px 50px
-        rgba(0, 0, 0, .5);
+        0 20px 50px rgba(0, 0, 0, .5);
 }
 
 
@@ -1439,13 +1180,11 @@ body {
     display: flex;
 
     align-items: center;
-
     justify-content: space-between;
 
     padding: 16px 18px;
 
-    border-bottom:
-        1px solid #263247;
+    border-bottom: 1px solid #263247;
 }
 
 
@@ -1494,7 +1233,6 @@ body {
     color: #cbd5e1;
 
     font-size: 13px;
-
     font-weight: 600;
 }
 
@@ -1502,13 +1240,11 @@ body {
 .modal-body input {
 
     width: 100%;
-
     height: 38px;
 
     padding: 0 10px;
 
-    border:
-        1px solid #334155;
+    border: 1px solid #334155;
 
     border-radius: 6px;
 
@@ -1548,8 +1284,7 @@ body {
 
     padding: 14px 18px;
 
-    border-top:
-        1px solid #263247;
+    border-top: 1px solid #263247;
 }
 
 
@@ -1565,15 +1300,13 @@ body {
     cursor: pointer;
 
     font-size: 13px;
-
     font-weight: 600;
 }
 
 
 .secondary-button {
 
-    border:
-        1px solid #334155;
+    border: 1px solid #334155;
 
     background: #111c31;
 
@@ -1618,7 +1351,6 @@ body {
     .platform-header {
 
         height: 54px;
-
         min-height: 54px;
 
         padding: 0 12px;
@@ -1636,8 +1368,6 @@ body {
         gap: 10px;
 
         overflow-x: auto;
-
-        overflow-y: hidden;
     }
 
 
@@ -1647,12 +1377,159 @@ body {
     }
 
 
-    .sandbox-header {
+    /*
+     * Sandbox header is removed.
+     * Therefore the layout starts directly below navbar.
+     */
 
-        height: 42px;
+    .sandbox-layout {
 
-        min-height: 42px;
+        height: calc(100vh - 54px);
     }
 
 
-    
+    .mobile-sidebar-button {
+
+        display: block;
+
+        margin-right: 8px;
+    }
+
+
+    .database-sidebar {
+
+        position: fixed;
+
+        left: 0;
+
+        top: 54px;
+
+        bottom: 0;
+
+        z-index: 500;
+
+        transform: translateX(-100%);
+
+        transition: transform .2s ease;
+
+        box-shadow:
+            5px 0 20px rgba(0, 0, 0, .5);
+    }
+
+
+    .database-sidebar.mobile-open {
+
+        transform: translateX(0);
+    }
+
+
+    .close-sidebar-button {
+
+        display: block;
+
+        border: 0;
+
+        background: transparent;
+
+        color: #94a3b8;
+
+        font-size: 22px;
+
+        cursor: pointer;
+    }
+
+
+    .sandbox-info-banner {
+
+        height: 50px;
+        min-height: 50px;
+
+        padding: 6px 10px;
+    }
+
+
+    .sandbox-info-content span {
+
+        font-size: 10px;
+    }
+
+
+    .query-tab {
+
+        min-width: 85px;
+
+        padding: 0 12px;
+    }
+
+
+    /*
+     * Mobile editor still gets priority.
+     */
+
+    .sql-editor-section {
+
+        height: 65%;
+
+        min-height: 0;
+    }
+
+
+    .workspace-toolbar {
+
+        height: 40px;
+        min-height: 40px;
+
+        padding: 0 8px;
+    }
+
+
+    .workspace-actions {
+
+        gap: 4px;
+
+        overflow-x: auto;
+    }
+
+
+    .toolbar-button {
+
+        display: block;
+
+        padding: 0 8px;
+    }
+
+
+    .run-query-button {
+
+        padding: 0 9px;
+    }
+
+
+    .editor-wrapper {
+
+        padding: 5px;
+    }
+
+
+    .sql-editor {
+
+        padding: 12px;
+
+        font-size: 13px;
+    }
+
+
+    .results-header {
+
+        height: 42px;
+        min-height: 42px;
+
+        padding: 5px 8px;
+    }
+
+
+    .download-button {
+
+        padding: 0 8px;
+    }
+}
