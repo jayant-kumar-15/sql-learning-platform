@@ -1,476 +1,195 @@
 /* ============================================================
-   GLOBAL
+   SANDBOX INFORMATION BANNER
    ============================================================ */
 
-* {
-    box-sizing: border-box;
+.sandbox-info-banner {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    padding: 11px 15px;
+
+    background: #f0f7ff;
+
+    border-bottom:
+        1px solid #dbeafe;
+
 }
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
+
+.sandbox-info-icon {
+
+    font-size: 18px;
+
+    line-height: 1.4;
+
 }
 
-body {
-    font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
 
-    background: #f7f9fc;
-    color: #172033;
+.sandbox-info-content {
 
-    overflow: hidden;
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+
+}
+
+
+.sandbox-info-content strong {
+
+    font-size: 13px;
+
+    color: #1e3a8a;
+
+}
+
+
+.sandbox-info-content span {
+
+    font-size: 12px;
+
+    color: #475569;
+
+    line-height: 1.4;
+
 }
 
 
 /* ============================================================
-   SANDBOX WORKSPACE HEADER
+   QUERY TABS
    ============================================================ */
 
-.sandbox-header {
+.query-tabs-container {
 
-    height: 52px;
+    height: 42px;
 
-    background: #ffffff;
+    display: flex;
+
+    align-items: stretch;
+
+    background: #f8fafc;
 
     border-bottom:
         1px solid #dfe4ec;
 
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 0 20px;
-
 }
 
 
-.header-left {
+.query-tabs {
 
     display: flex;
 
-    align-items: center;
+    align-items: stretch;
 
-    gap: 10px;
+    overflow-x: auto;
 
-}
-
-
-.page-title {
-
-    color: #475569;
-
-    font-size: 14px;
-
-    font-weight: 600;
+    min-width: 0;
 
 }
 
 
-.header-right {
+.query-tab {
 
-    display: flex;
+    min-width: 100px;
 
-    align-items: center;
+    max-width: 180px;
 
-}
-
-
-.active-database-label {
-
-    background: #eef5ff;
-
-    color: #2563eb;
-
-    padding: 6px 11px;
-
-    border-radius: 6px;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-}
-
-
-/* ============================================================
-   MOBILE SIDEBAR BUTTON
-   ============================================================ */
-
-.mobile-sidebar-button {
-
-    display: none;
+    padding: 0 16px;
 
     border: 0;
-
-    background: transparent;
-
-    font-size: 22px;
-
-    cursor: pointer;
-
-    color: #475569;
-
-}
-
-
-.close-sidebar-button {
-
-    display: none;
-
-}
-
-
-/* ============================================================
-   MAIN SANDBOX LAYOUT
-   ============================================================ */
-
-.sandbox-layout {
-
-    display: flex;
-
-    height:
-        calc(100vh - 52px);
-
-}
-
-
-/* ============================================================
-   DATABASE SIDEBAR
-   ============================================================ */
-
-.database-sidebar {
-
-    width: 260px;
-
-    min-width: 260px;
-
-    background: #ffffff;
 
     border-right:
         1px solid #dfe4ec;
 
-    display: flex;
-
-    flex-direction: column;
-
-}
-
-
-.sidebar-header {
-
-    height: 48px;
-
-    padding: 0 15px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    border-bottom:
-        1px solid #edf0f5;
-
-    font-size: 11px;
-
-    font-weight: 700;
-
-    color: #6b7280;
-
-    letter-spacing: .06em;
-
-}
-
-
-.database-search {
-
-    padding: 10px;
-
-}
-
-
-.database-search input {
-
-    width: 100%;
-
-    height: 34px;
-
-    border:
-        1px solid #d9dee8;
-
-    border-radius: 6px;
-
-    padding: 0 10px;
-
-    outline: none;
-
-    font-size: 13px;
-
-}
-
-
-.database-search input:focus {
-
-    border-color: #3b82f6;
-
-}
-
-
-.database-tree {
-
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding: 4px 8px;
-
-}
-
-
-.database-item {
-
-    margin-bottom: 5px;
-
-}
-
-
-.database-header {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 7px;
-
-    height: 34px;
-
-    padding: 0 7px;
-
-    border-radius: 5px;
-
-    cursor: pointer;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-}
-
-
-.database-header:hover {
-
     background: #f1f5f9;
-
-}
-
-
-.database-arrow {
-
-    width: 12px;
 
     color: #64748b;
 
-    font-size: 10px;
+    cursor: pointer;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
 
 }
 
 
-.database-icon {
+.query-tab:hover {
 
-    font-size: 14px;
+    background: #ffffff;
 
-}
-
-
-.table-list {
-
-    padding-left: 26px;
+    color: #334155;
 
 }
 
 
-.table-item {
+.query-tab.active {
 
-    display: flex;
+    background: #ffffff;
 
-    align-items: center;
+    color: #2563eb;
 
-    gap: 7px;
+    border-top:
+        2px solid #2563eb;
 
-    height: 32px;
+}
 
-    padding: 0 8px;
 
-    border-radius: 5px;
+.query-tab-name {
 
-    color: #536074;
+    display: block;
 
-    font-size: 13px;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+}
+
+
+.new-query-button {
+
+    width: 42px;
+
+    min-width: 42px;
+
+    border: 0;
+
+    border-left:
+        1px solid #dfe4ec;
+
+    background: #f8fafc;
+
+    color: #475569;
+
+    font-size: 18px;
 
     cursor: pointer;
 
 }
 
 
-.table-item:hover {
+.new-query-button:hover {
 
-    background: #eef5ff;
+    background: #ffffff;
 
     color: #2563eb;
 
 }
 
 
-.sidebar-actions {
-
-    padding: 12px;
-
-    border-top:
-        1px solid #edf0f5;
-
-}
-
-
-.create-database-button {
-
-    width: 100%;
-
-    height: 36px;
-
-    border:
-        1px solid #cfd7e5;
-
-    background: #ffffff;
-
-    color: #334155;
-
-    border-radius: 6px;
-
-    cursor: pointer;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-}
-
-
-.create-database-button:hover {
-
-    background: #f8fafc;
-
-}
-
-
 /* ============================================================
-   MAIN WORKSPACE
+   SCHEMA / RELATIONSHIP BUTTONS
    ============================================================ */
 
-.sandbox-workspace {
-
-    flex: 1;
-
-    min-width: 0;
-
-    display: flex;
-
-    flex-direction: column;
-
-}
-
-
-/* ============================================================
-   SQL EDITOR
-   ============================================================ */
-
-.sql-editor-section {
-
-    height: 46%;
-
-    min-height: 280px;
-
-    background: #ffffff;
-
-    border-bottom:
-        1px solid #dfe4ec;
-
-    display: flex;
-
-    flex-direction: column;
-
-}
-
-
-.workspace-toolbar {
-
-    height: 48px;
-
-    padding: 0 15px;
-
-    border-bottom:
-        1px solid #edf0f5;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-}
-
-
-.workspace-title {
-
-    font-size: 12px;
-
-    font-weight: 700;
-
-    letter-spacing: .05em;
-
-    color: #64748b;
-
-}
-
-
-.workspace-actions {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-}
-
-
-.toolbar-button,
-.run-query-button {
-
-    height: 34px;
-
-    padding: 0 13px;
-
-    border-radius: 6px;
-
-    cursor: pointer;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-}
-
-
-.toolbar-button {
+#view-schema-button,
+#view-relationships-button {
 
     border:
         1px solid #d6dce6;
@@ -482,676 +201,11 @@ body {
 }
 
 
-.toolbar-button:hover {
+#view-schema-button:hover,
+#view-relationships-button:hover {
 
     background: #f8fafc;
 
-}
-
-
-.run-query-button {
-
-    border: 0;
-
-    background: #2563eb;
-
-    color: #ffffff;
-
-}
-
-
-.run-query-button:hover {
-
-    background: #1d4ed8;
-
-}
-
-
-.run-query-button:disabled {
-
-    opacity: .6;
-
-    cursor: not-allowed;
-
-}
-
-
-.editor-wrapper {
-
-    flex: 1;
-
-    padding: 12px;
-
-    background: #f8fafc;
-
-}
-
-
-.sql-editor {
-
-    width: 100%;
-
-    height: 100%;
-
-    resize: none;
-
-    border:
-        1px solid #d8dee9;
-
-    border-radius: 6px;
-
-    padding: 15px;
-
-    outline: none;
-
-    background: #ffffff;
-
-    color: #172033;
-
-    font-family:
-        "Consolas",
-        "Monaco",
-        monospace;
-
-    font-size: 14px;
-
-    line-height: 1.6;
-
-}
-
-
-.sql-editor:focus {
-
-    border-color: #3b82f6;
-
-}
-
-
-.sandbox-status {
-
-    min-height: 30px;
-
-    padding:
-        6px 14px;
-
-    font-size: 12px;
-
-}
-
-
-/* ============================================================
-   RESULTS
-   ============================================================ */
-
-.results-section {
-
-    flex: 1;
-
-    min-height: 0;
-
-    background: #ffffff;
-
-    display: flex;
-
-    flex-direction: column;
-
-}
-
-
-.results-header {
-
-    min-height: 58px;
-
-    padding: 8px 15px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    border-bottom:
-        1px solid #edf0f5;
-
-}
-
-
-.results-header h2 {
-
-    margin: 0 0 3px 0;
-
-    font-size: 14px;
-
-}
-
-
-.results-summary {
-
-    font-size: 12px;
-
-    color: #7a8496;
-
-}
-
-
-.download-button {
-
-    height: 34px;
-
-    padding: 0 12px;
-
-    border:
-        1px solid #d6dce6;
-
-    background: #ffffff;
-
-    border-radius: 6px;
-
-    color: #475569;
-
-    cursor: pointer;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-}
-
-
-.download-button:hover:not(:disabled) {
-
-    background: #f8fafc;
-
-}
-
-
-.download-button:disabled {
-
-    opacity: .45;
-
-    cursor: not-allowed;
-
-}
-
-
-.results-container {
-
-    flex: 1;
-
-    min-height: 0;
-
-    overflow: auto;
-
-}
-
-
-.empty-results {
-
-    height: 100%;
-
-    min-height: 150px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    color: #94a3b8;
-
-}
-
-
-.empty-results-icon {
-
-    font-size: 35px;
-
-    margin-bottom: 10px;
-
-}
-
-
-.empty-results p {
-
-    margin: 0;
-
-    font-size: 13px;
-
-}
-
-
-/* ============================================================
-   RESULTS TABLE
-   ============================================================ */
-
-.results-table {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    font-size: 13px;
-
-}
-
-
-.results-table th {
-
-    position: sticky;
-
-    top: 0;
-
-    z-index: 1;
-
-    background: #f8fafc;
-
-    color: #475569;
-
-    text-align: left;
-
-    font-weight: 700;
-
-    border-bottom:
-        1px solid #dfe4ec;
-
-    padding: 9px 12px;
-
-    white-space: nowrap;
-
-}
-
-
-.results-table td {
-
-    padding: 8px 12px;
-
-    border-bottom:
-        1px solid #edf0f5;
-
-    color: #334155;
-
-    white-space: nowrap;
-
-}
-
-
-.results-table tr:hover td {
-
-    background: #f8fafc;
-
-}
-
-
-/* ============================================================
-   CREATE DATABASE MODAL
-   ============================================================ */
-
-.modal-overlay {
-
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(15, 23, 42, .45);
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    z-index: 1000;
-
-}
-
-
-.modal-overlay.hidden {
-
-    display: none;
-
-}
-
-
-.modal {
-
-    width: 420px;
-
-    max-width:
-        calc(100vw - 30px);
-
-    background: #ffffff;
-
-    border-radius: 10px;
-
-    box-shadow:
-        0 20px 50px
-        rgba(0, 0, 0, .2);
-
-}
-
-
-.modal-header {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 16px 18px;
-
-    border-bottom:
-        1px solid #edf0f5;
-
-}
-
-
-.modal-header h2 {
-
-    margin: 0;
-
-    font-size: 16px;
-
-}
-
-
-.modal-close {
-
-    border: 0;
-
-    background: transparent;
-
-    font-size: 22px;
-
-    cursor: pointer;
-
-    color: #64748b;
-
-}
-
-
-.modal-body {
-
-    padding: 18px;
-
-}
-
-
-.modal-body label {
-
-    display: block;
-
-    margin-bottom: 7px;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-}
-
-
-.modal-body input {
-
-    width: 100%;
-
-    height: 38px;
-
-    border:
-        1px solid #d6dce6;
-
-    border-radius: 6px;
-
-    padding: 0 10px;
-
-    outline: none;
-
-}
-
-
-.modal-body input:focus {
-
-    border-color: #3b82f6;
-
-}
-
-
-.modal-help {
-
-    margin:
-        9px 0 0;
-
-    color: #64748b;
-
-    font-size: 12px;
-
-    line-height: 1.5;
-
-}
-
-
-.modal-footer {
-
-    display: flex;
-
-    justify-content: flex-end;
-
-    gap: 8px;
-
-    padding: 14px 18px;
-
-    border-top:
-        1px solid #edf0f5;
-
-}
-
-
-.secondary-button,
-.primary-button {
-
-    height: 36px;
-
-    padding: 0 14px;
-
-    border-radius: 6px;
-
-    cursor: pointer;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-}
-
-
-.secondary-button {
-
-    background: #ffffff;
-
-    border:
-        1px solid #d6dce6;
-
-    color: #475569;
-
-}
-
-
-.primary-button {
-
-    background: #2563eb;
-
-    border: 0;
-
-    color: #ffffff;
-
-}
-
-
-.primary-button:hover {
-
-    background: #1d4ed8;
-
-}
-
-
-/* ============================================================
-   MOBILE
-   ============================================================ */
-
-@media (max-width: 800px) {
-
-    body {
-
-        overflow: hidden;
-
-    }
-
-
-    .mobile-sidebar-button {
-
-        display: block;
-
-    }
-
-
-    .database-sidebar {
-
-        position: fixed;
-
-        left: 0;
-
-        top: 58px;
-
-        bottom: 0;
-
-        z-index: 500;
-
-        transform:
-            translateX(-100%);
-
-        transition:
-            transform .2s ease;
-
-        box-shadow:
-            5px 0 20px
-            rgba(0, 0, 0, .12);
-
-    }
-
-
-    .database-sidebar.mobile-open {
-
-        transform:
-            translateX(0);
-
-    }
-
-
-    .close-sidebar-button {
-
-        display: block;
-
-        border: 0;
-
-        background: transparent;
-
-        font-size: 22px;
-
-        cursor: pointer;
-
-        color: #64748b;
-
-    }
-
-
-    .sql-editor-section {
-
-        height: 50%;
-
-        min-height: 240px;
-
-    }
-
-
-    .workspace-toolbar {
-
-        padding: 0 10px;
-
-    }
-
-
-    .toolbar-button {
-
-        display: none;
-
-    }
-
-
-    .run-query-button {
-
-        padding: 0 10px;
-
-    }
-
-
-    .results-header {
-
-        padding: 8px 10px;
-
-    }
-
-
-    .download-button {
-
-        padding: 0 8px;
-
-    }
-
-}
-
-
-/* ============================================================
-   VERY SMALL MOBILE SCREENS
-   ============================================================ */
-
-@media (max-width: 480px) {
-
-    .sandbox-header {
-
-        padding: 0 10px;
-
-    }
-
-
-    .active-database-label {
-
-        font-size: 11px;
-
-        padding: 5px 8px;
-
-    }
-
-
-    .workspace-title {
-
-        font-size: 11px;
-
-    }
-
-
-    .run-query-button {
-
-        font-size: 12px;
-
-    }
-
-
-    .results-header h2 {
-
-        font-size: 13px;
-
-    }
+    color: #2563eb;
 
 }
