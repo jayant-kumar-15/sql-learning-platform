@@ -823,10 +823,41 @@ function executeCurrentQuery() {
         statements.forEach(
             function (statement) {
 
-                const result =
-                    executeSingleStatement(
-                        statement
-                    );
+
+                let result;
+
+if (createDatabaseFromSQL(statement)) {
+
+    result = {
+        result: null,
+        changes: 0,
+        message:
+            "Database '" +
+            activeDatabaseName +
+            "' created successfully."
+    };
+
+}
+
+else if (dropDatabaseFromSQL(statement)) {
+
+    result = {
+        result: null,
+        changes: 0,
+        message:
+            "Database dropped successfully."
+    };
+
+}
+
+else {
+
+    result =
+        executeSingleStatement(
+            statement
+        );
+
+}
 
 
                 if (
