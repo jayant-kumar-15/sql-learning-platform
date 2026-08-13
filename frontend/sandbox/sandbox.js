@@ -211,6 +211,17 @@ let selectedTableName =
     null;
 
 
+/*
+ * Database that owns selectedTableName.
+ *
+ * Keeping the database name with the selected table prevents
+ * Describe / Schema / Relationships from accidentally using a
+ * table name from a previously selected database.
+ */
+let selectedTableDatabaseName =
+    null;
+
+
 /* ============================================================
  * INITIALIZATION
  * ============================================================ */
@@ -626,15 +637,17 @@ function initializeEventListeners() {
 
 function executeCurrentQuery() {
 
-    /*
-     * IMPORTANT:
-     *
-     * Do not require an active database here. CREATE DATABASE,
-     * DROP DATABASE, USE and SHOW DATABASES are Sandbox-level
-     * commands and must work without a selected SQLite database.
-     * Real SQLite statements are validated later by
-     * executeSingleStatement().
-     */
+    if (!activeSQLiteDatabase) {
+
+        showStatus(
+            "❌ Please create or select a database first.",
+            "error"
+        );
+
+        return;
+
+    }
+
 
     if (!sqlEditor) {
 
@@ -1195,7 +1208,7 @@ function executeSingleStatement(
      */
     const useMatch =
         statement.match(
-            /^USE(?:\s+DATABASE)?\s+["'`]?([A-Za-z0-9_]+)["'`]?\s*$/i
+            /^USE\s+["'`]?([A-Za-z0-9_]+)["'`]?\s*$/i
         );
 
 
@@ -1387,69 +1400,7 @@ function executeSingleStatement(
      * --------------------------------------------------------
      * SHOW DATABASES
      * --------------------------------------------------------
-     *
-     * Supported forms:
-     *     SHOW DATABASES;
-     *     SHOW DATABASES LIKE 'Test%';
-     *     SHOW DATABASE TestDB;
-     *
-     * These are Sandbox-level commands and therefore do not
-     * require an active database.
      */
-
-    const showDatabasesLikeMatch =
-        statement.match(
-            /^SHOW\s+DATABASES\s+LIKE\s+["'](.+)["']$/i
-        );
-
-
-    if (showDatabasesLikeMatch) {
-
-        const pattern =
-            showDatabasesLikeMatch[1]
-                .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-                .replace(/%/g, ".*")
-                .replace(/_/g, ".");
-
-
-        const matcher =
-            new RegExp(
-                "^" + pattern + "$",
-                "i"
-            );
-
-
-        return {
-
-            columns:
-                ["Database", "Active"],
-
-            rows:
-                Array.from(
-                    sandboxDatabases.keys()
-                )
-                .filter(
-                    name => matcher.test(name)
-                )
-                .map(
-                    name => ({
-                        Database:
-                            name,
-                        Active:
-                            name === activeDatabaseName
-                                ? "YES"
-                                : "NO"
-                    })
-                ),
-
-            executionTime:
-                0
-
-        };
-
-    }
-
-
     if (
         /^SHOW\s+DATABASES$/i.test(
             statement
@@ -1459,7 +1410,7 @@ function executeSingleStatement(
         return {
 
             columns:
-                ["Database", "Active"],
+                ["Database"],
 
             rows:
                 Array.from(
@@ -1467,11 +1418,7 @@ function executeSingleStatement(
                 ).map(
                     name => ({
                         Database:
-                            name,
-                        Active:
-                            name === activeDatabaseName
-                                ? "YES"
-                                : "NO"
+                            name
                     })
                 ),
 
@@ -1483,121 +1430,11 @@ function executeSingleStatement(
     }
 
 
-    const showDatabaseMatch =
-        statement.match(
-            /^SHOW\s+DATABASE\s+["'`]?([A-Za-z0-9_]+)["'`]?\s*$/i
-        );
-
-
-    if (showDatabaseMatch) {
-
-        const databaseName =
-            showDatabaseMatch[1];
-
-
-        if (
-            !sandboxDatabases.has(
-                databaseName
-            )
-        ) {
-
-            throw new Error(
-                "Database '" +
-                databaseName +
-                "' does not exist."
-            );
-
-        }
-
-
-        const inspectionDatabase =
-            new SQL_ENGINE.Database(
-                sandboxDatabases.get(
-                    databaseName
-                )
-            );
-
-
-        try {
-
-            const tableResult =
-                inspectionDatabase.exec(
-                    `
-                    SELECT name AS table_name
-                    FROM sqlite_master
-                    WHERE type = 'table'
-                    AND name NOT LIKE 'sqlite_%'
-                    ORDER BY name
-                    `
-                );
-
-
-            const tables =
-                tableResult.length
-                    ? convertSQLiteRows(
-                        tableResult[0]
-                    )
-                    : [];
-
-
-            return {
-
-                columns:
-                    [
-                        "Database",
-                        "Active",
-                        "Tables"
-                    ],
-
-                rows:
-                    [
-                        {
-                            Database:
-                                databaseName,
-                            Active:
-                                databaseName === activeDatabaseName
-                                    ? "YES"
-                                    : "NO",
-                            Tables:
-                                tables.length
-                                    ? tables
-                                        .map(
-                                            row => row.table_name
-                                        )
-                                        .join(", ")
-                                    : "No tables"
-                        }
-                    ],
-
-                executionTime:
-                    0
-
-            };
-
-        }
-
-        finally {
-
-            inspectionDatabase.close();
-
-        }
-
-    }
-
-
     /*
      * --------------------------------------------------------
      * NORMAL SQLITE QUERY
      * --------------------------------------------------------
      */
-
-    /*
-     * All remaining commands are actual SQLite commands.
-     * They require a currently selected database.
-     */
-    ensureActiveDatabase();
-
-
     const startTime =
         performance.now();
 
@@ -1856,6 +1693,12 @@ function dropDatabaseFromSQL(
         activeDatabaseName =
             null;
 
+        selectedTableName =
+            null;
+
+        selectedTableDatabaseName =
+            null;
+
     }
 
 
@@ -1868,6 +1711,9 @@ function dropDatabaseFromSQL(
 
 
     renderDatabaseTree();
+
+
+    hideResultsPanel();
 
 }
 
@@ -2268,6 +2114,9 @@ function openDatabase(
 
 
         selectedTableName =
+            null;
+
+        selectedTableDatabaseName =
             null;
 
 
@@ -2865,6 +2714,9 @@ function selectTable(
     selectedTableName =
         tableName;
 
+    selectedTableDatabaseName =
+        databaseName;
+
 
     /*
      * Selecting a table does NOT execute SQL.
@@ -2939,15 +2791,140 @@ function filterDatabaseTree() {
 
 
 /* ============================================================
+ * RESOLVE TABLE FOR INSPECTION BUTTONS
+ * ============================================================
+ *
+ * The Describe / Schema / Relationships buttons should feel
+ * like a normal SQL client. A user should not be forced to
+ * click a table in the explorer first if the editor already
+ * clearly identifies the table.
+ *
+ * Resolution priority:
+ * 1. Table selected from Database Explorer.
+ * 2. DESCRIBE/DESC statement in the editor.
+ * 3. FROM <table> in the editor.
+ * 4. UPDATE/INTO/JOIN table references as a fallback.
+ *
+ * This only identifies a table; it does not execute SQL.
+ * ============================================================ */
+
+function resolveInspectionTable() {
+
+    if (
+        selectedTableName &&
+        selectedTableDatabaseName === activeDatabaseName
+    ) {
+
+        return selectedTableName;
+
+    }
+
+
+    if (!sqlEditor || !activeSQLiteDatabase) {
+
+        return null;
+
+    }
+
+
+    const sql =
+        sqlEditor.value.trim();
+
+
+    if (!sql) {
+
+        return null;
+
+    }
+
+
+    const patterns = [
+
+        /^(?:DESCRIBE|DESC)\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bFROM\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bJOIN\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bUPDATE\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bINTO\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i
+
+    ];
+
+
+    for (
+        const pattern of patterns
+    ) {
+
+        const match =
+            sql.match(pattern);
+
+
+        if (!match) {
+
+            continue;
+
+        }
+
+
+        const candidate =
+            match[1];
+
+
+        const tables =
+            getTablesFromDatabase(
+                activeSQLiteDatabase
+            );
+
+
+        const actualTable =
+            tables.find(
+                function (name) {
+
+                    return (
+                        name.toLowerCase() ===
+                        candidate.toLowerCase()
+                    );
+
+                }
+            );
+
+
+        if (actualTable) {
+
+            selectedTableName =
+                actualTable;
+
+            selectedTableDatabaseName =
+                activeDatabaseName;
+
+            return actualTable;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* ============================================================
  * DESCRIBE BUTTON
  * ============================================================ */
 
 function describeSelectedTable() {
 
-    if (!selectedTableName) {
+    const tableName =
+        resolveInspectionTable();
+
+
+    if (!tableName) {
 
         showStatus(
-            "❌ Select a table first.",
+            "❌ Select a table or place a table query in the editor first.",
             "error"
         );
 
@@ -2956,10 +2933,13 @@ function describeSelectedTable() {
     }
 
 
-    if (!activeSQLiteDatabase) {
+    if (
+        !activeSQLiteDatabase ||
+        activeDatabaseName !== selectedTableDatabaseName
+    ) {
 
         showStatus(
-            "❌ Select a database first.",
+            "❌ Select the database containing this table first.",
             "error"
         );
 
@@ -2972,7 +2952,7 @@ function describeSelectedTable() {
 
         const result =
             executeDescribeTable(
-                selectedTableName
+                tableName
             );
 
 
@@ -3009,10 +2989,33 @@ function describeSelectedTable() {
 
 function showSelectedTableSchema() {
 
-    if (!selectedTableName) {
+    /*
+     * The schema button operates on the table selected in the
+     * Database Explorer, not merely on a table-name string.
+     */
+    const tableName =
+        resolveInspectionTable();
+
+
+    if (!tableName) {
 
         showStatus(
-            "❌ Select a table first.",
+            "❌ Select a table or place a table query in the editor first.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !activeSQLiteDatabase ||
+        activeDatabaseName !== selectedTableDatabaseName
+    ) {
+
+        showStatus(
+            "❌ Select the database containing this table first.",
             "error"
         );
 
@@ -3028,7 +3031,7 @@ function showSelectedTableSchema() {
                 `
                 PRAGMA table_info(
                     ${quoteSQLiteIdentifier(
-                        selectedTableName
+                        tableName
                     )}
                 )
                 `
@@ -3037,6 +3040,13 @@ function showSelectedTableSchema() {
 
         displaySandboxResults(
             result
+        );
+
+        showStatus(
+            "✅ Schema loaded for '" +
+            selectedTableName +
+            "'.",
+            "success"
         );
 
     }
@@ -3072,26 +3082,85 @@ function showSelectedTableRelationships() {
     }
 
 
+    const inspectionTable =
+        resolveInspectionTable();
+
+
+    /*
+     * Relationships are read directly from SQLite PRAGMA data.
+     * We intentionally avoid pragma_foreign_key_list(...) as a
+     * table-valued function because some sql.js/SQLite builds do
+     * not expose that form consistently.
+     *
+     * If a table is selected, show relationships for that table.
+     * Otherwise show relationships for all user tables.
+     */
     try {
 
-        const result =
-            activeSQLiteDatabase.exec(
-                `
-                SELECT
-                    m.name AS table_name,
-                    p."from" AS column_name,
-                    p."table" AS referenced_table,
-                    p."to" AS referenced_column
-                FROM sqlite_master m,
-                     pragma_foreign_key_list(m.name) p
-                WHERE m.type = 'table'
-                `
-            );
+        const tables =
+            inspectionTable
+                ? [inspectionTable]
+                : getTablesFromDatabase(
+                    activeSQLiteDatabase
+                );
 
 
-        if (
-            !result.length
-        ) {
+        const rows =
+            [];
+
+
+        tables.forEach(
+            function (tableName) {
+
+                const result =
+                    activeSQLiteDatabase.exec(
+                        `PRAGMA foreign_key_list(${quoteSQLiteIdentifier(tableName)})`
+                    );
+
+
+                if (!result.length) {
+
+                    return;
+
+                }
+
+
+                const pragmaRows =
+                    convertSQLiteRows(
+                        result[0]
+                    );
+
+
+                pragmaRows.forEach(
+                    function (relationship) {
+
+                        rows.push({
+
+                            table_name:
+                                tableName,
+
+                            column_name:
+                                relationship.from ||
+                                "",
+
+                            referenced_table:
+                                relationship.table ||
+                                "",
+
+                            referenced_column:
+                                relationship.to ||
+                                ""
+
+                        });
+
+                    }
+                );
+
+            }
+        );
+
+
+        if (rows.length === 0) {
 
             displaySandboxResults({
 
@@ -3104,7 +3173,11 @@ function showSelectedTableRelationships() {
                     [
                         {
                             Message:
-                                "No foreign-key relationships found."
+                                inspectionTable
+                                    ? "No foreign-key relationships found for '" +
+                                      inspectionTable +
+                                      "'."
+                                    : "No foreign-key relationships found in this database."
                         }
                     ],
 
@@ -3112,6 +3185,11 @@ function showSelectedTableRelationships() {
                     0
 
             });
+
+            showStatus(
+                "ℹ️ Relationship inspection completed.",
+                "info"
+            );
 
             return;
 
@@ -3121,29 +3199,39 @@ function showSelectedTableRelationships() {
         displaySandboxResults({
 
             columns:
-                result[0].columns,
+                [
+                    "table_name",
+                    "column_name",
+                    "referenced_table",
+                    "referenced_column"
+                ],
 
             rows:
-                convertSQLiteRows(
-                    result[0]
-                ),
+                rows,
 
             executionTime:
                 0
 
         });
 
+
+        showStatus(
+            "✅ Relationships loaded successfully.",
+            "success"
+        );
+
     }
 
     catch (error) {
 
-        /*
-         * Older SQLite builds may not expose
-         * pragma_foreign_key_list() as a table-valued
-         * function.
-         */
+        console.error(
+            "Relationship inspection failed:",
+            error
+        );
+
         showStatus(
-            "❌ Unable to inspect relationships.",
+            "❌ Unable to inspect relationships: " +
+            error.message,
             "error"
         );
 
