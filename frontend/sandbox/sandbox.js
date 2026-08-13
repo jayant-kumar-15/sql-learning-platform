@@ -62,6 +62,13 @@ const ACTIVE_DATABASE_STORAGE_KEY =
     "sql_learning_platform_active_database";
 
 
+/*
+ * Stores query-tab names and SQL text so worksheets survive refreshes.
+ */
+const QUERY_TABS_STORAGE_KEY =
+    "sql_learning_platform_sandbox_query_tabs";
+
+
 const MAX_DATABASES =
     2;
 
@@ -104,6 +111,28 @@ const resultsSummary =
 
 const downloadResultsButton =
     document.getElementById("download-results-button");
+
+
+/*
+ * Results panel controls.
+ *
+ * These are wired here instead of relying on inline HTML handlers so
+ * all Sandbox behaviour remains centralized in sandbox.js.
+ */
+const minimizeResultsButton =
+    document.getElementById("minimize-results-button");
+
+
+const maximizeResultsButton =
+    document.getElementById("maximize-results-button");
+
+
+const closeResultsButton =
+    document.getElementById("close-results-button");
+
+
+const resultsResizeHandle =
+    document.getElementById("results-resize-handle");
 
 
 const databaseModal =
@@ -216,6 +245,13 @@ const queryContents =
     new Map();
 
 
+/*
+ * Human-readable names for query tabs.
+ */
+const queryNames =
+    new Map();
+
+
 let selectedTableName =
     null;
 
@@ -276,10 +312,7 @@ async function initializeSandbox() {
         renderDatabaseTree();
 
 
-        queryContents.set(
-            1,
-            ""
-        );
+        initializeQueryTabs();
 
 
         hideResultsPanel();
@@ -451,6 +484,43 @@ function initializeEventListeners() {
 
 
     /* --------------------------------------------------------
+     * RESULTS PANEL CONTROLS
+     * -------------------------------------------------------- */
+
+    if (minimizeResultsButton) {
+
+        minimizeResultsButton.addEventListener(
+            "click",
+            toggleResultsMinimized
+        );
+
+    }
+
+
+    if (maximizeResultsButton) {
+
+        maximizeResultsButton.addEventListener(
+            "click",
+            toggleResultsMaximized
+        );
+
+    }
+
+
+    if (closeResultsButton) {
+
+        closeResultsButton.addEventListener(
+            "click",
+            hideResultsPanel
+        );
+
+    }
+
+
+    initializeResultsResize();
+
+
+    /* --------------------------------------------------------
      * MOBILE SIDEBAR
      * -------------------------------------------------------- */
 
@@ -528,6 +598,8 @@ function initializeEventListeners() {
                     activeQueryId,
                     sqlEditor.value
                 );
+
+                saveQueryTabsToStorage();
 
             }
         );
@@ -3408,15 +3480,77 @@ function createNewQueryTab() {
         queryCounter;
 
 
+    const defaultName =
+        "Query " + id;
+
+
     queryContents.set(
         id,
         ""
     );
 
 
+    queryNames.set(
+        id,
+        defaultName
+    );
+
+
     activeQueryId =
         id;
 
+
+    const tab =
+        createQueryTabElement(
+            id,
+            defaultName,
+            false
+        );
+
+
+    queryTabs.insertBefore(
+        tab,
+        newQueryButton
+    );
+
+
+    activateQueryTabElement(
+        tab
+    );
+
+
+    saveQueryTabsToStorage();
+
+
+    sqlEditor.value =
+        "";
+
+
+    hideResultsPanel();
+
+
+    sqlEditor.focus();
+
+}
+
+
+/* ============================================================
+ * QUERY TAB ELEMENT CREATION
+ * ============================================================
+ *
+ * Each worksheet has:
+ *
+ *     - a renameable name
+ *     - a close button for Query 2+
+ *
+ * Double-clicking the tab name allows the user to rename it.
+ * ============================================================ */
+
+function createQueryTabElement(
+    id,
+    name,
+    permanent
+) {
 
     const tab =
         document.createElement(
@@ -3438,16 +3572,26 @@ function createNewQueryTab() {
 
     tab.innerHTML = `
 
-        <span class="query-tab-name">
-            Query ${id}
+        <span
+            class="query-tab-name"
+            title="Double-click to rename"
+        >
+            ${escapeHTML(name)}
         </span>
 
-        <span
-            class="query-tab-close"
-            title="Close Query"
-        >
-            ×
-        </span>
+        ${
+            permanent
+                ? ""
+                : `
+                    <span
+                        class="query-tab-close"
+                        title="Close Query"
+                        aria-label="Close Query"
+                    >
+                        ×
+                    </span>
+                  `
+        }
 
     `;
 
@@ -3481,14 +3625,38 @@ function createNewQueryTab() {
     );
 
 
-    /*
-     * Insert before the + button.
-     */
-    queryTabs.insertBefore(
-        tab,
-        newQueryButton
+    const nameElement =
+        tab.querySelector(
+            ".query-tab-name"
+        );
+
+
+    nameElement.addEventListener(
+        "dblclick",
+        function (event) {
+
+            event.stopPropagation();
+
+            renameQueryTab(
+                id
+            );
+
+        }
     );
 
+
+    return tab;
+
+}
+
+
+/* ============================================================
+ * ACTIVATE QUERY TAB
+ * ============================================================ */
+
+function activateQueryTabElement(
+    tab
+) {
 
     document
         .querySelectorAll(
@@ -3509,15 +3677,392 @@ function createNewQueryTab() {
         "active"
     );
 
+}
+
+
+/* ============================================================
+ * RENAME QUERY TAB
+ * ============================================================
+ *
+ * Uses a small browser prompt intentionally. This keeps the first
+ * implementation dependency-free and easy to revise later into a
+ * custom Snowflake-style rename dialog.
+ * ============================================================ */
+
+function renameQueryTab(
+    id
+) {
+
+    const currentName =
+        queryNames.get(id) ||
+        "Query " + id;
+
+
+    const requestedName =
+        window.prompt(
+            "Rename query tab:",
+            currentName
+        );
+
+
+    if (requestedName === null) {
+
+        return;
+
+    }
+
+
+    const name =
+        requestedName
+            .trim()
+            .replace(/\s+/g, " ");
+
+
+    if (!name) {
+
+        showStatus(
+            "❌ Query name cannot be empty.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    queryNames.set(
+        id,
+        name
+    );
+
+
+    const tab =
+        document.querySelector(
+            `.query-tab[data-query-id="${id}"]`
+        );
+
+
+    if (tab) {
+
+        const nameElement =
+            tab.querySelector(
+                ".query-tab-name"
+            );
+
+
+        if (nameElement) {
+
+            nameElement.textContent =
+                name;
+
+        }
+
+    }
+
+
+    saveQueryTabsToStorage();
+
+
+    showStatus(
+        "✅ Query renamed to '" +
+        name +
+        "'.",
+        "success"
+    );
+
+}
+
+
+/* ============================================================
+ * INITIALIZE / RESTORE QUERY TABS
+ * ============================================================ */
+
+function initializeQueryTabs() {
+
+    const saved =
+        loadQueryTabsFromStorage();
+
+
+    queryContents.clear();
+    queryNames.clear();
+
+
+    if (
+        saved &&
+        Array.isArray(saved.tabs) &&
+        saved.tabs.length > 0
+    ) {
+
+        saved.tabs.forEach(
+            function (item) {
+
+                const id =
+                    Number(item.id);
+
+                if (!Number.isInteger(id) || id < 1) {
+
+                    return;
+
+                }
+
+                queryContents.set(
+                    id,
+                    typeof item.sql === "string"
+                        ? item.sql
+                        : ""
+                );
+
+                queryNames.set(
+                    id,
+                    typeof item.name === "string" && item.name.trim()
+                        ? item.name.trim()
+                        : "Query " + id
+                );
+
+            }
+        );
+
+    }
+
+
+    if (!queryContents.has(1)) {
+
+        queryContents.set(
+            1,
+            ""
+        );
+
+    }
+
+
+    if (!queryNames.has(1)) {
+
+        queryNames.set(
+            1,
+            "Query 1"
+        );
+
+    }
+
+
+    queryCounter =
+        Math.max(
+            1,
+            ...Array.from(
+                queryContents.keys()
+            )
+        );
+
+
+    activeQueryId =
+        1;
+
+
+    /*
+     * Remove dynamically restored tabs first. Query 1 remains in
+     * the HTML and is reused as the permanent first worksheet.
+     */
+    document
+        .querySelectorAll(
+            ".query-tab"
+        )
+        .forEach(
+            function (tab) {
+
+                if (
+                    Number(tab.dataset.queryId) !== 1
+                ) {
+
+                    tab.remove();
+
+                }
+
+            }
+        );
+
+
+    const queryOne =
+        document.querySelector(
+            '.query-tab[data-query-id="1"]'
+        );
+
+
+    if (queryOne) {
+
+        /*
+         * Query 1 exists in sandbox.html, so attach its click
+         * behaviour here just like dynamically created tabs.
+         */
+        queryOne.addEventListener(
+            "click",
+            function () {
+
+                switchQueryTab(
+                    1
+                );
+
+            }
+        );
+
+
+        const nameElement =
+            queryOne.querySelector(
+                ".query-tab-name"
+            );
+
+
+        if (nameElement) {
+
+            nameElement.textContent =
+                queryNames.get(1);
+
+            nameElement.title =
+                "Double-click to rename";
+
+        }
+
+
+        queryOne.addEventListener(
+            "dblclick",
+            function (event) {
+
+                event.stopPropagation();
+
+                renameQueryTab(
+                    1
+                );
+
+            }
+        );
+
+    }
+
+
+    Array.from(
+        queryContents.keys()
+    )
+        .filter(
+            id => id !== 1
+        )
+        .sort(
+            (a, b) => a - b
+        )
+        .forEach(
+            function (id) {
+
+                const tab =
+                    createQueryTabElement(
+                        id,
+                        queryNames.get(id),
+                        false
+                    );
+
+                queryTabs.insertBefore(
+                    tab,
+                    newQueryButton
+                );
+
+            }
+        );
+
+
+    if (queryOne) {
+
+        queryOne.classList.add(
+            "active"
+        );
+
+    }
+
 
     sqlEditor.value =
-        "";
+        queryContents.get(1) || "";
+
+}
 
 
-    hideResultsPanel();
+function saveQueryTabsToStorage() {
+
+    try {
+
+        const tabs =
+            Array.from(
+                queryContents.keys()
+            )
+                .sort(
+                    (a, b) => a - b
+                )
+                .map(
+                    function (id) {
+
+                        return {
+
+                            id:
+                                id,
+
+                            name:
+                                queryNames.get(id) ||
+                                "Query " + id,
+
+                            sql:
+                                queryContents.get(id) || ""
+
+                        };
+
+                    }
+                );
 
 
-    sqlEditor.focus();
+        localStorage.setItem(
+            QUERY_TABS_STORAGE_KEY,
+            JSON.stringify({ tabs: tabs })
+        );
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "Unable to persist query tabs:",
+            error
+        );
+
+    }
+
+}
+
+
+function loadQueryTabsFromStorage() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                QUERY_TABS_STORAGE_KEY
+            );
+
+
+        if (!raw) {
+
+            return null;
+
+        }
+
+
+        return JSON.parse(raw);
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "Unable to restore query tabs:",
+            error
+        );
+
+        return null;
+
+    }
 
 }
 
@@ -3563,6 +4108,9 @@ function switchQueryTab(
 
             }
         );
+
+
+    saveQueryTabsToStorage();
 
 
     hideResultsPanel();
@@ -3612,6 +4160,12 @@ function closeQueryTab(
     queryContents.delete(
         id
     );
+
+    queryNames.delete(
+        id
+    );
+
+    saveQueryTabsToStorage();
 
 
     /*
@@ -3910,6 +4464,21 @@ function showResultsPanel() {
         "results-hidden"
     );
 
+
+    /*
+     * Every newly executed query starts in compact mode unless the
+     * user has explicitly maximized/minimized it during this view.
+     */
+    if (
+        !resultsSection.classList.contains("results-maximized") &&
+        !resultsSection.classList.contains("results-minimized")
+    ) {
+
+        resultsSection.style.height =
+            getSavedResultsHeight() + "px";
+
+    }
+
 }
 
 
@@ -3936,6 +4505,15 @@ function hideResultsPanel() {
     );
 
 
+    resultsSection.classList.remove(
+        "results-maximized",
+        "results-minimized"
+    );
+
+    resultsSection.style.height =
+        "";
+
+
     latestResults =
         null;
 
@@ -3946,6 +4524,249 @@ function hideResultsPanel() {
             true;
 
     }
+
+}
+
+
+/* ============================================================
+ * RESULTS PANEL CONTROLS
+ * ============================================================
+ *
+ * The panel behaves like a lightweight Snowflake-style worksheet:
+ *
+ *     - Hidden until a query is executed.
+ *     - Compact by default.
+ *     - Drag handle changes its height.
+ *     - Minimize keeps only the header.
+ *     - Maximize gives results almost all workspace height.
+ *     - Close hides the panel without deleting the result data.
+ *
+ * Clicking Run Query again reopens the panel with the latest result.
+ * ============================================================ */
+
+function toggleResultsMinimized() {
+
+    if (!resultsSection) {
+
+        return;
+
+    }
+
+
+    resultsSection.classList.remove(
+        "results-maximized"
+    );
+
+
+    resultsSection.classList.toggle(
+        "results-minimized"
+    );
+
+
+    if (
+        resultsSection.classList.contains(
+            "results-minimized"
+        )
+    ) {
+
+        resultsSection.style.height =
+            "48px";
+
+    }
+
+    else {
+
+        resultsSection.style.height =
+            getSavedResultsHeight() + "px";
+
+    }
+
+}
+
+
+function toggleResultsMaximized() {
+
+    if (!resultsSection) {
+
+        return;
+
+    }
+
+
+    const isMaximized =
+        resultsSection.classList.contains(
+            "results-maximized"
+        );
+
+
+    if (isMaximized) {
+
+        resultsSection.classList.remove(
+            "results-maximized"
+        );
+
+        resultsSection.style.height =
+            getSavedResultsHeight() + "px";
+
+        return;
+
+    }
+
+
+    resultsSection.classList.remove(
+        "results-minimized"
+    );
+
+    resultsSection.classList.add(
+        "results-maximized"
+    );
+
+}
+
+
+let resultsPanelHeight =
+    180;
+
+
+function getSavedResultsHeight() {
+
+    return Math.max(
+        100,
+        Math.min(
+            700,
+            resultsPanelHeight
+        )
+    );
+
+}
+
+
+function initializeResultsResize() {
+
+    if (!resultsResizeHandle || !resultsSection) {
+
+        return;
+
+    }
+
+
+    let dragging =
+        false;
+
+
+    let startY =
+        0;
+
+
+    let startHeight =
+        getSavedResultsHeight();
+
+
+    resultsResizeHandle.addEventListener(
+        "pointerdown",
+        function (event) {
+
+            if (
+                resultsSection.classList.contains(
+                    "results-maximized"
+                ) ||
+                resultsSection.classList.contains(
+                    "results-minimized"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            dragging =
+                true;
+
+            startY =
+                event.clientY;
+
+            startHeight =
+                resultsSection.getBoundingClientRect().height;
+
+
+            resultsResizeHandle.setPointerCapture(
+                event.pointerId
+            );
+
+            document.body.classList.add(
+                "results-resizing"
+            );
+
+        }
+    );
+
+
+    resultsResizeHandle.addEventListener(
+        "pointermove",
+        function (event) {
+
+            if (!dragging) {
+
+                return;
+
+            }
+
+
+            /*
+             * Dragging upward makes the results panel larger.
+             * Dragging downward makes it smaller.
+             */
+            const newHeight =
+                Math.max(
+                    100,
+                    Math.min(
+                        700,
+                        startHeight +
+                        (startY - event.clientY)
+                    )
+                );
+
+
+            resultsPanelHeight =
+                newHeight;
+
+            resultsSection.style.height =
+                newHeight + "px";
+
+        }
+    );
+
+
+    function stopDragging() {
+
+        if (!dragging) {
+
+            return;
+
+        }
+
+
+        dragging =
+            false;
+
+        document.body.classList.remove(
+            "results-resizing"
+        );
+
+    }
+
+
+    resultsResizeHandle.addEventListener(
+        "pointerup",
+        stopDragging
+    );
+
+
+    resultsResizeHandle.addEventListener(
+        "pointercancel",
+        stopDragging
+    );
 
 }
 
