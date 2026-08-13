@@ -1,3 +1,22 @@
+/*
+ * ============================================================
+ * FILE PATH: Backend/api/server.js
+ * ============================================================
+ * PURPOSE
+ * -------
+ * SQL Learning Platform module.
+ *
+ * DOCUMENTATION
+ * -------------
+ * Keep this path header during future revisions. Add section
+ * comments before every new major feature, state object,
+ * event group, API call, or validation rule.
+ *
+ * Existing functionality is preserved in this documentation
+ * revision.
+ * ============================================================
+ */
+
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
