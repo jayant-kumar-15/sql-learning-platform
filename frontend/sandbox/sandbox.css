@@ -550,6 +550,14 @@ body {
 
     min-width: 90px;
 
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 2px;
+
     height: 40px;
 
     padding: 0 15px;
@@ -597,6 +605,52 @@ body {
     overflow: hidden;
 
     text-overflow: ellipsis;
+
+    max-width: 120px;
+
+    cursor: text;
+}
+
+
+.query-tab-close {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 18px;
+
+    height: 18px;
+
+    margin-left: 7px;
+
+    border-radius: 4px;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+
+.query-tab-close:hover {
+
+    background: #263247;
+
+    color: #f87171;
+}
+
+
+body.results-resizing {
+
+    cursor: ns-resize !important;
+
+    user-select: none;
 }
 
 
@@ -1024,6 +1078,8 @@ body {
     z-index: 5;
 
     cursor: ns-resize;
+
+    touch-action: none;
 
     background: transparent;
 }
