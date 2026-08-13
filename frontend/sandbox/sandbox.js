@@ -62,13 +62,6 @@ const ACTIVE_DATABASE_STORAGE_KEY =
     "sql_learning_platform_active_database";
 
 
-/*
- * Stores query-tab names and SQL text so worksheets survive refreshes.
- */
-const QUERY_TABS_STORAGE_KEY =
-    "sql_learning_platform_sandbox_query_tabs";
-
-
 const MAX_DATABASES =
     2;
 
@@ -111,28 +104,6 @@ const resultsSummary =
 
 const downloadResultsButton =
     document.getElementById("download-results-button");
-
-
-/*
- * Results panel controls.
- *
- * These are wired here instead of relying on inline HTML handlers so
- * all Sandbox behaviour remains centralized in sandbox.js.
- */
-const minimizeResultsButton =
-    document.getElementById("minimize-results-button");
-
-
-const maximizeResultsButton =
-    document.getElementById("maximize-results-button");
-
-
-const closeResultsButton =
-    document.getElementById("close-results-button");
-
-
-const resultsResizeHandle =
-    document.getElementById("results-resize-handle");
 
 
 const databaseModal =
@@ -198,6 +169,18 @@ const queryTabs =
 const newQueryButton =
     document.getElementById("new-query-button");
 
+const resultsResizeHandle =
+    document.getElementById("results-resize-handle");
+
+const minimizeResultsButton =
+    document.getElementById("minimize-results-button");
+
+const maximizeResultsButton =
+    document.getElementById("maximize-results-button");
+
+const closeResultsButton =
+    document.getElementById("close-results-button");
+
 
 /* ============================================================
  * APPLICATION STATE
@@ -242,13 +225,6 @@ let activeQueryId =
  * Stores SQL text for every query tab.
  */
 const queryContents =
-    new Map();
-
-
-/*
- * Human-readable names for query tabs.
- */
-const queryNames =
     new Map();
 
 
@@ -312,7 +288,10 @@ async function initializeSandbox() {
         renderDatabaseTree();
 
 
-        initializeQueryTabs();
+        queryContents.set(
+            1,
+            ""
+        );
 
 
         hideResultsPanel();
@@ -484,43 +463,6 @@ function initializeEventListeners() {
 
 
     /* --------------------------------------------------------
-     * RESULTS PANEL CONTROLS
-     * -------------------------------------------------------- */
-
-    if (minimizeResultsButton) {
-
-        minimizeResultsButton.addEventListener(
-            "click",
-            toggleResultsMinimized
-        );
-
-    }
-
-
-    if (maximizeResultsButton) {
-
-        maximizeResultsButton.addEventListener(
-            "click",
-            toggleResultsMaximized
-        );
-
-    }
-
-
-    if (closeResultsButton) {
-
-        closeResultsButton.addEventListener(
-            "click",
-            hideResultsPanel
-        );
-
-    }
-
-
-    initializeResultsResize();
-
-
-    /* --------------------------------------------------------
      * MOBILE SIDEBAR
      * -------------------------------------------------------- */
 
@@ -598,8 +540,6 @@ function initializeEventListeners() {
                     activeQueryId,
                     sqlEditor.value
                 );
-
-                saveQueryTabsToStorage();
 
             }
         );
@@ -694,6 +634,13 @@ function initializeEventListeners() {
         );
 
     }
+
+
+    /* --------------------------------------------------------
+     * RESULTS PANEL CONTROLS
+     * -------------------------------------------------------- */
+
+    initializeResultsPanelControls();
 
 }
 
@@ -2692,7 +2639,33 @@ function renderDatabaseTree() {
                     ${escapeHTML(databaseName)}
                 </span>
 
+                <span class="database-actions">
+                    <button type="button" class="database-action-button create-table-action" title="Create table">＋</button>
+                    <button type="button" class="database-action-button drop-database-action" title="Drop database">×</button>
+                </span>
+
             `;
+
+
+            const createTableAction =
+                header.querySelector(".create-table-action");
+
+            const dropDatabaseAction =
+                header.querySelector(".drop-database-action");
+
+            if (createTableAction) {
+                createTableAction.addEventListener("click", function (event) {
+                    event.stopPropagation();
+                    openCreateTableModal(databaseName);
+                });
+            }
+
+            if (dropDatabaseAction) {
+                dropDatabaseAction.addEventListener("click", function (event) {
+                    event.stopPropagation();
+                    confirmDropDatabase(databaseName);
+                });
+            }
 
 
             const tableList =
@@ -2742,16 +2715,49 @@ function renderDatabaseTree() {
 
                     table.innerHTML = `
 
-                        <span>
-                            ▦
+                        <span class="table-item-main">
+                            <span>▦</span>
+                            <span>${escapeHTML(tableName)}</span>
                         </span>
 
-                        <span>
-                            ${escapeHTML(tableName)}
+                        <span class="table-actions">
+                            <button type="button" class="table-action-button table-data-action" title="View and edit data">Data</button>
+                            <button type="button" class="table-action-button table-insert-action" title="Insert row">＋</button>
+                            <button type="button" class="table-action-button table-drop-action" title="Drop table">×</button>
                         </span>
 
                     `;
 
+
+                    const dataAction =
+                        table.querySelector(".table-data-action");
+                    const insertAction =
+                        table.querySelector(".table-insert-action");
+                    const dropAction =
+                        table.querySelector(".table-drop-action");
+
+                    if (dataAction) {
+                        dataAction.addEventListener("click", function (event) {
+                            event.stopPropagation();
+                            selectTable(databaseName, tableName);
+                            openTableDataEditor(databaseName, tableName);
+                        });
+                    }
+
+                    if (insertAction) {
+                        insertAction.addEventListener("click", function (event) {
+                            event.stopPropagation();
+                            selectTable(databaseName, tableName);
+                            openInsertRowModal(databaseName, tableName);
+                        });
+                    }
+
+                    if (dropAction) {
+                        dropAction.addEventListener("click", function (event) {
+                            event.stopPropagation();
+                            confirmDropTable(databaseName, tableName);
+                        });
+                    }
 
                     table.addEventListener(
                         "click",
@@ -3480,77 +3486,15 @@ function createNewQueryTab() {
         queryCounter;
 
 
-    const defaultName =
-        "Query " + id;
-
-
     queryContents.set(
         id,
         ""
     );
 
 
-    queryNames.set(
-        id,
-        defaultName
-    );
-
-
     activeQueryId =
         id;
 
-
-    const tab =
-        createQueryTabElement(
-            id,
-            defaultName,
-            false
-        );
-
-
-    queryTabs.insertBefore(
-        tab,
-        newQueryButton
-    );
-
-
-    activateQueryTabElement(
-        tab
-    );
-
-
-    saveQueryTabsToStorage();
-
-
-    sqlEditor.value =
-        "";
-
-
-    hideResultsPanel();
-
-
-    sqlEditor.focus();
-
-}
-
-
-/* ============================================================
- * QUERY TAB ELEMENT CREATION
- * ============================================================
- *
- * Each worksheet has:
- *
- *     - a renameable name
- *     - a close button for Query 2+
- *
- * Double-clicking the tab name allows the user to rename it.
- * ============================================================ */
-
-function createQueryTabElement(
-    id,
-    name,
-    permanent
-) {
 
     const tab =
         document.createElement(
@@ -3572,26 +3516,16 @@ function createQueryTabElement(
 
     tab.innerHTML = `
 
-        <span
-            class="query-tab-name"
-            title="Double-click to rename"
-        >
-            ${escapeHTML(name)}
+        <span class="query-tab-name">
+            Query ${id}
         </span>
 
-        ${
-            permanent
-                ? ""
-                : `
-                    <span
-                        class="query-tab-close"
-                        title="Close Query"
-                        aria-label="Close Query"
-                    >
-                        ×
-                    </span>
-                  `
-        }
+        <span
+            class="query-tab-close"
+            title="Close Query"
+        >
+            ×
+        </span>
 
     `;
 
@@ -3625,38 +3559,14 @@ function createQueryTabElement(
     );
 
 
-    const nameElement =
-        tab.querySelector(
-            ".query-tab-name"
-        );
-
-
-    nameElement.addEventListener(
-        "dblclick",
-        function (event) {
-
-            event.stopPropagation();
-
-            renameQueryTab(
-                id
-            );
-
-        }
+    /*
+     * Insert before the + button.
+     */
+    queryTabs.insertBefore(
+        tab,
+        newQueryButton
     );
 
-
-    return tab;
-
-}
-
-
-/* ============================================================
- * ACTIVATE QUERY TAB
- * ============================================================ */
-
-function activateQueryTabElement(
-    tab
-) {
 
     document
         .querySelectorAll(
@@ -3677,392 +3587,15 @@ function activateQueryTabElement(
         "active"
     );
 
-}
-
-
-/* ============================================================
- * RENAME QUERY TAB
- * ============================================================
- *
- * Uses a small browser prompt intentionally. This keeps the first
- * implementation dependency-free and easy to revise later into a
- * custom Snowflake-style rename dialog.
- * ============================================================ */
-
-function renameQueryTab(
-    id
-) {
-
-    const currentName =
-        queryNames.get(id) ||
-        "Query " + id;
-
-
-    const requestedName =
-        window.prompt(
-            "Rename query tab:",
-            currentName
-        );
-
-
-    if (requestedName === null) {
-
-        return;
-
-    }
-
-
-    const name =
-        requestedName
-            .trim()
-            .replace(/\s+/g, " ");
-
-
-    if (!name) {
-
-        showStatus(
-            "❌ Query name cannot be empty.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    queryNames.set(
-        id,
-        name
-    );
-
-
-    const tab =
-        document.querySelector(
-            `.query-tab[data-query-id="${id}"]`
-        );
-
-
-    if (tab) {
-
-        const nameElement =
-            tab.querySelector(
-                ".query-tab-name"
-            );
-
-
-        if (nameElement) {
-
-            nameElement.textContent =
-                name;
-
-        }
-
-    }
-
-
-    saveQueryTabsToStorage();
-
-
-    showStatus(
-        "✅ Query renamed to '" +
-        name +
-        "'.",
-        "success"
-    );
-
-}
-
-
-/* ============================================================
- * INITIALIZE / RESTORE QUERY TABS
- * ============================================================ */
-
-function initializeQueryTabs() {
-
-    const saved =
-        loadQueryTabsFromStorage();
-
-
-    queryContents.clear();
-    queryNames.clear();
-
-
-    if (
-        saved &&
-        Array.isArray(saved.tabs) &&
-        saved.tabs.length > 0
-    ) {
-
-        saved.tabs.forEach(
-            function (item) {
-
-                const id =
-                    Number(item.id);
-
-                if (!Number.isInteger(id) || id < 1) {
-
-                    return;
-
-                }
-
-                queryContents.set(
-                    id,
-                    typeof item.sql === "string"
-                        ? item.sql
-                        : ""
-                );
-
-                queryNames.set(
-                    id,
-                    typeof item.name === "string" && item.name.trim()
-                        ? item.name.trim()
-                        : "Query " + id
-                );
-
-            }
-        );
-
-    }
-
-
-    if (!queryContents.has(1)) {
-
-        queryContents.set(
-            1,
-            ""
-        );
-
-    }
-
-
-    if (!queryNames.has(1)) {
-
-        queryNames.set(
-            1,
-            "Query 1"
-        );
-
-    }
-
-
-    queryCounter =
-        Math.max(
-            1,
-            ...Array.from(
-                queryContents.keys()
-            )
-        );
-
-
-    activeQueryId =
-        1;
-
-
-    /*
-     * Remove dynamically restored tabs first. Query 1 remains in
-     * the HTML and is reused as the permanent first worksheet.
-     */
-    document
-        .querySelectorAll(
-            ".query-tab"
-        )
-        .forEach(
-            function (tab) {
-
-                if (
-                    Number(tab.dataset.queryId) !== 1
-                ) {
-
-                    tab.remove();
-
-                }
-
-            }
-        );
-
-
-    const queryOne =
-        document.querySelector(
-            '.query-tab[data-query-id="1"]'
-        );
-
-
-    if (queryOne) {
-
-        /*
-         * Query 1 exists in sandbox.html, so attach its click
-         * behaviour here just like dynamically created tabs.
-         */
-        queryOne.addEventListener(
-            "click",
-            function () {
-
-                switchQueryTab(
-                    1
-                );
-
-            }
-        );
-
-
-        const nameElement =
-            queryOne.querySelector(
-                ".query-tab-name"
-            );
-
-
-        if (nameElement) {
-
-            nameElement.textContent =
-                queryNames.get(1);
-
-            nameElement.title =
-                "Double-click to rename";
-
-        }
-
-
-        queryOne.addEventListener(
-            "dblclick",
-            function (event) {
-
-                event.stopPropagation();
-
-                renameQueryTab(
-                    1
-                );
-
-            }
-        );
-
-    }
-
-
-    Array.from(
-        queryContents.keys()
-    )
-        .filter(
-            id => id !== 1
-        )
-        .sort(
-            (a, b) => a - b
-        )
-        .forEach(
-            function (id) {
-
-                const tab =
-                    createQueryTabElement(
-                        id,
-                        queryNames.get(id),
-                        false
-                    );
-
-                queryTabs.insertBefore(
-                    tab,
-                    newQueryButton
-                );
-
-            }
-        );
-
-
-    if (queryOne) {
-
-        queryOne.classList.add(
-            "active"
-        );
-
-    }
-
 
     sqlEditor.value =
-        queryContents.get(1) || "";
-
-}
+        "";
 
 
-function saveQueryTabsToStorage() {
-
-    try {
-
-        const tabs =
-            Array.from(
-                queryContents.keys()
-            )
-                .sort(
-                    (a, b) => a - b
-                )
-                .map(
-                    function (id) {
-
-                        return {
-
-                            id:
-                                id,
-
-                            name:
-                                queryNames.get(id) ||
-                                "Query " + id,
-
-                            sql:
-                                queryContents.get(id) || ""
-
-                        };
-
-                    }
-                );
+    hideResultsPanel();
 
 
-        localStorage.setItem(
-            QUERY_TABS_STORAGE_KEY,
-            JSON.stringify({ tabs: tabs })
-        );
-
-    }
-
-    catch (error) {
-
-        console.warn(
-            "Unable to persist query tabs:",
-            error
-        );
-
-    }
-
-}
-
-
-function loadQueryTabsFromStorage() {
-
-    try {
-
-        const raw =
-            localStorage.getItem(
-                QUERY_TABS_STORAGE_KEY
-            );
-
-
-        if (!raw) {
-
-            return null;
-
-        }
-
-
-        return JSON.parse(raw);
-
-    }
-
-    catch (error) {
-
-        console.warn(
-            "Unable to restore query tabs:",
-            error
-        );
-
-        return null;
-
-    }
+    sqlEditor.focus();
 
 }
 
@@ -4108,9 +3641,6 @@ function switchQueryTab(
 
             }
         );
-
-
-    saveQueryTabsToStorage();
 
 
     hideResultsPanel();
@@ -4160,12 +3690,6 @@ function closeQueryTab(
     queryContents.delete(
         id
     );
-
-    queryNames.delete(
-        id
-    );
-
-    saveQueryTabsToStorage();
 
 
     /*
@@ -4464,21 +3988,6 @@ function showResultsPanel() {
         "results-hidden"
     );
 
-
-    /*
-     * Every newly executed query starts in compact mode unless the
-     * user has explicitly maximized/minimized it during this view.
-     */
-    if (
-        !resultsSection.classList.contains("results-maximized") &&
-        !resultsSection.classList.contains("results-minimized")
-    ) {
-
-        resultsSection.style.height =
-            getSavedResultsHeight() + "px";
-
-    }
-
 }
 
 
@@ -4505,15 +4014,6 @@ function hideResultsPanel() {
     );
 
 
-    resultsSection.classList.remove(
-        "results-maximized",
-        "results-minimized"
-    );
-
-    resultsSection.style.height =
-        "";
-
-
     latestResults =
         null;
 
@@ -4524,249 +4024,6 @@ function hideResultsPanel() {
             true;
 
     }
-
-}
-
-
-/* ============================================================
- * RESULTS PANEL CONTROLS
- * ============================================================
- *
- * The panel behaves like a lightweight Snowflake-style worksheet:
- *
- *     - Hidden until a query is executed.
- *     - Compact by default.
- *     - Drag handle changes its height.
- *     - Minimize keeps only the header.
- *     - Maximize gives results almost all workspace height.
- *     - Close hides the panel without deleting the result data.
- *
- * Clicking Run Query again reopens the panel with the latest result.
- * ============================================================ */
-
-function toggleResultsMinimized() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    resultsSection.classList.remove(
-        "results-maximized"
-    );
-
-
-    resultsSection.classList.toggle(
-        "results-minimized"
-    );
-
-
-    if (
-        resultsSection.classList.contains(
-            "results-minimized"
-        )
-    ) {
-
-        resultsSection.style.height =
-            "48px";
-
-    }
-
-    else {
-
-        resultsSection.style.height =
-            getSavedResultsHeight() + "px";
-
-    }
-
-}
-
-
-function toggleResultsMaximized() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    const isMaximized =
-        resultsSection.classList.contains(
-            "results-maximized"
-        );
-
-
-    if (isMaximized) {
-
-        resultsSection.classList.remove(
-            "results-maximized"
-        );
-
-        resultsSection.style.height =
-            getSavedResultsHeight() + "px";
-
-        return;
-
-    }
-
-
-    resultsSection.classList.remove(
-        "results-minimized"
-    );
-
-    resultsSection.classList.add(
-        "results-maximized"
-    );
-
-}
-
-
-let resultsPanelHeight =
-    180;
-
-
-function getSavedResultsHeight() {
-
-    return Math.max(
-        100,
-        Math.min(
-            700,
-            resultsPanelHeight
-        )
-    );
-
-}
-
-
-function initializeResultsResize() {
-
-    if (!resultsResizeHandle || !resultsSection) {
-
-        return;
-
-    }
-
-
-    let dragging =
-        false;
-
-
-    let startY =
-        0;
-
-
-    let startHeight =
-        getSavedResultsHeight();
-
-
-    resultsResizeHandle.addEventListener(
-        "pointerdown",
-        function (event) {
-
-            if (
-                resultsSection.classList.contains(
-                    "results-maximized"
-                ) ||
-                resultsSection.classList.contains(
-                    "results-minimized"
-                )
-            ) {
-
-                return;
-
-            }
-
-
-            dragging =
-                true;
-
-            startY =
-                event.clientY;
-
-            startHeight =
-                resultsSection.getBoundingClientRect().height;
-
-
-            resultsResizeHandle.setPointerCapture(
-                event.pointerId
-            );
-
-            document.body.classList.add(
-                "results-resizing"
-            );
-
-        }
-    );
-
-
-    resultsResizeHandle.addEventListener(
-        "pointermove",
-        function (event) {
-
-            if (!dragging) {
-
-                return;
-
-            }
-
-
-            /*
-             * Dragging upward makes the results panel larger.
-             * Dragging downward makes it smaller.
-             */
-            const newHeight =
-                Math.max(
-                    100,
-                    Math.min(
-                        700,
-                        startHeight +
-                        (startY - event.clientY)
-                    )
-                );
-
-
-            resultsPanelHeight =
-                newHeight;
-
-            resultsSection.style.height =
-                newHeight + "px";
-
-        }
-    );
-
-
-    function stopDragging() {
-
-        if (!dragging) {
-
-            return;
-
-        }
-
-
-        dragging =
-            false;
-
-        document.body.classList.remove(
-            "results-resizing"
-        );
-
-    }
-
-
-    resultsResizeHandle.addEventListener(
-        "pointerup",
-        stopDragging
-    );
-
-
-    resultsResizeHandle.addEventListener(
-        "pointercancel",
-        stopDragging
-    );
 
 }
 
@@ -6270,3 +5527,452 @@ function showSelectedTableSchema() {
  * ============================================================ */
 
 updateActiveDatabaseHint();
+
+
+/* ============================================================
+ * UI TABLE / DATABASE MANAGEMENT
+ * ============================================================
+ *
+ * PURPOSE
+ * -------
+ * Adds the missing Snowflake-like object-management actions:
+ *
+ * 1. Create table from the Database Explorer.
+ * 2. Drop table from the Database Explorer.
+ * 3. Drop database from the Database Explorer.
+ * 4. View table data from the Database Explorer.
+ * 5. Insert a row through a UI form.
+ * 6. Edit existing rows and commit changes.
+ * 7. Drag the Query Results panel vertically.
+ * 8. Make Results minimize / maximize / close controls functional.
+ *
+ * SQL remains fully supported. These are convenience controls on
+ * top of the same SQLite database already used by the Sandbox.
+ * ============================================================ */
+
+function initializeResultsPanelControls() {
+
+    if (minimizeResultsButton) {
+        minimizeResultsButton.addEventListener("click", function () {
+            if (!resultsSection) return;
+            resultsSection.classList.remove("results-maximized");
+            resultsSection.classList.toggle("results-minimized");
+        });
+    }
+
+    if (maximizeResultsButton) {
+        maximizeResultsButton.addEventListener("click", function () {
+            if (!resultsSection) return;
+            resultsSection.classList.remove("results-minimized");
+            resultsSection.classList.toggle("results-maximized");
+        });
+    }
+
+    if (closeResultsButton) {
+        closeResultsButton.addEventListener("click", function () {
+            if (!resultsSection) return;
+            resultsSection.classList.remove("results-maximized", "results-minimized");
+            hideResultsPanel();
+        });
+    }
+
+    if (resultsResizeHandle && resultsSection) {
+        let dragging = false;
+
+        const startDrag = function (event) {
+            if (resultsSection.classList.contains("results-maximized")) return;
+            dragging = true;
+            resultsSection.classList.remove("results-minimized");
+            document.body.classList.add("sandbox-resizing-results");
+            event.preventDefault();
+        };
+
+        const moveDrag = function (event) {
+            if (!dragging) return;
+
+            const workspace = document.querySelector(".sandbox-workspace");
+            if (!workspace) return;
+
+            const rect = workspace.getBoundingClientRect();
+            const desiredHeight = rect.bottom - event.clientY;
+            const minHeight = 100;
+            const maxHeight = Math.max(minHeight, rect.height - 180);
+            const height = Math.min(maxHeight, Math.max(minHeight, desiredHeight));
+
+            resultsSection.style.height = height + "px";
+            resultsSection.style.flexBasis = height + "px";
+        };
+
+        const stopDrag = function () {
+            if (!dragging) return;
+            dragging = false;
+            document.body.classList.remove("sandbox-resizing-results");
+        };
+
+        resultsResizeHandle.addEventListener("mousedown", startDrag);
+        document.addEventListener("mousemove", moveDrag);
+        document.addEventListener("mouseup", stopDrag);
+
+        resultsResizeHandle.addEventListener("touchstart", function (event) {
+            if (resultsSection.classList.contains("results-maximized")) return;
+            dragging = true;
+            resultsSection.classList.remove("results-minimized");
+            document.body.classList.add("sandbox-resizing-results");
+            event.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener("touchmove", function (event) {
+            if (!dragging || !event.touches.length) return;
+            const workspace = document.querySelector(".sandbox-workspace");
+            if (!workspace) return;
+            const rect = workspace.getBoundingClientRect();
+            const desiredHeight = rect.bottom - event.touches[0].clientY;
+            const minHeight = 100;
+            const maxHeight = Math.max(minHeight, rect.height - 180);
+            const height = Math.min(maxHeight, Math.max(minHeight, desiredHeight));
+            resultsSection.style.height = height + "px";
+            resultsSection.style.flexBasis = height + "px";
+            event.preventDefault();
+        }, { passive: false });
+
+        document.addEventListener("touchend", stopDrag);
+    }
+}
+
+
+function createTemporaryModal(title, subtitle) {
+    const existing = document.getElementById("sandbox-ui-modal");
+    if (existing) existing.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "sandbox-ui-modal";
+    overlay.className = "sandbox-ui-modal-overlay";
+
+    const modal = document.createElement("div");
+    modal.className = "sandbox-ui-modal";
+
+    modal.innerHTML = `
+        <div class="sandbox-ui-modal-header">
+            <div>
+                <h2>${escapeHTML(title)}</h2>
+                <span>${escapeHTML(subtitle || "")}</span>
+            </div>
+            <button type="button" class="sandbox-ui-modal-close">×</button>
+        </div>
+        <div class="sandbox-ui-modal-body"></div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const close = function () { overlay.remove(); };
+    modal.querySelector(".sandbox-ui-modal-close").addEventListener("click", close);
+    overlay.addEventListener("click", function (event) {
+        if (event.target === overlay) close();
+    });
+
+    return {
+        overlay,
+        modal,
+        body: modal.querySelector(".sandbox-ui-modal-body"),
+        close
+    };
+}
+
+
+function openCreateTableModal(databaseName) {
+    if (!sandboxDatabases.has(databaseName)) {
+        showStatus("❌ Database could not be found.", "error");
+        return;
+    }
+
+    openDatabase(databaseName);
+
+    const ui = createTemporaryModal(
+        "Create Table",
+        "Database: " + databaseName
+    );
+
+    ui.body.innerHTML = `
+        <label>Table name</label>
+        <input id="ui-table-name" class="sandbox-ui-input" type="text" placeholder="e.g. users" />
+
+        <label>Columns</label>
+        <textarea id="ui-column-definition" class="sandbox-ui-textarea" rows="7" placeholder="id INTEGER PRIMARY KEY\nname TEXT NOT NULL\nage INTEGER\nemail TEXT"></textarea>
+
+        <div class="sandbox-ui-help">
+            One column per line. Example: <b>id INTEGER PRIMARY KEY</b>
+        </div>
+
+        <div class="sandbox-ui-footer">
+            <button type="button" class="sandbox-ui-secondary">Cancel</button>
+            <button type="button" class="sandbox-ui-primary">Create Table</button>
+        </div>
+    `;
+
+    ui.body.querySelector(".sandbox-ui-secondary").addEventListener("click", ui.close);
+    ui.body.querySelector(".sandbox-ui-primary").addEventListener("click", function () {
+        const tableName = document.getElementById("ui-table-name").value.trim();
+        const definition = document.getElementById("ui-column-definition").value.trim();
+
+        if (!tableName || !/^[A-Za-z0-9_]+$/.test(tableName)) {
+            showStatus("❌ Enter a valid table name.", "error");
+            return;
+        }
+
+        if (!definition) {
+            showStatus("❌ Add at least one column definition.", "error");
+            return;
+        }
+
+        if (getTableCount() >= MAX_TABLES_PER_DATABASE) {
+            showStatus("❌ Maximum of " + MAX_TABLES_PER_DATABASE + " tables allowed in this database.", "error");
+            return;
+        }
+
+        const columns = definition
+            .split(/\r?\n/)
+            .map(line => line.trim())
+            .filter(Boolean);
+
+        try {
+            ensureActiveDatabase();
+            activeSQLiteDatabase.run(
+                "CREATE TABLE " + quoteSQLiteIdentifier(tableName) + " (" + columns.join(", ") + ")"
+            );
+            persistActiveDatabase();
+            renderDatabaseTree();
+            ui.close();
+            displayActionResult(1);
+            showStatus("✅ Table '" + tableName + "' created successfully.", "success");
+        } catch (error) {
+            showStatus("❌ " + getSQLiteErrorMessage(error), "error");
+        }
+    });
+}
+
+
+function confirmDropDatabase(databaseName) {
+    if (!window.confirm("Drop database '" + databaseName + "'? This cannot be undone.")) return;
+
+    try {
+        dropDatabaseFromSQL(databaseName);
+        displayActionResult(1);
+        showStatus("✅ Database '" + databaseName + "' dropped successfully.", "success");
+    } catch (error) {
+        showStatus("❌ " + getSQLiteErrorMessage(error), "error");
+    }
+}
+
+
+function confirmDropTable(databaseName, tableName) {
+    if (!window.confirm("Drop table '" + tableName + "' from '" + databaseName + "'?")) return;
+
+    try {
+        openDatabase(databaseName);
+        activeSQLiteDatabase.run("DROP TABLE " + quoteSQLiteIdentifier(tableName));
+        persistActiveDatabase();
+        if (selectedTableName === tableName && selectedTableDatabaseName === databaseName) {
+            selectedTableName = null;
+            selectedTableDatabaseName = null;
+        }
+        renderDatabaseTree();
+        displayActionResult(1);
+        showStatus("✅ Table '" + tableName + "' dropped successfully.", "success");
+    } catch (error) {
+        showStatus("❌ " + getSQLiteErrorMessage(error), "error");
+    }
+}
+
+
+function openInsertRowModal(databaseName, tableName) {
+    openDatabase(databaseName);
+
+    const schema = getTableSchemaForUI(tableName);
+    if (!schema.length) {
+        showStatus("❌ Table '" + tableName + "' has no columns.", "error");
+        return;
+    }
+
+    const ui = createTemporaryModal("Insert Row", databaseName + " • " + tableName);
+
+    const fields = schema.map(column => `
+        <label>${escapeHTML(column.name)} <span>${escapeHTML(column.type || "")}</span></label>
+        <input class="sandbox-ui-input ui-insert-field" data-column="${escapeHTML(column.name)}" type="text" placeholder="NULL / value" />
+    `).join("");
+
+    ui.body.innerHTML = `
+        <div class="sandbox-ui-form">${fields}</div>
+        <div class="sandbox-ui-help">Leave a field blank to insert SQL NULL. Text values are quoted automatically.</div>
+        <div class="sandbox-ui-footer">
+            <button type="button" class="sandbox-ui-secondary">Cancel</button>
+            <button type="button" class="sandbox-ui-primary">Insert & Commit</button>
+        </div>
+    `;
+
+    ui.body.querySelector(".sandbox-ui-secondary").addEventListener("click", ui.close);
+    ui.body.querySelector(".sandbox-ui-primary").addEventListener("click", function () {
+        const values = {};
+        ui.body.querySelectorAll(".ui-insert-field").forEach(input => {
+            values[input.dataset.column] = input.value;
+        });
+
+        try {
+            const columns = schema.map(c => c.name);
+            const sql = "INSERT INTO " + quoteSQLiteIdentifier(tableName) + " (" +
+                columns.map(quoteSQLiteIdentifier).join(", ") + ") VALUES (" +
+                columns.map(column => sqlLiteral(values[column])).join(", ") + ")";
+
+            activeSQLiteDatabase.run(sql);
+            persistActiveDatabase();
+            renderDatabaseTree();
+            ui.close();
+            displayTableData(databaseName, tableName);
+            showStatus("✅ Row inserted and committed.", "success");
+        } catch (error) {
+            showStatus("❌ " + getSQLiteErrorMessage(error), "error");
+        }
+    });
+}
+
+
+function getTableSchemaForUI(tableName) {
+    const result = activeSQLiteDatabase.exec(
+        "PRAGMA table_info(" + quoteSQLiteIdentifier(tableName) + ")"
+    );
+    if (!result.length) return [];
+    return convertSQLiteRows(result[0]).map(row => ({
+        name: row.name,
+        type: row.type,
+        notnull: Number(row.notnull) === 1,
+        primaryKey: Number(row.pk) > 0,
+        defaultValue: row.dflt_value
+    }));
+}
+
+
+function sqlLiteral(value) {
+    if (value === null || value === undefined || String(value).trim() === "") return "NULL";
+    const text = String(value).trim();
+    if (/^(NULL|CURRENT_TIMESTAMP|CURRENT_DATE|CURRENT_TIME)$/i.test(text)) return text.toUpperCase();
+    if (/^-?\d+(?:\.\d+)?$/.test(text)) return text;
+    if (/^(TRUE|FALSE)$/i.test(text)) return text.toUpperCase() === "TRUE" ? "1" : "0";
+    return "'" + text.replace(/'/g, "''") + "'";
+}
+
+
+function openTableDataEditor(databaseName, tableName) {
+    openDatabase(databaseName);
+    displayTableData(databaseName, tableName);
+}
+
+
+function displayTableData(databaseName, tableName) {
+    const rowsResult = activeSQLiteDatabase.exec(
+        "SELECT rowid AS __sandbox_rowid, * FROM " + quoteSQLiteIdentifier(tableName)
+    );
+
+    const columns = rowsResult.length ? rowsResult[0].columns : [];
+    const rows = rowsResult.length ? convertSQLiteRows(rowsResult[0]) : [];
+    const editableColumns = columns.filter(c => c !== "__sandbox_rowid");
+
+    const ui = createTemporaryModal("Table Data", databaseName + " • " + tableName);
+
+    let tableHTML = `
+        <div class="sandbox-data-toolbar">
+            <button type="button" class="sandbox-ui-primary" id="ui-add-row">＋ Add Row</button>
+            <button type="button" class="sandbox-ui-secondary" id="ui-refresh-data">Refresh</button>
+        </div>
+        <div class="sandbox-data-grid-wrap">
+            <table class="sandbox-data-grid">
+                <thead><tr>
+                    <th>rowid</th>
+                    ${editableColumns.map(c => `<th>${escapeHTML(c)}</th>`).join("")}
+                    <th>Delete</th>
+                </tr></thead>
+                <tbody>
+    `;
+
+    rows.forEach(row => {
+        tableHTML += `<tr data-rowid="${escapeHTML(row.__sandbox_rowid)}">`;
+        tableHTML += `<td>${escapeHTML(row.__sandbox_rowid)}</td>`;
+        editableColumns.forEach(column => {
+            const value = row[column];
+            tableHTML += `<td><input class="sandbox-cell-input" data-column="${escapeHTML(column)}" value="${escapeHTML(value === null ? "" : value)}" /></td>`;
+        });
+        tableHTML += `<td><button type="button" class="sandbox-delete-row">×</button></td></tr>`;
+    });
+
+    tableHTML += `</tbody></table></div>
+        <div class="sandbox-ui-footer">
+            <button type="button" class="sandbox-ui-secondary" id="ui-close-data">Close</button>
+            <button type="button" class="sandbox-ui-primary" id="ui-commit-data">Commit Changes</button>
+        </div>`;
+
+    ui.body.innerHTML = tableHTML;
+
+    ui.body.querySelector("#ui-close-data").addEventListener("click", ui.close);
+    ui.body.querySelector("#ui-refresh-data").addEventListener("click", function () {
+        ui.close();
+        displayTableData(databaseName, tableName);
+    });
+    ui.body.querySelector("#ui-add-row").addEventListener("click", function () {
+        ui.close();
+        openInsertRowModal(databaseName, tableName);
+    });
+
+    ui.body.querySelectorAll(".sandbox-delete-row").forEach(button => {
+        button.addEventListener("click", function () {
+            const row = button.closest("tr");
+            const rowid = row.dataset.rowid;
+            if (!window.confirm("Delete row " + rowid + "?")) return;
+            row.classList.toggle("sandbox-row-marked-delete");
+            if (row.classList.contains("sandbox-row-marked-delete")) {
+                button.textContent = "↶";
+                showStatus("🗑️ Row marked for deletion. Click Commit Changes to apply it.", "info");
+            } else {
+                button.textContent = "×";
+                showStatus("↶ Row deletion cancelled.", "info");
+            }
+        });
+    });
+
+    ui.body.querySelector("#ui-commit-data").addEventListener("click", function () {
+        try {
+            ui.body.querySelectorAll("tbody tr").forEach(row => {
+                const rowid = Number(row.dataset.rowid);
+
+                if (row.classList.contains("sandbox-row-marked-delete")) {
+                    activeSQLiteDatabase.run(
+                        "DELETE FROM " + quoteSQLiteIdentifier(tableName) + " WHERE rowid = ?",
+                        [rowid]
+                    );
+                    return;
+                }
+
+                const updates = [];
+                const values = [];
+
+                row.querySelectorAll(".sandbox-cell-input").forEach(input => {
+                    updates.push(quoteSQLiteIdentifier(input.dataset.column) + " = ?");
+                    values.push(input.value === "" ? null : input.value);
+                });
+
+                if (updates.length) {
+                    activeSQLiteDatabase.run(
+                        "UPDATE " + quoteSQLiteIdentifier(tableName) + " SET " + updates.join(", ") + " WHERE rowid = ?",
+                        values.concat(rowid)
+                    );
+                }
+            });
+
+            persistActiveDatabase();
+            renderDatabaseTree();
+            ui.close();
+            displayTableData(databaseName, tableName);
+            showStatus("✅ Changes committed successfully.", "success");
+        } catch (error) {
+            showStatus("❌ " + getSQLiteErrorMessage(error), "error");
+        }
+    });
+}
