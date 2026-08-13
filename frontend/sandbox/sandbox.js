@@ -4637,12 +4637,19 @@ function showInspectionTableList(
             "error"
         );
 
-        return false;
+        return true;
 
     }
 
 
     if (tables.length === 0) {
+
+        showStatus(
+            "ℹ️ Database '" +
+            activeDatabaseName +
+            "' has no tables.",
+            "info"
+        );
 
         displaySandboxResults({
 
@@ -4663,19 +4670,15 @@ function showInspectionTableList(
 
         });
 
-
-        showStatus(
-            "ℹ️ No tables are available in '" +
-            activeDatabaseName +
-            "'.",
-            "info"
-        );
-
         return true;
 
     }
 
 
+    /*
+     * One table means there is no ambiguity.
+     * Describe / Schema can open it immediately.
+     */
     if (tables.length === 1) {
 
         return false;
@@ -4683,42 +4686,19 @@ function showInspectionTableList(
     }
 
 
-    displaySandboxResults({
-
-        columns: [
-            "Table Name",
-            "Database"
-        ],
-
-        rows: tables.map(
-            function (tableName) {
-
-                return {
-                    "Table Name": tableName,
-                    Database: activeDatabaseName
-                };
-
-            }
-        ),
-
-        executionTime: 0,
-
-        inspectionTableList: true,
-        inspectionAction: actionName
-
-    });
-
-
-    showStatus(
-        "ℹ️ Select a table from the list to " +
-        actionName.toLowerCase() +
-        " it.",
-        "info"
-    );
-
-
-    makeInspectionResultsClickable(
-        actionName
+    /*
+     * Multiple tables:
+     *
+     * Do NOT use the previous selectedTableName here.
+     * The user explicitly asked for a table-selection popup
+     * whenever the active database contains more than one table.
+     *
+     * This also prevents a stale table from TestDB being reused
+     * after the user switches to MYTest.
+     */
+    openInspectionTablePopup(
+        actionName,
+        tables
     );
 
 
@@ -4727,65 +4707,297 @@ function showInspectionTableList(
 }
 
 
-function makeInspectionResultsClickable(
-    actionName
+/* ============================================================
+ * INSPECTION TABLE POPUP
+ * ============================================================
+ *
+ * Used by Describe / Schema when the active database contains
+ * more than one table.
+ *
+ * Example:
+ *
+ *     TestDB
+ *     ----------------
+ *     Test       [Describe]
+ *     Dummy      [Describe]
+ *
+ * Clicking a button executes the requested inspection and closes
+ * the popup immediately.
+ * ============================================================ */
+
+function openInspectionTablePopup(
+    actionName,
+    tables
 ) {
 
-    if (!resultsContainer) {
-
-        return;
-
-    }
+    closeInspectionTablePopup();
 
 
-    const table =
-        resultsContainer.querySelector(
-            ".results-table"
-        );
+    const overlay =
+        document.createElement("div");
 
 
-    if (!table) {
-
-        return;
-
-    }
+    overlay.id =
+        "inspection-table-popup";
 
 
-    table.querySelectorAll(
-        "tbody tr"
-    ).forEach(
-        function (row) {
+    overlay.style.position =
+        "fixed";
 
-            row.style.cursor =
+    overlay.style.inset =
+        "0";
+
+    overlay.style.zIndex =
+        "2000";
+
+    overlay.style.display =
+        "flex";
+
+    overlay.style.alignItems =
+        "center";
+
+    overlay.style.justifyContent =
+        "center";
+
+    overlay.style.background =
+        "rgba(2, 6, 23, .72)";
+
+    overlay.style.padding =
+        "20px";
+
+
+    const modal =
+        document.createElement("div");
+
+
+    modal.style.width =
+        "420px";
+
+    modal.style.maxWidth =
+        "100%";
+
+    modal.style.maxHeight =
+        "80vh";
+
+    modal.style.overflow =
+        "hidden";
+
+    modal.style.background =
+        "#111c31";
+
+    modal.style.border =
+        "1px solid #334155";
+
+    modal.style.borderRadius =
+        "10px";
+
+    modal.style.boxShadow =
+        "0 20px 50px rgba(0,0,0,.55)";
+
+
+    const header =
+        document.createElement("div");
+
+
+    header.style.display =
+        "flex";
+
+    header.style.alignItems =
+        "center";
+
+    header.style.justifyContent =
+        "space-between";
+
+    header.style.padding =
+        "15px 18px";
+
+    header.style.borderBottom =
+        "1px solid #263247";
+
+
+    const title =
+        document.createElement("div");
+
+
+    title.innerHTML =
+        "<strong style='color:#f1f5f9;font-size:15px;'>" +
+        escapeHTML(actionName) +
+        " Table</strong>" +
+        "<div style='margin-top:3px;color:#94a3b8;font-size:11px;'>" +
+        "Select a table from " +
+        escapeHTML(activeDatabaseName) +
+        "</div>";
+
+
+    const closeButton =
+        document.createElement("button");
+
+
+    closeButton.type =
+        "button";
+
+    closeButton.textContent =
+        "×";
+
+    closeButton.title =
+        "Close";
+
+    closeButton.style.border =
+        "0";
+
+    closeButton.style.background =
+        "transparent";
+
+    closeButton.style.color =
+        "#94a3b8";
+
+    closeButton.style.fontSize =
+        "22px";
+
+    closeButton.style.cursor =
+        "pointer";
+
+
+    closeButton.addEventListener(
+        "click",
+        closeInspectionTablePopup
+    );
+
+
+    header.appendChild(title);
+    header.appendChild(closeButton);
+
+
+    const body =
+        document.createElement("div");
+
+
+    body.style.padding =
+        "12px";
+
+    body.style.maxHeight =
+        "60vh";
+
+    body.style.overflowY =
+        "auto";
+
+
+    tables.forEach(
+        function (tableName, index) {
+
+            const row =
+                document.createElement("div");
+
+
+            row.style.display =
+                "flex";
+
+            row.style.alignItems =
+                "center";
+
+            row.style.justifyContent =
+                "space-between";
+
+            row.style.gap =
+                "12px";
+
+            row.style.padding =
+                "10px 11px";
+
+            row.style.border =
+                "1px solid #263247";
+
+            row.style.borderRadius =
+                "7px";
+
+            row.style.background =
+                "#0f172a";
+
+            row.style.marginBottom =
+                index === tables.length - 1
+                    ? "0"
+                    : "7px";
+
+
+            const name =
+                document.createElement("span");
+
+
+            name.textContent =
+                tableName;
+
+            name.style.color =
+                "#dbeafe";
+
+            name.style.fontSize =
+                "13px";
+
+            name.style.fontWeight =
+                "600";
+
+            name.style.overflow =
+                "hidden";
+
+            name.style.textOverflow =
+                "ellipsis";
+
+            name.style.whiteSpace =
+                "nowrap";
+
+
+            const button =
+                document.createElement("button");
+
+
+            button.type =
+                "button";
+
+            button.textContent =
+                actionName;
+
+            button.style.height =
+                "32px";
+
+            button.style.padding =
+                "0 11px";
+
+            button.style.border =
+                "1px solid #3b82f6";
+
+            button.style.borderRadius =
+                "6px";
+
+            button.style.background =
+                "#2563eb";
+
+            button.style.color =
+                "#ffffff";
+
+            button.style.cursor =
                 "pointer";
 
-            row.title =
-                "Click to " +
-                actionName.toLowerCase() +
-                " this table";
+            button.style.fontSize =
+                "12px";
+
+            button.style.fontWeight =
+                "600";
 
 
-            row.addEventListener(
+            button.addEventListener(
                 "click",
                 function () {
 
-                    const firstCell =
-                        row.querySelector(
-                            "td"
-                        );
+                    /*
+                     * Close first so the results panel becomes the
+                     * visible destination of the inspection output.
+                     */
+                    closeInspectionTablePopup();
 
 
-                    if (!firstCell) {
-
-                        return;
-
-                    }
-
-
-                    const tableName =
-                        firstCell.textContent.trim();
-
-
+                    /*
+                     * Always re-check against the CURRENT database.
+                     * This protects against stale table selections.
+                     */
                     const actualTable =
                         findTableInActiveDatabase(
                             tableName
@@ -4837,8 +5049,69 @@ function makeInspectionResultsClickable(
                 }
             );
 
+
+            row.appendChild(name);
+            row.appendChild(button);
+            body.appendChild(row);
+
         }
     );
+
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    overlay.appendChild(modal);
+
+
+    /*
+     * Clicking the dark area outside the popup closes it.
+     */
+    overlay.addEventListener(
+        "click",
+        function (event) {
+
+            if (event.target === overlay) {
+
+                closeInspectionTablePopup();
+
+            }
+
+        }
+    );
+
+
+    document.body.appendChild(
+        overlay
+    );
+
+}
+
+
+function closeInspectionTablePopup() {
+
+    const popup =
+        document.getElementById(
+            "inspection-table-popup"
+        );
+
+
+    if (popup) {
+
+        popup.remove();
+
+    }
+
+}
+
+
+function makeInspectionResultsClickable() {
+
+    /*
+     * Kept as a harmless compatibility function because older
+     * Sandbox code may call it. Inspection selection now happens
+     * through the dedicated popup instead of the Results table.
+     */
+    return;
 
 }
 
@@ -4999,6 +5272,16 @@ function describeSelectedTable() {
     }
 
 
+    /*
+     * First priority:
+     * If the SQL editor clearly mentions a table, use that table.
+     * This makes:
+     *
+     *     SELECT * FROM Dummy;
+     *
+     * followed by Describe inspect Dummy, even if Test was
+     * previously selected in the explorer.
+     */
     const editorInfo =
         extractInspectionTableFromEditor();
 
@@ -5036,34 +5319,26 @@ function describeSelectedTable() {
     }
 
 
-    if (
-        selectedTableName &&
-        selectedTableDatabaseName ===
-        activeDatabaseName
-    ) {
+    const tables =
+        getActiveDatabaseTables();
 
-        describeTableByName(
-            selectedTableName
+
+    /*
+     * IMPORTANT:
+     *
+     * Do not use selectedTableName before checking the table count.
+     * If TestDB has Test + Dummy, the user must see BOTH choices.
+     * This prevents a stale Test selection from hiding Dummy.
+     */
+    if (tables.length > 1) {
+
+        showInspectionTableList(
+            "Describe"
         );
 
         return;
 
     }
-
-
-    if (
-        showInspectionTableList(
-            "Describe"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const tables =
-        getActiveDatabaseTables();
 
 
     if (tables.length === 1) {
@@ -5072,13 +5347,20 @@ function describeSelectedTable() {
             tables[0]
         );
 
+        return;
+
     }
+
+
+    showInspectionTableList(
+        "Describe"
+    );
 
 }
 
 
 /* ============================================================
- * REPLACED SCHEMA BUTTON BEHAVIOUR
+ * SCHEMA BUTTON
  * ============================================================ */
 
 function showSelectedTableSchema() {
@@ -5095,6 +5377,9 @@ function showSelectedTableSchema() {
     }
 
 
+    /*
+     * SQL editor table has priority over explorer state.
+     */
     const editorInfo =
         extractInspectionTableFromEditor();
 
@@ -5132,34 +5417,22 @@ function showSelectedTableSchema() {
     }
 
 
-    if (
-        selectedTableName &&
-        selectedTableDatabaseName ===
-        activeDatabaseName
-    ) {
+    const tables =
+        getActiveDatabaseTables();
 
-        schemaTableByName(
-            selectedTableName
+
+    /*
+     * Multiple tables always show the selection popup.
+     */
+    if (tables.length > 1) {
+
+        showInspectionTableList(
+            "Schema"
         );
 
         return;
 
     }
-
-
-    if (
-        showInspectionTableList(
-            "Schema"
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    const tables =
-        getActiveDatabaseTables();
 
 
     if (tables.length === 1) {
@@ -5168,7 +5441,14 @@ function showSelectedTableSchema() {
             tables[0]
         );
 
+        return;
+
     }
+
+
+    showInspectionTableList(
+        "Schema"
+    );
 
 }
 
