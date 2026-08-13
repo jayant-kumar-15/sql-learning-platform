@@ -1,119 +1,64 @@
-✅ Sandbox features we have completed
-Feature
-Status
-SQLite running in browser
-✅
-Create database using UI
-✅
-Create database using SQL
-✅
-Drop database using UI/SQL
-✅
-Multiple databases
-✅
-Persistent databases after refresh
-✅
-Last active database restored
-✅
-USE database behavior
-✅
+
+COMPLETED / WORKING
+Browser SQLite/sql.js
+Multiple databases + persistence
+CREATE/DROP DATABASE
+USE database
 Database Explorer
-✅
-Tables displayed under correct DB
-✅
-Create table using SQL
-✅
-Drop table using SQL
-✅
-Create table from UI
-✅
-Drop table from UI
-✅
-Insert data using SQL
-✅
-Update/Delete using SQL
-✅
-Insert records using UI
-✅
-Modify records using UI
-✅
-Commit changes from UI
-✅
+Create/drop tables
+CREATE/ALTER/DROP TABLE
+INSERT/UPDATE/DELETE
+SELECT + joins
 Multiple SQL statements
-✅
-Execute selected SQL statement
-✅
-SELECT results
-✅
-Results appear only after execution
-✅
-Results minimize/maximize
-✅
-Results close
-✅
-Results drag vertically
-✅
-CSV download
-✅
+Run selected statement
+Execute statement under cursor
+DESCRIBE
+SCHEMA
+RELATIONSHIPS
 Multiple query tabs
-✅
-Query tab rename
-✅
-Query persistence
-✅
-Close query tabs
-✅
-Describe table
-✅
-Schema
-✅
-Relationships
-✅
-Describe multiple tables
-✅
+Rename/persist query tabs
+Query history
+Results panel
+Results drag/minimize/maximize/close
+CSV download
+UI table creation
+UI data insertion/editing/commit
+Active database restoration
 Correct DB/table context
-✅
 Mobile sidebar
-✅
 Browser persistence
-✅
-Extensive code comments
-✅
-So the core Sandbox experience is essentially complete.
-🟡 Things I'd still consider before declaring Sandbox "finished"
-These are mostly polish / robustness, not fundamental missing functionality:
-Table structure editor
+The latest code already has safeguards such as the 2-database, 10-table and 2,000-row limits. �
+sandbox_js.txt
+🟡 REMAINING / V2
+SQL syntax highlighting
+SQL autocomplete/intellisense
+Line numbers
+Better SQL editor — CodeMirror/Monaco
+UI table structure designer:
 Add column
 Remove column
 Rename column
 Change datatype
-Add/remove NOT NULL
-Add/remove UNIQUE
-Primary key
-Foreign key
-Default value
-You specifically wanted this functionality earlier. SQL can already handle much of it, but the UI-based table-structure editor isn't something I'd consider fully finished yet.
-Transaction behavior
-BEGIN
-COMMIT
-ROLLBACK
-Especially useful for the UI record editor.
-Better SQL error messages
-Instead of only:
-Query failed
-we can eventually show something like:
-no such column: customer_nmae
-Line 3, column 12
-Query editor polish
-SQL syntax highlighting
-Better autocomplete
-Matching brackets/parentheses
-Line numbers
-Keyboard shortcuts
-Possibly Monaco/CodeMirror later
-Large-result handling
-Pagination
-Row limit
-Better performance for thousands of records.
-Schema visualization
-Your Relationships feature works, but eventually we could make it more visual — something closer to a small ER diagram.
+NOT NULL
+UNIQUE
+PRIMARY KEY
+FOREIGN KEY
+DEFAULT
+UI transaction controls — BEGIN/COMMIT/ROLLBACK
+Better SQL error messages with line/column
+Result-grid improvements
+Pagination/large-result handling
+Better ER/relationship visualization
+One thing I'd add to that requirement file
+🔴 DO NOT BREAK
+Whenever we modify Sandbox:
+Don't remove existing SQL functionality.
+Don't change existing element IDs unless necessary.
+Don't break USE, DESCRIBE, SCHEMA, or RELATIONSHIPS.
+Don't break multiple-statement execution.
+Don't break database persistence.
+Don't break query-tab persistence.
+Don't make the Results panel permanently occupy editor space.
+Don't require clicking the Database Explorer before SQL can select a database.
+Preserve extensive code comments.
+Test existing functionality before adding new functionality.
