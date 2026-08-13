@@ -1,4 +1,3 @@
-
 COMPLETED / WORKING
 Browser SQLite/sql.js
 Multiple databases + persistence
