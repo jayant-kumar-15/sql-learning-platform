@@ -5245,17 +5245,38 @@ function schemaTableByName(
 
 
 /* ============================================================
- * REPLACED DESCRIBE BUTTON BEHAVIOUR
+ * DESCRIBE / SCHEMA BUTTON BEHAVIOUR
  * ============================================================
  *
- * Multiple tables:
- *     show all table names first.
+ * IMPORTANT DESIGN RULE
+ * ---------------------
  *
- * One table:
- *     describe it immediately.
+ * These buttons operate on the CURRENTLY ACTIVE DATABASE.
  *
- * SQL editor table:
- *     always takes priority over stale explorer selection.
+ * We intentionally do NOT use the old SQL editor text here.
+ *
+ * Why?
+ * -----
+ * Suppose TestDB contains:
+ *
+ *     Test
+ *     Dummy
+ *
+ * The editor may still contain:
+ *
+ *     SELECT * FROM Test;
+ *
+ * If the user switches to MYTest, that old query must NOT force
+ * Describe / Schema to inspect Test again.
+ *
+ * Behaviour:
+ * ----------
+ * 0 tables  -> show no-tables message
+ * 1 table   -> inspect that table automatically
+ * >1 tables -> show the table-selection popup
+ *
+ * The popup always uses tables from activeDatabaseName.
+ * Therefore switching databases cannot reuse a stale table.
  * ============================================================ */
 
 function describeSelectedTable() {
@@ -5273,74 +5294,49 @@ function describeSelectedTable() {
 
 
     /*
-     * First priority:
-     * If the SQL editor clearly mentions a table, use that table.
-     * This makes:
-     *
-     *     SELECT * FROM Dummy;
-     *
-     * followed by Describe inspect Dummy, even if Test was
-     * previously selected in the explorer.
+     * ALWAYS obtain the table list from the current database.
+     * Never use selectedTableName here.
      */
-    const editorInfo =
-        extractInspectionTableFromEditor();
-
-
-    if (editorInfo.mentioned) {
-
-        const actualTable =
-            findTableInActiveDatabase(
-                editorInfo.table
-            );
-
-
-        if (!actualTable) {
-
-            showStatus(
-                "❌ Table '" +
-                editorInfo.table +
-                "' is not present in database '" +
-                activeDatabaseName +
-                "'.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        describeTableByName(
-            actualTable
-        );
-
-        return;
-
-    }
-
-
     const tables =
         getActiveDatabaseTables();
 
 
-    /*
-     * IMPORTANT:
-     *
-     * Do not use selectedTableName before checking the table count.
-     * If TestDB has Test + Dummy, the user must see BOTH choices.
-     * This prevents a stale Test selection from hiding Dummy.
-     */
-    if (tables.length > 1) {
+    if (tables.length === 0) {
 
-        showInspectionTableList(
-            "Describe"
+        showStatus(
+            "ℹ️ Database '" +
+            activeDatabaseName +
+            "' has no tables.",
+            "info"
         );
+
+        displaySandboxResults({
+
+            columns: [
+                "Message"
+            ],
+
+            rows: [
+                {
+                    Message:
+                        "Database '" +
+                        activeDatabaseName +
+                        "' has no tables."
+                }
+            ],
+
+            executionTime: 0
+
+        });
 
         return;
 
     }
 
 
+    /*
+     * One table is unambiguous.
+     */
     if (tables.length === 1) {
 
         describeTableByName(
@@ -5352,6 +5348,12 @@ function describeSelectedTable() {
     }
 
 
+    /*
+     * More than one table:
+     * ALWAYS show the popup.
+     *
+     * This is the important fix for TestDB -> Test + Dummy.
+     */
     showInspectionTableList(
         "Describe"
     );
@@ -5378,63 +5380,48 @@ function showSelectedTableSchema() {
 
 
     /*
-     * SQL editor table has priority over explorer state.
+     * ALWAYS obtain tables from the CURRENT active database.
      */
-    const editorInfo =
-        extractInspectionTableFromEditor();
-
-
-    if (editorInfo.mentioned) {
-
-        const actualTable =
-            findTableInActiveDatabase(
-                editorInfo.table
-            );
-
-
-        if (!actualTable) {
-
-            showStatus(
-                "❌ Table '" +
-                editorInfo.table +
-                "' is not present in database '" +
-                activeDatabaseName +
-                "'.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        schemaTableByName(
-            actualTable
-        );
-
-        return;
-
-    }
-
-
     const tables =
         getActiveDatabaseTables();
 
 
-    /*
-     * Multiple tables always show the selection popup.
-     */
-    if (tables.length > 1) {
+    if (tables.length === 0) {
 
-        showInspectionTableList(
-            "Schema"
+        showStatus(
+            "ℹ️ Database '" +
+            activeDatabaseName +
+            "' has no tables.",
+            "info"
         );
+
+        displaySandboxResults({
+
+            columns: [
+                "Message"
+            ],
+
+            rows: [
+                {
+                    Message:
+                        "Database '" +
+                        activeDatabaseName +
+                        "' has no tables."
+                }
+            ],
+
+            executionTime: 0
+
+        });
 
         return;
 
     }
 
 
+    /*
+     * One table is unambiguous.
+     */
     if (tables.length === 1) {
 
         schemaTableByName(
@@ -5446,6 +5433,10 @@ function showSelectedTableSchema() {
     }
 
 
+    /*
+     * More than one table:
+     * ALWAYS show the popup.
+     */
     showInspectionTableList(
         "Schema"
     );
