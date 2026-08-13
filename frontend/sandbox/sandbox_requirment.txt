@@ -1,0 +1,119 @@
+✅ Sandbox features we have completed
+Feature
+Status
+SQLite running in browser
+✅
+Create database using UI
+✅
+Create database using SQL
+✅
+Drop database using UI/SQL
+✅
+Multiple databases
+✅
+Persistent databases after refresh
+✅
+Last active database restored
+✅
+USE database behavior
+✅
+Database Explorer
+✅
+Tables displayed under correct DB
+✅
+Create table using SQL
+✅
+Drop table using SQL
+✅
+Create table from UI
+✅
+Drop table from UI
+✅
+Insert data using SQL
+✅
+Update/Delete using SQL
+✅
+Insert records using UI
+✅
+Modify records using UI
+✅
+Commit changes from UI
+✅
+Multiple SQL statements
+✅
+Execute selected SQL statement
+✅
+SELECT results
+✅
+Results appear only after execution
+✅
+Results minimize/maximize
+✅
+Results close
+✅
+Results drag vertically
+✅
+CSV download
+✅
+Multiple query tabs
+✅
+Query tab rename
+✅
+Query persistence
+✅
+Close query tabs
+✅
+Describe table
+✅
+Schema
+✅
+Relationships
+✅
+Describe multiple tables
+✅
+Correct DB/table context
+✅
+Mobile sidebar
+✅
+Browser persistence
+✅
+Extensive code comments
+✅
+So the core Sandbox experience is essentially complete.
+🟡 Things I'd still consider before declaring Sandbox "finished"
+These are mostly polish / robustness, not fundamental missing functionality:
+Table structure editor
+Add column
+Remove column
+Rename column
+Change datatype
+Add/remove NOT NULL
+Add/remove UNIQUE
+Primary key
+Foreign key
+Default value
+You specifically wanted this functionality earlier. SQL can already handle much of it, but the UI-based table-structure editor isn't something I'd consider fully finished yet.
+Transaction behavior
+BEGIN
+COMMIT
+ROLLBACK
+Especially useful for the UI record editor.
+Better SQL error messages
+Instead of only:
+Query failed
+we can eventually show something like:
+no such column: customer_nmae
+Line 3, column 12
+Query editor polish
+SQL syntax highlighting
+Better autocomplete
+Matching brackets/parentheses
+Line numbers
+Keyboard shortcuts
+Possibly Monaco/CodeMirror later
+Large-result handling
+Pagination
+Row limit
+Better performance for thousands of records.
+Schema visualization
+Your Relationships feature works, but eventually we could make it more visual — something closer to a small ER diagram.
