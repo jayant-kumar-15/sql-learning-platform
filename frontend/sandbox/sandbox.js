@@ -626,17 +626,15 @@ function initializeEventListeners() {
 
 function executeCurrentQuery() {
 
-    if (!activeSQLiteDatabase) {
-
-        showStatus(
-            "❌ Please create or select a database first.",
-            "error"
-        );
-
-        return;
-
-    }
-
+    /*
+     * IMPORTANT:
+     *
+     * Do not require an active database here. CREATE DATABASE,
+     * DROP DATABASE, USE and SHOW DATABASES are Sandbox-level
+     * commands and must work without a selected SQLite database.
+     * Real SQLite statements are validated later by
+     * executeSingleStatement().
+     */
 
     if (!sqlEditor) {
 
@@ -1197,7 +1195,7 @@ function executeSingleStatement(
      */
     const useMatch =
         statement.match(
-            /^USE\s+["'`]?([A-Za-z0-9_]+)["'`]?\s*$/i
+            /^USE(?:\s+DATABASE)?\s+["'`]?([A-Za-z0-9_]+)["'`]?\s*$/i
         );
 
 
@@ -1389,25 +1387,58 @@ function executeSingleStatement(
      * --------------------------------------------------------
      * SHOW DATABASES
      * --------------------------------------------------------
+     *
+     * Supported forms:
+     *     SHOW DATABASES;
+     *     SHOW DATABASES LIKE 'Test%';
+     *     SHOW DATABASE TestDB;
+     *
+     * These are Sandbox-level commands and therefore do not
+     * require an active database.
      */
-    if (
-        /^SHOW\s+DATABASES$/i.test(
-            statement
-        )
-    ) {
+
+    const showDatabasesLikeMatch =
+        statement.match(
+            /^SHOW\s+DATABASES\s+LIKE\s+["'](.+)["']$/i
+        );
+
+
+    if (showDatabasesLikeMatch) {
+
+        const pattern =
+            showDatabasesLikeMatch[1]
+                .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+                .replace(/%/g, ".*")
+                .replace(/_/g, ".");
+
+
+        const matcher =
+            new RegExp(
+                "^" + pattern + "$",
+                "i"
+            );
+
 
         return {
 
             columns:
-                ["Database"],
+                ["Database", "Active"],
 
             rows:
                 Array.from(
                     sandboxDatabases.keys()
-                ).map(
+                )
+                .filter(
+                    name => matcher.test(name)
+                )
+                .map(
                     name => ({
                         Database:
-                            name
+                            name,
+                        Active:
+                            name === activeDatabaseName
+                                ? "YES"
+                                : "NO"
                     })
                 ),
 
@@ -1419,11 +1450,154 @@ function executeSingleStatement(
     }
 
 
+    if (
+        /^SHOW\s+DATABASES$/i.test(
+            statement
+        )
+    ) {
+
+        return {
+
+            columns:
+                ["Database", "Active"],
+
+            rows:
+                Array.from(
+                    sandboxDatabases.keys()
+                ).map(
+                    name => ({
+                        Database:
+                            name,
+                        Active:
+                            name === activeDatabaseName
+                                ? "YES"
+                                : "NO"
+                    })
+                ),
+
+            executionTime:
+                0
+
+        };
+
+    }
+
+
+    const showDatabaseMatch =
+        statement.match(
+            /^SHOW\s+DATABASE\s+["'`]?([A-Za-z0-9_]+)["'`]?\s*$/i
+        );
+
+
+    if (showDatabaseMatch) {
+
+        const databaseName =
+            showDatabaseMatch[1];
+
+
+        if (
+            !sandboxDatabases.has(
+                databaseName
+            )
+        ) {
+
+            throw new Error(
+                "Database '" +
+                databaseName +
+                "' does not exist."
+            );
+
+        }
+
+
+        const inspectionDatabase =
+            new SQL_ENGINE.Database(
+                sandboxDatabases.get(
+                    databaseName
+                )
+            );
+
+
+        try {
+
+            const tableResult =
+                inspectionDatabase.exec(
+                    `
+                    SELECT name AS table_name
+                    FROM sqlite_master
+                    WHERE type = 'table'
+                    AND name NOT LIKE 'sqlite_%'
+                    ORDER BY name
+                    `
+                );
+
+
+            const tables =
+                tableResult.length
+                    ? convertSQLiteRows(
+                        tableResult[0]
+                    )
+                    : [];
+
+
+            return {
+
+                columns:
+                    [
+                        "Database",
+                        "Active",
+                        "Tables"
+                    ],
+
+                rows:
+                    [
+                        {
+                            Database:
+                                databaseName,
+                            Active:
+                                databaseName === activeDatabaseName
+                                    ? "YES"
+                                    : "NO",
+                            Tables:
+                                tables.length
+                                    ? tables
+                                        .map(
+                                            row => row.table_name
+                                        )
+                                        .join(", ")
+                                    : "No tables"
+                        }
+                    ],
+
+                executionTime:
+                    0
+
+            };
+
+        }
+
+        finally {
+
+            inspectionDatabase.close();
+
+        }
+
+    }
+
+
     /*
      * --------------------------------------------------------
      * NORMAL SQLITE QUERY
      * --------------------------------------------------------
      */
+
+    /*
+     * All remaining commands are actual SQLite commands.
+     * They require a currently selected database.
+     */
+    ensureActiveDatabase();
+
+
     const startTime =
         performance.now();
 
@@ -1694,9 +1868,6 @@ function dropDatabaseFromSQL(
 
 
     renderDatabaseTree();
-
-
-    hideResultsPanel();
 
 }
 
