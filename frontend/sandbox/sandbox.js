@@ -53,6 +53,15 @@ const SANDBOX_STORAGE_KEY =
     "sql_learning_platform_sandbox";
 
 
+/*
+ * Stores the last active database name separately from the
+ * database contents. This lets the Sandbox restore the same
+ * working database after a browser refresh.
+ */
+const ACTIVE_DATABASE_STORAGE_KEY =
+    "sql_learning_platform_active_database";
+
+
 const MAX_DATABASES =
     2;
 
@@ -250,6 +259,18 @@ async function initializeSandbox() {
 
 
         loadSavedDatabases();
+
+
+        /*
+         * Restore the previously active database when possible.
+         * This is only a convenience; SQL commands such as USE
+         * and CREATE DATABASE can also work when no database is
+         * currently active.
+         */
+        restoreActiveDatabase();
+
+
+        updateActiveDatabaseHint();
 
 
         renderDatabaseTree();
@@ -637,17 +658,15 @@ function initializeEventListeners() {
 
 function executeCurrentQuery() {
 
-    if (!activeSQLiteDatabase) {
-
-        showStatus(
-            "❌ Please create or select a database first.",
-            "error"
-        );
-
-        return;
-
-    }
-
+    /*
+     * Do NOT reject the query here just because no database is
+     * active. CREATE DATABASE, SHOW DATABASES, USE <db>, and
+     * DROP DATABASE are intentionally allowed without an active
+     * database, just like a normal SQL client.
+     *
+     * executeSingleStatement() will enforce the active-database
+     * requirement only for statements that actually need one.
+     */
 
     if (!sqlEditor) {
 
@@ -1631,6 +1650,7 @@ function createDatabaseFromSQL(
 
 
     persistDatabases();
+    persistActiveDatabaseName();
 
 
     renderDatabaseTree();
@@ -1708,6 +1728,15 @@ function dropDatabaseFromSQL(
 
 
     persistDatabases();
+
+
+    if (!activeDatabaseName) {
+
+        localStorage.removeItem(
+            ACTIVE_DATABASE_STORAGE_KEY
+        );
+
+    }
 
 
     renderDatabaseTree();
@@ -2018,6 +2047,7 @@ function createNewDatabase() {
 
 
         persistDatabases();
+        persistActiveDatabaseName();
 
 
         renderDatabaseTree();
@@ -2111,6 +2141,17 @@ function openDatabase(
 
         activeDatabaseName =
             databaseName;
+
+
+        /*
+         * Keep the active database visible directly inside the SQL
+         * worksheet so the user always knows which database will
+         * receive CREATE / INSERT / UPDATE / DELETE / SELECT work.
+         */
+        updateActiveDatabaseHint();
+
+
+        persistActiveDatabaseName();
 
 
         selectedTableName =
@@ -2371,6 +2412,87 @@ function base64ToUint8Array(
 
 
     return bytes;
+
+}
+
+
+/* ============================================================
+ * ACTIVE DATABASE PERSISTENCE
+ * ============================================================
+ *
+ * Keep the last active database name separate from the database
+ * bytes. This allows refresh -> restore -> USE/SELECT without
+ * forcing the user to click the Database Explorer first.
+ * ============================================================ */
+
+function persistActiveDatabaseName() {
+
+    if (!activeDatabaseName) {
+
+        localStorage.removeItem(
+            ACTIVE_DATABASE_STORAGE_KEY
+        );
+
+        return;
+
+    }
+
+
+    localStorage.setItem(
+        ACTIVE_DATABASE_STORAGE_KEY,
+        activeDatabaseName
+    );
+
+}
+
+
+function restoreActiveDatabase() {
+
+    const savedActiveDatabase =
+        localStorage.getItem(
+            ACTIVE_DATABASE_STORAGE_KEY
+        );
+
+
+    if (!savedActiveDatabase) {
+
+        return;
+
+    }
+
+
+    if (!sandboxDatabases.has(savedActiveDatabase)) {
+
+        localStorage.removeItem(
+            ACTIVE_DATABASE_STORAGE_KEY
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        /*
+         * Re-open the saved database so the normal openDatabase()
+         * path is used and all related state is initialized in
+         * one place.
+         */
+        openDatabase(
+            savedActiveDatabase
+        );
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "Could not restore active database:",
+            error
+        );
+
+    }
 
 }
 
@@ -2810,6 +2932,99 @@ function filterDatabaseTree() {
 
 function resolveInspectionTable() {
 
+    /*
+     * The SQL editor is the most recent source of intent.
+     *
+     * Example:
+     *     SELECT * FROM Dummy;
+     *
+     * If the user previously clicked Test, we must NOT continue
+     * describing Test when the editor now clearly says Dummy.
+     */
+    if (sqlEditor && activeSQLiteDatabase) {
+
+        const sql =
+            sqlEditor.value.trim();
+
+
+        if (sql) {
+
+            const patterns = [
+
+                /(?:DESCRIBE|DESC)\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+                /\bFROM\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+                /\bJOIN\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+                /\bUPDATE\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+                /\bINTO\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+                /\bTABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i
+
+            ];
+
+
+            const tables =
+                getTablesFromDatabase(
+                    activeSQLiteDatabase
+                );
+
+
+            for (const pattern of patterns) {
+
+                const match =
+                    sql.match(pattern);
+
+
+                if (!match) {
+
+                    continue;
+
+                }
+
+
+                const candidate =
+                    match[1];
+
+
+                const actualTable =
+                    tables.find(
+                        function (name) {
+
+                            return (
+                                name.toLowerCase() ===
+                                candidate.toLowerCase()
+                            );
+
+                        }
+                    );
+
+
+                if (actualTable) {
+
+                    selectedTableName =
+                        actualTable;
+
+                    selectedTableDatabaseName =
+                        activeDatabaseName;
+
+                    return actualTable;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * If the editor does not identify a table, use the explorer
+     * selection as the second source of intent.
+     */
     if (
         selectedTableName &&
         selectedTableDatabaseName === activeDatabaseName
@@ -2820,57 +3035,12 @@ function resolveInspectionTable() {
     }
 
 
-    if (!sqlEditor || !activeSQLiteDatabase) {
-
-        return null;
-
-    }
-
-
-    const sql =
-        sqlEditor.value.trim();
-
-
-    if (!sql) {
-
-        return null;
-
-    }
-
-
-    const patterns = [
-
-        /^(?:DESCRIBE|DESC)\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
-
-        /\bFROM\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
-
-        /\bJOIN\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
-
-        /\bUPDATE\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
-
-        /\bINTO\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i
-
-    ];
-
-
-    for (
-        const pattern of patterns
-    ) {
-
-        const match =
-            sql.match(pattern);
-
-
-        if (!match) {
-
-            continue;
-
-        }
-
-
-        const candidate =
-            match[1];
-
+    /*
+     * Convenience behaviour:
+     * if this database contains exactly one user table, that table
+     * is unambiguous and can be inspected without another click.
+     */
+    if (activeSQLiteDatabase) {
 
         const tables =
             getTablesFromDatabase(
@@ -2878,28 +3048,15 @@ function resolveInspectionTable() {
             );
 
 
-        const actualTable =
-            tables.find(
-                function (name) {
-
-                    return (
-                        name.toLowerCase() ===
-                        candidate.toLowerCase()
-                    );
-
-                }
-            );
-
-
-        if (actualTable) {
+        if (tables.length === 1) {
 
             selectedTableName =
-                actualTable;
+                tables[0];
 
             selectedTableDatabaseName =
                 activeDatabaseName;
 
-            return actualTable;
+            return tables[0];
 
         }
 
@@ -2907,9 +3064,7 @@ function resolveInspectionTable() {
 
 
     return null;
-
 }
-
 
 /* ============================================================
  * DESCRIBE BUTTON
@@ -4180,19 +4335,37 @@ function getSQLiteErrorMessage(
     error
 ) {
 
-    if (
-        error &&
-        error.message
-    ) {
+    const message =
+        error && error.message
+            ? error.message
+            : String(error);
 
-        return error.message;
+
+    /*
+     * Translate SQLite's generic missing-table error into a
+     * Sandbox-specific message that tells the user exactly which
+     * database was searched.
+     */
+    const tableMatch =
+        message.match(
+            /no such table:\s*([A-Za-z0-9_]+)/i
+        );
+
+
+    if (tableMatch) {
+
+        return (
+            "Table '" +
+            tableMatch[1] +
+            "' is not present in database '" +
+            (activeDatabaseName || "current database") +
+            "'."
+        );
 
     }
 
 
-    return String(
-        error
-    );
+    return message;
 
 }
 
@@ -4247,6 +4420,11 @@ window.getSandboxState =
             activeDatabase:
                 activeDatabaseName,
 
+            savedActiveDatabase:
+                localStorage.getItem(
+                    ACTIVE_DATABASE_STORAGE_KEY
+                ),
+
             databaseCount:
                 sandboxDatabases.size,
 
@@ -4273,3 +4451,730 @@ window.getSandboxState =
 console.log(
     "✅ sandbox.js loaded."
 );
+
+
+/* ============================================================
+ * ACTIVE DATABASE WORKSHEET HINT
+ * ============================================================
+ *
+ * The SQL worksheet always shows the current database context.
+ *
+ * Example:
+ *     Active database: TestDB | To change: USE database_name;
+ *
+ * This is intentionally kept in the textarea placeholder rather
+ * than adding another permanent toolbar element, so it uses no
+ * additional vertical workspace space.
+ * ============================================================ */
+
+function updateActiveDatabaseHint() {
+
+    if (!sqlEditor) {
+
+        return;
+
+    }
+
+
+    const databaseLabel =
+        activeDatabaseName
+            ? activeDatabaseName
+            : "No database selected";
+
+
+    sqlEditor.placeholder =
+        "-- Active database: " +
+        databaseLabel +
+        " | To change: USE database_name;\n\n" +
+        "-- Write your SQL query here\n\n" +
+        "-- Example:\n" +
+        "SELECT *\n" +
+        "FROM your_table;";
+
+}
+
+
+/* ============================================================
+ * TABLE EXISTENCE / INSPECTION HELPERS
+ * ============================================================
+ *
+ * Describe and Schema behave like a database client:
+ *
+ * 1. If SQL names a table, inspect that table.
+ * 2. If the selected explorer table belongs to the active DB,
+ *    inspect that table.
+ * 3. If the active DB contains one table, inspect it directly.
+ * 4. If several tables exist and no table is identified, display
+ *    the table list and let the user choose one.
+ *
+ * A table from another database is never silently reused.
+ * ============================================================ */
+
+function getActiveDatabaseTables() {
+
+    if (!activeSQLiteDatabase) {
+
+        return [];
+
+    }
+
+
+    return getTablesFromDatabase(
+        activeSQLiteDatabase
+    );
+
+}
+
+
+function findTableInActiveDatabase(tableName) {
+
+    if (!tableName || !activeSQLiteDatabase) {
+
+        return null;
+
+    }
+
+
+    const tables =
+        getActiveDatabaseTables();
+
+
+    return tables.find(
+        function (name) {
+
+            return (
+                name.toLowerCase() ===
+                String(tableName).toLowerCase()
+            );
+
+        }
+    ) || null;
+
+}
+
+
+function extractInspectionTableFromEditor() {
+
+    if (!sqlEditor) {
+
+        return {
+            table: null,
+            mentioned: false
+        };
+
+    }
+
+
+    const sql =
+        sqlEditor.value.trim();
+
+
+    if (!sql) {
+
+        return {
+            table: null,
+            mentioned: false
+        };
+
+    }
+
+
+    const patterns = [
+
+        /(?:DESCRIBE|DESC)\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bFROM\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bJOIN\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bUPDATE\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bINTO\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i,
+
+        /\bTABLE\s+(?:IF\s+(?:NOT\s+)?EXISTS\s+)?(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?/i
+
+    ];
+
+
+    for (const pattern of patterns) {
+
+        const match =
+            sql.match(pattern);
+
+
+        if (match) {
+
+            return {
+                table: match[1],
+                mentioned: true
+            };
+
+        }
+
+    }
+
+
+    return {
+        table: null,
+        mentioned: false
+    };
+
+}
+
+
+function showInspectionTableList(
+    actionName
+) {
+
+    const tables =
+        getActiveDatabaseTables();
+
+
+    if (!activeDatabaseName) {
+
+        showStatus(
+            "❌ Please create or select a database first.",
+            "error"
+        );
+
+        return false;
+
+    }
+
+
+    if (tables.length === 0) {
+
+        displaySandboxResults({
+
+            columns: [
+                "Message"
+            ],
+
+            rows: [
+                {
+                    Message:
+                        "Database '" +
+                        activeDatabaseName +
+                        "' has no tables."
+                }
+            ],
+
+            executionTime: 0
+
+        });
+
+
+        showStatus(
+            "ℹ️ No tables are available in '" +
+            activeDatabaseName +
+            "'.",
+            "info"
+        );
+
+        return true;
+
+    }
+
+
+    if (tables.length === 1) {
+
+        return false;
+
+    }
+
+
+    displaySandboxResults({
+
+        columns: [
+            "Table Name",
+            "Database"
+        ],
+
+        rows: tables.map(
+            function (tableName) {
+
+                return {
+                    "Table Name": tableName,
+                    Database: activeDatabaseName
+                };
+
+            }
+        ),
+
+        executionTime: 0,
+
+        inspectionTableList: true,
+        inspectionAction: actionName
+
+    });
+
+
+    showStatus(
+        "ℹ️ Select a table from the list to " +
+        actionName.toLowerCase() +
+        " it.",
+        "info"
+    );
+
+
+    makeInspectionResultsClickable(
+        actionName
+    );
+
+
+    return true;
+
+}
+
+
+function makeInspectionResultsClickable(
+    actionName
+) {
+
+    if (!resultsContainer) {
+
+        return;
+
+    }
+
+
+    const table =
+        resultsContainer.querySelector(
+            ".results-table"
+        );
+
+
+    if (!table) {
+
+        return;
+
+    }
+
+
+    table.querySelectorAll(
+        "tbody tr"
+    ).forEach(
+        function (row) {
+
+            row.style.cursor =
+                "pointer";
+
+            row.title =
+                "Click to " +
+                actionName.toLowerCase() +
+                " this table";
+
+
+            row.addEventListener(
+                "click",
+                function () {
+
+                    const firstCell =
+                        row.querySelector(
+                            "td"
+                        );
+
+
+                    if (!firstCell) {
+
+                        return;
+
+                    }
+
+
+                    const tableName =
+                        firstCell.textContent.trim();
+
+
+                    const actualTable =
+                        findTableInActiveDatabase(
+                            tableName
+                        );
+
+
+                    if (!actualTable) {
+
+                        showStatus(
+                            "❌ Table '" +
+                            tableName +
+                            "' is not present in database '" +
+                            activeDatabaseName +
+                            "'.",
+                            "error"
+                        );
+
+                        return;
+
+                    }
+
+
+                    selectedTableName =
+                        actualTable;
+
+                    selectedTableDatabaseName =
+                        activeDatabaseName;
+
+
+                    if (
+                        actionName ===
+                        "Describe"
+                    ) {
+
+                        describeTableByName(
+                            actualTable
+                        );
+
+                    }
+
+                    else {
+
+                        schemaTableByName(
+                            actualTable
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+}
+
+
+function describeTableByName(
+    tableName
+) {
+
+    const actualTable =
+        findTableInActiveDatabase(
+            tableName
+        );
+
+
+    if (!actualTable) {
+
+        showStatus(
+            "❌ Table '" +
+            tableName +
+            "' is not present in database '" +
+            activeDatabaseName +
+            "'.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    selectedTableName =
+        actualTable;
+
+    selectedTableDatabaseName =
+        activeDatabaseName;
+
+
+    try {
+
+        displaySandboxResults(
+            executeDescribeTable(
+                actualTable
+            )
+        );
+
+
+        showStatus(
+            "✅ Table '" +
+            actualTable +
+            "' described successfully.",
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        showStatus(
+            "❌ " +
+            getSQLiteErrorMessage(error),
+            "error"
+        );
+
+    }
+
+}
+
+
+function schemaTableByName(
+    tableName
+) {
+
+    const actualTable =
+        findTableInActiveDatabase(
+            tableName
+        );
+
+
+    if (!actualTable) {
+
+        showStatus(
+            "❌ Table '" +
+            tableName +
+            "' is not present in database '" +
+            activeDatabaseName +
+            "'.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    selectedTableName =
+        actualTable;
+
+    selectedTableDatabaseName =
+        activeDatabaseName;
+
+
+    try {
+
+        displaySandboxResults(
+            executeSingleStatement(
+                `PRAGMA table_info(${quoteSQLiteIdentifier(actualTable)})`
+            )
+        );
+
+
+        showStatus(
+            "✅ Schema loaded for '" +
+            actualTable +
+            "'.",
+            "success"
+        );
+
+    }
+
+    catch (error) {
+
+        showStatus(
+            "❌ " +
+            getSQLiteErrorMessage(error),
+            "error"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+ * REPLACED DESCRIBE BUTTON BEHAVIOUR
+ * ============================================================
+ *
+ * Multiple tables:
+ *     show all table names first.
+ *
+ * One table:
+ *     describe it immediately.
+ *
+ * SQL editor table:
+ *     always takes priority over stale explorer selection.
+ * ============================================================ */
+
+function describeSelectedTable() {
+
+    if (!activeSQLiteDatabase || !activeDatabaseName) {
+
+        showStatus(
+            "❌ Please create or select a database first.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const editorInfo =
+        extractInspectionTableFromEditor();
+
+
+    if (editorInfo.mentioned) {
+
+        const actualTable =
+            findTableInActiveDatabase(
+                editorInfo.table
+            );
+
+
+        if (!actualTable) {
+
+            showStatus(
+                "❌ Table '" +
+                editorInfo.table +
+                "' is not present in database '" +
+                activeDatabaseName +
+                "'.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        describeTableByName(
+            actualTable
+        );
+
+        return;
+
+    }
+
+
+    if (
+        selectedTableName &&
+        selectedTableDatabaseName ===
+        activeDatabaseName
+    ) {
+
+        describeTableByName(
+            selectedTableName
+        );
+
+        return;
+
+    }
+
+
+    if (
+        showInspectionTableList(
+            "Describe"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const tables =
+        getActiveDatabaseTables();
+
+
+    if (tables.length === 1) {
+
+        describeTableByName(
+            tables[0]
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+ * REPLACED SCHEMA BUTTON BEHAVIOUR
+ * ============================================================ */
+
+function showSelectedTableSchema() {
+
+    if (!activeSQLiteDatabase || !activeDatabaseName) {
+
+        showStatus(
+            "❌ Please create or select a database first.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const editorInfo =
+        extractInspectionTableFromEditor();
+
+
+    if (editorInfo.mentioned) {
+
+        const actualTable =
+            findTableInActiveDatabase(
+                editorInfo.table
+            );
+
+
+        if (!actualTable) {
+
+            showStatus(
+                "❌ Table '" +
+                editorInfo.table +
+                "' is not present in database '" +
+                activeDatabaseName +
+                "'.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        schemaTableByName(
+            actualTable
+        );
+
+        return;
+
+    }
+
+
+    if (
+        selectedTableName &&
+        selectedTableDatabaseName ===
+        activeDatabaseName
+    ) {
+
+        schemaTableByName(
+            selectedTableName
+        );
+
+        return;
+
+    }
+
+
+    if (
+        showInspectionTableList(
+            "Schema"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const tables =
+        getActiveDatabaseTables();
+
+
+    if (tables.length === 1) {
+
+        schemaTableByName(
+            tables[0]
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+ * FINAL WORKSHEET HINT INITIALIZATION
+ * ============================================================ */
+
+updateActiveDatabaseHint();
