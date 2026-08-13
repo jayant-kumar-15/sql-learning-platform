@@ -19,12 +19,12 @@
 
     <link
         rel="stylesheet"
-        href="../styles/main.css?v=18"
+        href="../styles/main.css?v=17"
     >
 
     <link
         rel="stylesheet"
-        href="sandbox.css?v=5"
+        href="sandbox.css?v=6"
     >
 
 
@@ -642,25 +642,6 @@ FROM your_table;"
         </div>
 
     </div>
-
-<!-- =====================================================
-     SQLITE WASM
-     =====================================================
-
-     sql.js provides SQLite inside the browser.
-
-     IMPORTANT:
-     - No backend/server is required for SQLite execution.
-     - sandbox.js uses this library to create databases,
-       execute SQL, and return query results.
-     - Keep this script BEFORE sandbox.js so the SQL engine
-       is available when sandbox.js starts.
-     ===================================================== -->
-
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.13.0/sql-wasm.js"
-></script>
-
 
 <!-- =====================================================
      SANDBOX JAVASCRIPT
