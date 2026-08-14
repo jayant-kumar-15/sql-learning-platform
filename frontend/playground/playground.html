@@ -1,1 +1,123 @@
+<!DOCTYPE html>
+SQL Playground | SQL Learning Platform
+SQL Learning Platform
+Home Tutorials Playground Challenges Sandbox Explorer
+    <!-- DATABASE EXPLORER: learning databases/tables are read-only here. -->
+    <aside id="database-sidebar" class="database-sidebar">
+        <div class="sidebar-header">
+            <span>DATABASE EXPLORER</span>
+            <button id="close-sidebar-button" class="close-sidebar-button" type="button">×</button>
+        </div>
 
+        <div class="database-search">
+            <input id="database-search-input" type="text"
+                   placeholder="Search databases or tables..." autocomplete="off">
+        </div>
+
+        <div id="database-tree" class="database-tree"></div>
+    </aside>
+
+    <section class="playground-workspace">
+
+        <!-- INFORMATION: explains that Playground is for practice only. -->
+        <section class="playground-info-banner">
+            <div class="playground-info-content">
+                <strong>SQL Playground</strong>
+                <span>Practice SQL using the platform's read-only learning databases.</span>
+            </div>
+        </section>
+
+        <!-- ACTIVE DATABASE: USE database_name; can change it. -->
+        <div id="active-database-hint" class="active-database-hint">
+            Active database:
+            <strong id="active-database-name">None</strong>
+            <span> · To change database, execute <code>USE database_name;</code></span>
+        </div>
+
+        <!-- QUERY TABS -->
+        <div class="query-tabs-container">
+            <div id="query-tabs" class="query-tabs">
+                <button class="query-tab active" data-query-id="1" type="button">
+                    <span class="query-tab-name">Query 1</span>
+                </button>
+                <button id="new-query-button" class="new-query-button"
+                        type="button" title="New Query">＋</button>
+            </div>
+        </div>
+
+        <!-- SQL WORKSHEET -->
+        <section class="sql-editor-section">
+            <div class="workspace-toolbar">
+                <div class="workspace-title"><span>SQL WORKSHEET</span></div>
+                <div class="workspace-actions">
+                    <button id="describe-table-button" class="toolbar-button" type="button">Describe</button>
+                    <button id="view-schema-button" class="toolbar-button" type="button">Schema</button>
+                    <button id="view-relationships-button" class="toolbar-button" type="button">Relationships</button>
+                    <button id="run-query-button" class="run-query-button" type="button">▶ Run Query</button>
+                </div>
+            </div>
+
+            <div class="editor-wrapper">
+                <textarea id="sql-editor" class="sql-editor" spellcheck="false" wrap="off"
+                    placeholder="-- Write your SQL query here
+
+– Example: USE Healthcare;
+
+SELECT * FROM Patients;“>
+            </div>
+
+            <div id="playground-status" class="playground-status"></div>
+        </section>
+
+        <!-- RESULTS: hidden initially; appears only after execution. -->
+        <section id="results-section" class="results-section results-hidden">
+            <div id="results-resize-handle" class="results-resize-handle"
+                 title="Drag to resize results"></div>
+
+            <div class="results-header">
+                <div class="results-title-container">
+                    <h2>Query Results</h2>
+                    <span id="results-summary" class="results-summary">No query executed</span>
+                </div>
+
+                <div class="results-actions">
+                    <button id="download-results-button" class="download-button"
+                            type="button" disabled>↓ CSV</button>
+                    <button id="minimize-results-button" class="results-control-button"
+                            type="button" title="Minimize results">−</button>
+                    <button id="maximize-results-button" class="results-control-button"
+                            type="button" title="Maximize results">⛶</button>
+                    <button id="close-results-button" class="results-control-button"
+                            type="button" title="Close results">×</button>
+                </div>
+            </div>
+
+            <div id="results-container" class="results-container">
+                <div class="empty-results">Run a SQL query to see results here.</div>
+            </div>
+        </section>
+    </section>
+
+    <div class="modal">
+        <div class="modal-header">
+            <h2 id="table-selector-title">Select Table</h2>
+            <button id="close-table-selector" class="modal-close" type="button">×</button>
+        </div>
+        <div id="table-selector-list" class="table-selector-list"></div>
+    </div>
+
+    <div class="modal modal-large">
+        <div class="modal-header">
+            <h2 id="table-details-title">Table Details</h2>
+            <button id="close-table-details" class="modal-close" type="button">×</button>
+        </div>
+        <div id="table-details-container" class="table-details-container"></div>
+    </div>
+
+    <div class="modal modal-xl">
+        <div class="modal-header">
+            <h2>Data Model / Relationships</h2>
+            <button id="close-relationships" class="modal-close" type="button">×</button>
+        </div>
+        <div id="relationships-container" class="relationships-container"></div>
+    </div>
