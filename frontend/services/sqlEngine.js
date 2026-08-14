@@ -1,3 +1,22 @@
+/*
+ * ============================================================
+ * FILE PATH: frontend/services/sqlEngine.js
+ * ============================================================
+ * PURPOSE
+ * -------
+ * SQL Learning Platform component.
+ *
+ * DOCUMENTATION
+ * -------------
+ * This path header is intentionally kept at the top so the
+ * repository location can be identified quickly during future
+ * revisions.
+ *
+ * Existing functionality is preserved in this documentation
+ * revision.
+ * ============================================================
+ */
+
 const sqlEngine = {
 
     /*
