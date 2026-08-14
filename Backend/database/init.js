@@ -1,3 +1,22 @@
+/*
+ * ============================================================
+ * FILE PATH: Backend/database/init.js
+ * ============================================================
+ * PURPOSE
+ * -------
+ * SQL Learning Platform component.
+ *
+ * DOCUMENTATION
+ * -------------
+ * This path header is intentionally kept at the top so the
+ * repository location can be identified quickly during future
+ * revisions.
+ *
+ * Existing functionality is preserved in this documentation
+ * revision.
+ * ============================================================
+ */
+
 const fs = require("fs");
 const path = require("path");
 
