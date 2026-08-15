@@ -197,6 +197,7 @@
 
 }
 
+/* The list remains scrollable while each question card grows naturally. */
 .questions-grid {
 
     display: flex;
@@ -267,48 +268,50 @@
 
 }
 
+/* ============================================================
+ * QUESTION POPUP CARDS - AUTO HEIGHT
+ * ------------------------------------------------------------
+ * Short and long questions must occupy only the space they need.
+ * The previous minimum-height/flex-centering combination could make
+ * long descriptive questions visually collide with the next card.
+ * ============================================================ */
 .question-popup-card {
-
     display: flex;
-
-    align-items: center;
-
+    align-items: flex-start;
     justify-content: space-between;
-
     gap: 20px;
-
     padding: 16px;
-
     background: #334155;
-
     border: 1px solid #475569;
-
     border-radius: 10px;
-
-    min-height: 70px;
-
+    min-height: 0;
+    height: auto;
+    box-sizing: border-box;
 }
 
 .question-popup-text {
-
-    flex: 1;
-
+    flex: 1 1 auto;
+    min-width: 0;
     color: #f8fafc;
+    line-height: 1.55;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+} 
 
-    line-height: 1.5;
-
+.question-popup-text strong {
+    display: block;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
 .question-popup-actions {
-
     display: flex;
-
     align-items: center;
-
     gap: 12px;
-
-    flex-shrink: 0;
-
+    flex: 0 0 auto;
+    align-self: flex-start;
 }
 
 .question-status {
@@ -1009,11 +1012,21 @@
    EXPECTED OUTPUT - HORIZONTAL SCROLL
    ============================================================ */
 
+/* ============================================================
+   EXPECTED OUTPUT - SCROLLABLE PREVIEW
+   ------------------------------------------------------------
+   The question data may contain hundreds/thousands of rows.
+   We keep the complete expected result in the DOM for reference,
+   but constrain the visible area so long outputs never push the
+   question card out of shape. Users can scroll vertically through
+   every matching row and horizontally when many columns exist.
+   ============================================================ */
 .expected-output-wrapper {
     width: 100%;
     max-width: 100%;
+    max-height: 240px;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
     margin-top: 10px;
     border-radius: 8px;
     -webkit-overflow-scrolling: touch;
@@ -1038,6 +1051,9 @@
 }
 
 #expected-output th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     background: #e5e7eb;
     color: #111827;
     font-weight: 700;
@@ -1057,7 +1073,9 @@
 
     .expected-output-wrapper {
         max-width: 100%;
+        max-height: 220px;
         overflow-x: auto;
+        overflow-y: auto;
     }
 
     #expected-output {
@@ -1096,47 +1114,63 @@
     margin-bottom: 0;
 }
 
+/* ============================================================
+ * YOUR LEVEL CARD
+ * ------------------------------------------------------------
+ * Compact status-only card for the top-right of the Challenge page.
+ * All three levels are visible; milestone messages stay in the popup.
+ * ============================================================ */
 .your-level-card {
-    width: 310px;
+    width: 330px;
     flex-shrink: 0;
-    padding: 18px 20px;
+    padding: 16px 18px;
     border: 2px solid #f59e0b;
-    border-radius: 14px;
-    background: #172033;
-    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.14);
+    border-radius: 16px;
+    background: linear-gradient(145deg, #172033, #111827);
+    box-shadow: 0 10px 28px rgba(245, 158, 11, 0.16);
 }
 
 .your-level-header {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     color: #fbbf24;
-    font-size: 1.05rem;
+    font-size: 1.08rem;
     font-weight: 800;
+    letter-spacing: 0.04em;
 }
 
-/* ============================================================
- * ACTIVE LEVEL ROW
- * ============================================================
- * Only one row is rendered by challenge.html. It represents the
- * user's highest currently active level.
- * ============================================================ */
 .your-level-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 15px;
-    padding: 8px 0;
+    min-height: 38px;
+    padding: 8px 2px;
     border-top: 1px solid rgba(148, 163, 184, 0.18);
     color: #e2e8f0;
 }
 
-.active-level-row {
-    min-height: 34px;
+.level-status-label {
+    color: #cbd5e1;
+    font-weight: 700;
 }
 
 .your-level-row strong {
     color: #ffffff;
     white-space: nowrap;
     letter-spacing: 0.04em;
+    text-align: right;
+}
+
+.level-status-beginner strong {
+    color: #86efac;
+}
+
+.level-status-intermediate strong {
+    color: #facc15;
+}
+
+.level-status-expert strong {
+    color: #f87171;
 }
 
 /* ============================================================
@@ -1282,6 +1316,16 @@
     .your-level-card {
         width: 100%;
         box-sizing: border-box;
+    }
+
+    .question-popup-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .question-popup-actions {
+        width: 100%;
+        justify-content: flex-end;
     }
 
 }
