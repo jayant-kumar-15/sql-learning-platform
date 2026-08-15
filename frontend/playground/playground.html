@@ -109,7 +109,7 @@
 
     <link
         rel="stylesheet"
-        href="playground.css?v=3"
+        href="./playground.css?v=2"
     >
 
 
@@ -212,7 +212,7 @@
          ============================================================ -->
 
     <main
-        class="playground-main"
+        class="playground-layout"
         id="playground-layout"
     >
 
@@ -406,20 +406,6 @@
 
 
             <!-- ====================================================
-                 ACTIVE DATABASE DISPLAY
-                 ====================================================
-
-                 The active database is maintained internally by
-                 playground.js and can be changed with:
-
-                     USE database_name;
-
-                 The dedicated status banner was intentionally removed
-                 so the SQL worksheet receives the maximum available
-                 vertical space.
-                 ==================================================== -->
-
-            <!-- ====================================================
                  QUERY TAB BAR
                  ====================================================
 
@@ -523,6 +509,14 @@
                             SQL WORKSHEET
                         </span>
 
+                    </div>
+
+                    <div
+                        id="active-database-inline"
+                        class="active-database-inline"
+                        title="Run USE database_name; to change database"
+                    >
+                        Active: None · USE database_name; to change
                     </div>
 
 
@@ -1082,7 +1076,7 @@ FROM Patients;"
 
 <!-- Playground page controller -->
 <script
-    src="playground.js?v=4"
+    src="./playground.js?v=2"
 ></script>
 
 
