@@ -1,0 +1,1701 @@
+[
+    {
+        "id": 1,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "customers"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List each customer's full name together with the city where the customer is registered.",
+        "expectedOutput": [
+            {
+                "customer_name": "Arjun Mehta",
+                "city": "Kochi"
+            },
+            {
+                "customer_name": "Isha Mehta",
+                "city": "Pune"
+            },
+            {
+                "customer_name": "Kavya Shah",
+                "city": "Chennai"
+            },
+            {
+                "customer_name": "Aditya Sharma",
+                "city": "Bengaluru"
+            },
+            {
+                "customer_name": "Aarav Kulkarni",
+                "city": "Pune"
+            }
+        ],
+        "hint": "Combine first_name and last_name with || and select city.",
+        "solution": "SELECT first_name || ' ' || last_name AS customer_name, city FROM customers;"
+    },
+    {
+        "id": 2,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "customers"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Display the customer ID, full name, and email address for customers registered in Mumbai.",
+        "expectedOutput": [
+            {
+                "customer_id": 7,
+                "customer_name": "Nikhil Shah",
+                "email": "nikhil.shah7@example.com"
+            },
+            {
+                "customer_id": 23,
+                "customer_name": "Ananya Patil",
+                "email": "ananya.patil23@example.com"
+            },
+            {
+                "customer_id": 44,
+                "customer_name": "Rahul Joshi",
+                "email": "rahul.joshi44@example.com"
+            },
+            {
+                "customer_id": 85,
+                "customer_name": "Ananya Kulkarni",
+                "email": "ananya.kulkarni85@example.com"
+            },
+            {
+                "customer_id": 107,
+                "customer_name": "Aditi Verma",
+                "email": "aditi.verma107@example.com"
+            }
+        ],
+        "hint": "Filter the customers table with WHERE city = 'Mumbai'.",
+        "solution": "SELECT customer_id, first_name || ' ' || last_name AS customer_name, email FROM customers WHERE city = 'Mumbai';"
+    },
+    {
+        "id": 3,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "customers"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find customers whose first or last name contains the text 'Sharma'. Return the customer ID and full name.",
+        "expectedOutput": [
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma"
+            },
+            {
+                "customer_id": 6,
+                "customer_name": "Neha Sharma"
+            },
+            {
+                "customer_id": 15,
+                "customer_name": "Aditi Sharma"
+            },
+            {
+                "customer_id": 34,
+                "customer_name": "Nikhil Sharma"
+            },
+            {
+                "customer_id": 94,
+                "customer_name": "Aditya Sharma"
+            }
+        ],
+        "hint": "Use LIKE on both name columns and combine the conditions with OR.",
+        "solution": "SELECT customer_id, first_name || ' ' || last_name AS customer_name FROM customers WHERE first_name LIKE '%Sharma%' OR last_name LIKE '%Sharma%';"
+    },
+    {
+        "id": 4,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Show the account ID, customer ID, account type, and balance for every account that is currently active.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "customer_id": 658,
+                "account_type": "Salary",
+                "balance": 104981.71
+            },
+            {
+                "account_id": 2,
+                "customer_id": 1231,
+                "account_type": "Current",
+                "balance": 12593.12
+            },
+            {
+                "account_id": 3,
+                "customer_id": 1176,
+                "account_type": "Savings",
+                "balance": 177878.16
+            },
+            {
+                "account_id": 4,
+                "customer_id": 508,
+                "account_type": "Salary",
+                "balance": 22993.5
+            },
+            {
+                "account_id": 5,
+                "customer_id": 293,
+                "account_type": "Savings",
+                "balance": 121989.55
+            }
+        ],
+        "hint": "Filter accounts using account_status.",
+        "solution": "SELECT account_id, customer_id, account_type, balance FROM accounts WHERE account_status = 'Active';"
+    },
+    {
+        "id": 5,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List accounts whose current balance is greater than 100000. Return the account ID, customer ID, and balance.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "customer_id": 658,
+                "balance": 104981.71
+            },
+            {
+                "account_id": 3,
+                "customer_id": 1176,
+                "balance": 177878.16
+            },
+            {
+                "account_id": 5,
+                "customer_id": 293,
+                "balance": 121989.55
+            },
+            {
+                "account_id": 6,
+                "customer_id": 852,
+                "balance": 146864.66
+            },
+            {
+                "account_id": 9,
+                "customer_id": 966,
+                "balance": 115963.46
+            }
+        ],
+        "hint": "Use a WHERE condition on balance.",
+        "solution": "SELECT account_id, customer_id, balance FROM accounts WHERE balance > 100000;"
+    },
+    {
+        "id": 6,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List accounts whose balance is between 50000 and 150000, including both boundary values.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "customer_id": 658,
+                "balance": 104981.71
+            },
+            {
+                "account_id": 5,
+                "customer_id": 293,
+                "balance": 121989.55
+            },
+            {
+                "account_id": 6,
+                "customer_id": 852,
+                "balance": 146864.66
+            },
+            {
+                "account_id": 7,
+                "customer_id": 558,
+                "balance": 70440.7
+            },
+            {
+                "account_id": 8,
+                "customer_id": 35,
+                "balance": 94549.99
+            }
+        ],
+        "hint": "BETWEEN is inclusive in SQLite.",
+        "solution": "SELECT account_id, customer_id, balance FROM accounts WHERE balance BETWEEN 50000 AND 150000;"
+    },
+    {
+        "id": 7,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Return the distinct account types available in the banking system.",
+        "expectedOutput": [
+            {
+                "account_type": "Salary"
+            },
+            {
+                "account_type": "Current"
+            },
+            {
+                "account_type": "Savings"
+            },
+            {
+                "account_type": "Student"
+            },
+            {
+                "account_type": "Business"
+            }
+        ],
+        "hint": "DISTINCT removes duplicate account types.",
+        "solution": "SELECT DISTINCT account_type FROM accounts;"
+    },
+    {
+        "id": 8,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List all credit card payment transactions. Return transaction ID, account ID, amount, and transaction date.",
+        "expectedOutput": [
+            {
+                "transaction_id": 4,
+                "account_id": 486,
+                "amount": 182219.06,
+                "transaction_date": "2026-06-19"
+            },
+            {
+                "transaction_id": 28,
+                "account_id": 1396,
+                "amount": 161326.48,
+                "transaction_date": "2023-02-05"
+            },
+            {
+                "transaction_id": 33,
+                "account_id": 1526,
+                "amount": 94603.28,
+                "transaction_date": "2024-11-13"
+            },
+            {
+                "transaction_id": 35,
+                "account_id": 214,
+                "amount": 83975.12,
+                "transaction_date": "2025-11-13"
+            },
+            {
+                "transaction_id": 37,
+                "account_id": 1365,
+                "amount": 157405.78,
+                "transaction_date": "2026-01-19"
+            }
+        ],
+        "hint": "Check the transaction_type values in the dataset.",
+        "solution": "SELECT transaction_id, account_id, amount, transaction_date FROM transactions WHERE transaction_type = 'CARD_PAYMENT';"
+    },
+    {
+        "id": 9,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find transactions whose amount is greater than 50000. Return the transaction ID, account ID, and amount.",
+        "expectedOutput": [
+            {
+                "transaction_id": 1,
+                "account_id": 1299,
+                "amount": 247249.77
+            },
+            {
+                "transaction_id": 2,
+                "account_id": 27,
+                "amount": 218987.39
+            },
+            {
+                "transaction_id": 3,
+                "account_id": 1435,
+                "amount": 191382.56
+            },
+            {
+                "transaction_id": 4,
+                "account_id": 486,
+                "amount": 182219.06
+            },
+            {
+                "transaction_id": 6,
+                "account_id": 81,
+                "amount": 214234.98
+            }
+        ],
+        "hint": "Filter transactions by amount > 50000.",
+        "solution": "SELECT transaction_id, account_id, amount FROM transactions WHERE amount > 50000;"
+    },
+    {
+        "id": 10,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Display the five accounts with the highest balances. Return account ID, customer ID, and balance, ordered from highest to lowest balance.",
+        "expectedOutput": [
+            {
+                "account_id": 1142,
+                "customer_id": 317,
+                "balance": 312398.63
+            },
+            {
+                "account_id": 1935,
+                "customer_id": 1344,
+                "balance": 298669.38
+            },
+            {
+                "account_id": 983,
+                "customer_id": 469,
+                "balance": 297327.85
+            },
+            {
+                "account_id": 1597,
+                "customer_id": 490,
+                "balance": 276923.82
+            },
+            {
+                "account_id": 1426,
+                "customer_id": 163,
+                "balance": 275301.88
+            }
+        ],
+        "hint": "Use ORDER BY balance DESC and LIMIT 5.",
+        "solution": "SELECT account_id, customer_id, balance FROM accounts ORDER BY balance DESC LIMIT 5;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 11,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "customers"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the total number of customers in the system.",
+        "expectedOutput": [
+            {
+                "total_customers": 1500
+            }
+        ],
+        "hint": "COUNT(*) returns the number of rows.",
+        "solution": "SELECT COUNT(*) AS total_customers FROM customers;"
+    },
+    {
+        "id": 12,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Calculate the average balance across all accounts.",
+        "expectedOutput": [
+            {
+                "average_balance": 79169.19411363637
+            }
+        ],
+        "hint": "Use AVG(balance).",
+        "solution": "SELECT AVG(balance) AS average_balance FROM accounts;"
+    },
+    {
+        "id": 13,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the highest principal amount among all loans.",
+        "expectedOutput": [
+            {
+                "highest_loan": 3498973.75
+            }
+        ],
+        "hint": "The loan amount is stored in principal_amount.",
+        "solution": "SELECT MAX(principal_amount) AS highest_loan FROM loans;"
+    },
+    {
+        "id": 14,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the lowest interest rate offered across all loans.",
+        "expectedOutput": [
+            {
+                "lowest_interest_rate": 7.25
+            }
+        ],
+        "hint": "Use MIN on interest_rate.",
+        "solution": "SELECT MIN(interest_rate) AS lowest_interest_rate FROM loans;"
+    },
+    {
+        "id": 15,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "customers"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count how many customers are registered in each city. Return the city and customer count.",
+        "expectedOutput": [
+            {
+                "city": "Ahmedabad",
+                "customer_count": 130
+            },
+            {
+                "city": "Bengaluru",
+                "customer_count": 108
+            },
+            {
+                "city": "Chennai",
+                "customer_count": 106
+            },
+            {
+                "city": "Delhi",
+                "customer_count": 116
+            },
+            {
+                "city": "Gurugram",
+                "customer_count": 124
+            }
+        ],
+        "hint": "Group customers by city and count each group.",
+        "solution": "SELECT city, COUNT(*) AS customer_count FROM customers GROUP BY city;"
+    },
+    {
+        "id": 16,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "customers"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Identify cities that have more than 100 registered customers. Return each city and its customer count.",
+        "expectedOutput": [
+            {
+                "city": "Ahmedabad",
+                "customer_count": 130
+            },
+            {
+                "city": "Bengaluru",
+                "customer_count": 108
+            },
+            {
+                "city": "Chennai",
+                "customer_count": 106
+            },
+            {
+                "city": "Delhi",
+                "customer_count": 116
+            },
+            {
+                "city": "Gurugram",
+                "customer_count": 124
+            }
+        ],
+        "hint": "Use HAVING after GROUP BY.",
+        "solution": "SELECT city, COUNT(*) AS customer_count FROM customers GROUP BY city HAVING COUNT(*) > 100;"
+    },
+    {
+        "id": 17,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List savings accounts with their balances, ordered from highest balance to lowest.",
+        "expectedOutput": [
+            {
+                "account_id": 983,
+                "customer_id": 469,
+                "balance": 297327.85
+            },
+            {
+                "account_id": 1882,
+                "customer_id": 307,
+                "balance": 274372.17
+            },
+            {
+                "account_id": 1462,
+                "customer_id": 167,
+                "balance": 264561.83
+            },
+            {
+                "account_id": 394,
+                "customer_id": 369,
+                "balance": 254921.9
+            },
+            {
+                "account_id": 2010,
+                "customer_id": 874,
+                "balance": 226182.45
+            }
+        ],
+        "hint": "Filter account_type and then sort by balance descending.",
+        "solution": "SELECT account_id, customer_id, balance FROM accounts WHERE account_type = 'Savings' ORDER BY balance DESC;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 18,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Show all transactions recorded during calendar year 2025. Return transaction ID, account ID, amount, and transaction date.",
+        "expectedOutput": [
+            {
+                "transaction_id": 1,
+                "account_id": 1299,
+                "amount": 247249.77,
+                "transaction_date": "2025-07-04"
+            },
+            {
+                "transaction_id": 5,
+                "account_id": 181,
+                "amount": 22070.54,
+                "transaction_date": "2025-01-28"
+            },
+            {
+                "transaction_id": 8,
+                "account_id": 9,
+                "amount": 8710.97,
+                "transaction_date": "2025-12-26"
+            },
+            {
+                "transaction_id": 11,
+                "account_id": 1285,
+                "amount": 48087.4,
+                "transaction_date": "2025-03-13"
+            },
+            {
+                "transaction_id": 15,
+                "account_id": 1867,
+                "amount": 208724.13,
+                "transaction_date": "2025-01-15"
+            }
+        ],
+        "hint": "Use an inclusive start and exclusive end date for 2025.",
+        "solution": "SELECT transaction_id, account_id, amount, transaction_date FROM transactions WHERE transaction_date >= '2025-01-01' AND transaction_date < '2026-01-01';"
+    },
+    {
+        "id": 19,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "customers"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find customers whose email address uses the example.com domain. Return customer ID and email.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "email": "arjun.mehta1@example.com"
+            },
+            {
+                "customer_id": 2,
+                "email": "isha.mehta2@example.com"
+            },
+            {
+                "customer_id": 3,
+                "email": "kavya.shah3@example.com"
+            },
+            {
+                "customer_id": 4,
+                "email": "aditya.sharma4@example.com"
+            },
+            {
+                "customer_id": 5,
+                "email": "aarav.kulkarni5@example.com"
+            }
+        ],
+        "hint": "Use LIKE with the email suffix @example.com.",
+        "solution": "SELECT customer_id,email FROM customers WHERE email LIKE '%@example.com';"
+    },
+    {
+        "id": 20,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count accounts for each account status. Return the status and number of accounts.",
+        "expectedOutput": [
+            {
+                "account_status": "Active",
+                "account_count": 2007
+            },
+            {
+                "account_status": "Closed",
+                "account_count": 98
+            },
+            {
+                "account_status": "Frozen",
+                "account_count": 95
+            }
+        ],
+        "hint": "Group by account_status.",
+        "solution": "SELECT account_status, COUNT(*) AS account_count FROM accounts GROUP BY account_status;"
+    },
+    {
+        "id": 21,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Calculate the total amount across every transaction in the transactions table.",
+        "expectedOutput": [
+            {
+                "total_transaction_amount": 1006377568.94
+            }
+        ],
+        "hint": "Use SUM(amount).",
+        "solution": "SELECT SUM(amount) AS total_transaction_amount FROM transactions;"
+    },
+    {
+        "id": 22,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Calculate the total value of all withdrawal transactions.",
+        "expectedOutput": [
+            {
+                "total_withdrawal_amount": 173204384.25
+            }
+        ],
+        "hint": "Filter transaction_type before applying SUM.",
+        "solution": "SELECT SUM(amount) AS total_withdrawal_amount FROM transactions WHERE transaction_type = 'WITHDRAWAL';"
+    },
+    {
+        "id": 23,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List loans whose status is either Active or Defaulted. Return loan ID, customer ID, principal amount, and loan status.",
+        "expectedOutput": [
+            {
+                "loan_id": 1,
+                "customer_id": 1449,
+                "principal_amount": 346922.09,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 2,
+                "customer_id": 286,
+                "principal_amount": 1298412.48,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 3,
+                "customer_id": 559,
+                "principal_amount": 134515.93,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 4,
+                "customer_id": 638,
+                "principal_amount": 1054067.76,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 6,
+                "customer_id": 1263,
+                "principal_amount": 312087.09,
+                "loan_status": "Active"
+            }
+        ],
+        "hint": "Use IN with the loan_status column.",
+        "solution": "SELECT loan_id, customer_id, principal_amount, loan_status FROM loans WHERE loan_status IN ('Active','Defaulted');"
+    },
+    {
+        "id": 24,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the ten loans with the largest principal amounts. Return loan ID, customer ID, and principal amount in descending order.",
+        "expectedOutput": [
+            {
+                "loan_id": 250,
+                "customer_id": 192,
+                "principal_amount": 3498973.75
+            },
+            {
+                "loan_id": 706,
+                "customer_id": 315,
+                "principal_amount": 3480646.65
+            },
+            {
+                "loan_id": 46,
+                "customer_id": 463,
+                "principal_amount": 3479216.59
+            },
+            {
+                "loan_id": 610,
+                "customer_id": 1149,
+                "principal_amount": 3465330.16
+            },
+            {
+                "loan_id": 352,
+                "customer_id": 1259,
+                "principal_amount": 3450405.21
+            }
+        ],
+        "hint": "Sort principal_amount descending and limit the result to ten rows.",
+        "solution": "SELECT loan_id, customer_id, principal_amount FROM loans ORDER BY principal_amount DESC LIMIT 10;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 25,
+        "difficulty": "Beginner",
+        "database": "Banking",
+        "tables": [
+            "payments"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count how many payments were made using each payment method. Return the payment method and payment count.",
+        "expectedOutput": [
+            {
+                "payment_method": "Auto Debit",
+                "payment_count": 439
+            },
+            {
+                "payment_method": "Cash",
+                "payment_count": 433
+            },
+            {
+                "payment_method": "Cheque",
+                "payment_count": 434
+            },
+            {
+                "payment_method": "NEFT",
+                "payment_count": 456
+            },
+            {
+                "payment_method": "UPI",
+                "payment_count": 438
+            }
+        ],
+        "hint": "Group payments by payment_method.",
+        "solution": "SELECT payment_method, COUNT(*) AS payment_count FROM payments GROUP BY payment_method;"
+    },
+    {
+        "id": 26,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List each patient's full name together with city, gender, and blood group.",
+        "expectedOutput": [
+            {
+                "patient_name": "Aditi Sharma",
+                "city": "Noida",
+                "gender": "Female",
+                "blood_group": "A-"
+            },
+            {
+                "patient_name": "Amit Kumar",
+                "city": "Kolkata",
+                "gender": "Other",
+                "blood_group": "AB-"
+            },
+            {
+                "patient_name": "Aarav Reddy",
+                "city": "Chennai",
+                "gender": "Male",
+                "blood_group": "O-"
+            },
+            {
+                "patient_name": "Amit Reddy",
+                "city": "Bengaluru",
+                "gender": "Male",
+                "blood_group": "A-"
+            },
+            {
+                "patient_name": "Vivaan Shah",
+                "city": "Hyderabad",
+                "gender": "Female",
+                "blood_group": "A+"
+            }
+        ],
+        "hint": "Combine first_name and last_name and select the requested columns.",
+        "solution": "SELECT first_name || ' ' || last_name AS patient_name,city,gender,blood_group FROM patients;"
+    },
+    {
+        "id": 27,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Display patient ID, full name, and city for all female patients.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "city": "Noida"
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "city": "Hyderabad"
+            },
+            {
+                "patient_id": 11,
+                "patient_name": "Aditi Joshi",
+                "city": "Ahmedabad"
+            },
+            {
+                "patient_id": 12,
+                "patient_name": "Vivaan Kumar",
+                "city": "Indore"
+            },
+            {
+                "patient_id": 19,
+                "patient_name": "Rahul Patil",
+                "city": "Delhi"
+            }
+        ],
+        "hint": "Filter patients with gender = Female.",
+        "solution": "SELECT patient_id,first_name || ' ' || last_name AS patient_name,city FROM patients WHERE gender='Female';"
+    },
+    {
+        "id": 28,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find patients whose date of birth is before 1 January 1960. Return patient ID, full name, and date of birth.",
+        "expectedOutput": [
+            {
+                "patient_id": 21,
+                "patient_name": "Priya Singh",
+                "date_of_birth": "1943-04-27"
+            },
+            {
+                "patient_id": 24,
+                "patient_name": "Sanjay Kumar",
+                "date_of_birth": "1951-04-14"
+            },
+            {
+                "patient_id": 25,
+                "patient_name": "Riya Joshi",
+                "date_of_birth": "1947-11-01"
+            },
+            {
+                "patient_id": 27,
+                "patient_name": "Priya Singh",
+                "date_of_birth": "1951-01-31"
+            },
+            {
+                "patient_id": 30,
+                "patient_name": "Nikhil Reddy",
+                "date_of_birth": "1958-01-02"
+            }
+        ],
+        "hint": "Compare date_of_birth with the given date.",
+        "solution": "SELECT patient_id,first_name || ' ' || last_name AS patient_name,date_of_birth FROM patients WHERE date_of_birth<'1960-01-01';"
+    },
+    {
+        "id": 29,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Show appointments that are currently marked as Completed. Return appointment ID, patient ID, doctor ID, and appointment date.",
+        "expectedOutput": [
+            {
+                "appointment_id": 1,
+                "patient_id": 486,
+                "doctor_id": 80,
+                "appointment_date": "2026-01-23"
+            },
+            {
+                "appointment_id": 2,
+                "patient_id": 1113,
+                "doctor_id": 103,
+                "appointment_date": "2022-11-22"
+            },
+            {
+                "appointment_id": 3,
+                "patient_id": 1217,
+                "doctor_id": 88,
+                "appointment_date": "2022-10-27"
+            },
+            {
+                "appointment_id": 5,
+                "patient_id": 1362,
+                "doctor_id": 126,
+                "appointment_date": "2022-06-06"
+            },
+            {
+                "appointment_id": 7,
+                "patient_id": 901,
+                "doctor_id": 42,
+                "appointment_date": "2022-07-16"
+            }
+        ],
+        "hint": "The current schema stores appointment status in appointment_status.",
+        "solution": "SELECT appointment_id,patient_id,doctor_id,appointment_date FROM appointments WHERE appointment_status='Completed';"
+    },
+    {
+        "id": 30,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List the five most expensive billing records. Return billing ID, patient ID, amount, and payment status, ordered from highest amount to lowest.",
+        "expectedOutput": [
+            {
+                "billing_id": 2742,
+                "patient_id": 628,
+                "amount": 249737.22,
+                "payment_status": "Paid"
+            },
+            {
+                "billing_id": 824,
+                "patient_id": 1192,
+                "amount": 249592.13,
+                "payment_status": "Paid"
+            },
+            {
+                "billing_id": 1729,
+                "patient_id": 738,
+                "amount": 249535.27,
+                "payment_status": "Paid"
+            },
+            {
+                "billing_id": 2023,
+                "patient_id": 538,
+                "amount": 249422.31,
+                "payment_status": "Paid"
+            },
+            {
+                "billing_id": 2911,
+                "patient_id": 571,
+                "amount": 249349.47,
+                "payment_status": "Paid"
+            }
+        ],
+        "hint": "Sort billing amount descending and limit to five rows.",
+        "solution": "SELECT billing_id,patient_id,amount,payment_status FROM billing ORDER BY amount DESC LIMIT 5;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 31,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Calculate the average billing amount across all billing records.",
+        "expectedOutput": [
+            {
+                "average_bill_amount": 125157.16100625001
+            }
+        ],
+        "hint": "Use AVG(amount).",
+        "solution": "SELECT AVG(amount) AS average_bill_amount FROM billing;"
+    },
+    {
+        "id": 32,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count appointments by appointment status and return one row per status.",
+        "expectedOutput": [
+            {
+                "appointment_status": "Cancelled",
+                "appointment_count": 266
+            },
+            {
+                "appointment_status": "Completed",
+                "appointment_count": 3711
+            },
+            {
+                "appointment_status": "No Show",
+                "appointment_count": 258
+            },
+            {
+                "appointment_status": "Scheduled",
+                "appointment_count": 265
+            }
+        ],
+        "hint": "Group appointments by appointment_status.",
+        "solution": "SELECT appointment_status,COUNT(*) AS appointment_count FROM appointments GROUP BY appointment_status;"
+    },
+    {
+        "id": 33,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "lab_reports"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List laboratory reports recorded during calendar year 2025. Return report ID, patient ID, test name, and test date.",
+        "expectedOutput": [
+            {
+                "lab_report_id": 5,
+                "patient_id": 1142,
+                "test_name": "Total Cholesterol",
+                "test_date": "2025-06-21"
+            },
+            {
+                "lab_report_id": 8,
+                "patient_id": 702,
+                "test_name": "Creatinine",
+                "test_date": "2025-05-16"
+            },
+            {
+                "lab_report_id": 12,
+                "patient_id": 861,
+                "test_name": "TSH",
+                "test_date": "2025-08-30"
+            },
+            {
+                "lab_report_id": 22,
+                "patient_id": 473,
+                "test_name": "Hemoglobin",
+                "test_date": "2025-08-26"
+            },
+            {
+                "lab_report_id": 28,
+                "patient_id": 483,
+                "test_name": "Glucose",
+                "test_date": "2025-01-19"
+            }
+        ],
+        "hint": "Filter test_date to the 2025 calendar year.",
+        "solution": "SELECT lab_report_id,patient_id,test_name,test_date FROM lab_reports WHERE test_date>='2025-01-01' AND test_date<'2026-01-01';"
+    },
+    {
+        "id": 34,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find patients with blood group A+ or O+. Return patient ID, full name, and blood group.",
+        "expectedOutput": [
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "blood_group": "A+"
+            },
+            {
+                "patient_id": 10,
+                "patient_name": "Nikhil Kumar",
+                "blood_group": "A+"
+            },
+            {
+                "patient_id": 14,
+                "patient_name": "Aditya Gupta",
+                "blood_group": "A+"
+            },
+            {
+                "patient_id": 17,
+                "patient_name": "Aditi Joshi",
+                "blood_group": "A+"
+            },
+            {
+                "patient_id": 19,
+                "patient_name": "Rahul Patil",
+                "blood_group": "O+"
+            }
+        ],
+        "hint": "Use IN with the blood_group column.",
+        "solution": "SELECT patient_id,first_name || ' ' || last_name AS patient_name,blood_group FROM patients WHERE blood_group IN ('A+','O+');"
+    },
+    {
+        "id": 35,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count patients by gender.",
+        "expectedOutput": [
+            {
+                "gender": "Female",
+                "patient_count": 531
+            },
+            {
+                "gender": "Male",
+                "patient_count": 592
+            },
+            {
+                "gender": "Other",
+                "patient_count": 477
+            }
+        ],
+        "hint": "Group by gender and count rows.",
+        "solution": "SELECT gender,COUNT(*) AS patient_count FROM patients GROUP BY gender;"
+    },
+    {
+        "id": 36,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the total amount billed across the entire healthcare system.",
+        "expectedOutput": [
+            {
+                "total_billed": 400502915.22
+            }
+        ],
+        "hint": "Use SUM(amount).",
+        "solution": "SELECT SUM(amount) AS total_billed FROM billing;"
+    },
+    {
+        "id": 37,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "insurance"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the highest insurance coverage amount in the insurance table.",
+        "expectedOutput": [
+            {
+                "highest_coverage": 4999468.63
+            }
+        ],
+        "hint": "Use MAX on coverage_amount.",
+        "solution": "SELECT MAX(coverage_amount) AS highest_coverage FROM insurance;"
+    },
+    {
+        "id": 38,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Return the distinct appointment types available in the system.",
+        "expectedOutput": [
+            {
+                "appointment_type": "Emergency"
+            },
+            {
+                "appointment_type": "Consultation"
+            },
+            {
+                "appointment_type": "Surgery Review"
+            },
+            {
+                "appointment_type": "Follow-up"
+            },
+            {
+                "appointment_type": "Diagnostic"
+            }
+        ],
+        "hint": "Use DISTINCT to remove duplicate appointment types.",
+        "solution": "SELECT DISTINCT appointment_type FROM appointments;"
+    },
+    {
+        "id": 39,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "doctors"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find doctors with more than 15 years of experience. Return doctor ID, doctor name, and experience years.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "experience_years": 20
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "experience_years": 27
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "experience_years": 17
+            },
+            {
+                "doctor_id": 6,
+                "doctor_name": "Dr. Kavya Singh",
+                "experience_years": 23
+            },
+            {
+                "doctor_id": 7,
+                "doctor_name": "Dr. Aditya Verma",
+                "experience_years": 30
+            }
+        ],
+        "hint": "Filter doctors by experience_years.",
+        "solution": "SELECT doctor_id,doctor_name,experience_years FROM doctors WHERE experience_years>15;"
+    },
+    {
+        "id": 40,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "doctors"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count doctors by specialization.",
+        "expectedOutput": [
+            {
+                "specialization": "Cardiology",
+                "doctor_count": 29
+            },
+            {
+                "specialization": "Dermatology",
+                "doctor_count": 1
+            },
+            {
+                "specialization": "ENT",
+                "doctor_count": 12
+            },
+            {
+                "specialization": "Emergency",
+                "doctor_count": 3
+            },
+            {
+                "specialization": "Gastroenterology",
+                "doctor_count": 19
+            }
+        ],
+        "hint": "Group doctors by specialization.",
+        "solution": "SELECT specialization,COUNT(*) AS doctor_count FROM doctors GROUP BY specialization;"
+    },
+    {
+        "id": 41,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "doctors"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List active doctors with their name, specialization, and experience.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "specialization": "Neurology",
+                "experience_years": 20
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "specialization": "Oncology",
+                "experience_years": 11
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "specialization": "Radiology",
+                "experience_years": 9
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "specialization": "Cardiology",
+                "experience_years": 17
+            },
+            {
+                "doctor_id": 6,
+                "doctor_name": "Dr. Kavya Singh",
+                "specialization": "ENT",
+                "experience_years": 23
+            }
+        ],
+        "hint": "Filter doctor_status = Active.",
+        "solution": "SELECT doctor_id,doctor_name,specialization,experience_years FROM doctors WHERE doctor_status='Active';"
+    },
+    {
+        "id": 42,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find billing records whose payment status is Pending. Return billing ID, patient ID, amount, and billing date.",
+        "expectedOutput": [
+            {
+                "billing_id": 35,
+                "patient_id": 1213,
+                "amount": 207788.19,
+                "billing_date": "2022-06-11"
+            },
+            {
+                "billing_id": 42,
+                "patient_id": 34,
+                "amount": 43566.82,
+                "billing_date": "2023-10-23"
+            },
+            {
+                "billing_id": 61,
+                "patient_id": 856,
+                "amount": 194831.74,
+                "billing_date": "2026-03-15"
+            },
+            {
+                "billing_id": 64,
+                "patient_id": 658,
+                "amount": 107031.95,
+                "billing_date": "2023-04-17"
+            },
+            {
+                "billing_id": 68,
+                "patient_id": 760,
+                "amount": 29212.6,
+                "billing_date": "2024-08-13"
+            }
+        ],
+        "hint": "Filter billing by payment_status.",
+        "solution": "SELECT billing_id,patient_id,amount,billing_date FROM billing WHERE payment_status='Pending';"
+    },
+    {
+        "id": 43,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "doctors"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Calculate the average doctor experience for each doctor status.",
+        "expectedOutput": [
+            {
+                "doctor_status": "Active",
+                "average_experience": 16.451219512195124
+            },
+            {
+                "doctor_status": "Inactive",
+                "average_experience": 19.333333333333332
+            },
+            {
+                "doctor_status": "On Leave",
+                "average_experience": 14.307692307692308
+            }
+        ],
+        "hint": "Group doctors by doctor_status and use AVG.",
+        "solution": "SELECT doctor_status,AVG(experience_years) AS average_experience FROM doctors GROUP BY doctor_status;"
+    },
+    {
+        "id": 44,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "prescriptions"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List prescriptions that are currently active. Return prescription ID, patient ID, medication name, and start date.",
+        "expectedOutput": [
+            {
+                "prescription_id": 2,
+                "patient_id": 946,
+                "medication_name": "Omeprazole",
+                "start_date": "2024-07-25"
+            },
+            {
+                "prescription_id": 9,
+                "patient_id": 1570,
+                "medication_name": "Insulin",
+                "start_date": "2026-05-19"
+            },
+            {
+                "prescription_id": 12,
+                "patient_id": 915,
+                "medication_name": "Paracetamol",
+                "start_date": "2024-04-25"
+            },
+            {
+                "prescription_id": 13,
+                "patient_id": 1599,
+                "medication_name": "Losartan",
+                "start_date": "2026-03-02"
+            },
+            {
+                "prescription_id": 14,
+                "patient_id": 803,
+                "medication_name": "Amoxicillin",
+                "start_date": "2022-09-22"
+            }
+        ],
+        "hint": "Filter prescriptions by prescription_status.",
+        "solution": "SELECT prescription_id,patient_id,medication_name,start_date FROM prescriptions WHERE prescription_status='Active';"
+    },
+    {
+        "id": 45,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "prescriptions"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count prescriptions by medication name and return medications prescribed more than 100 times.",
+        "expectedOutput": [
+            {
+                "medication_name": "Amlodipine",
+                "prescription_count": 237
+            },
+            {
+                "medication_name": "Amoxicillin",
+                "prescription_count": 249
+            },
+            {
+                "medication_name": "Atorvastatin",
+                "prescription_count": 220
+            },
+            {
+                "medication_name": "Azithromycin",
+                "prescription_count": 244
+            },
+            {
+                "medication_name": "Cetirizine",
+                "prescription_count": 216
+            }
+        ],
+        "hint": "Use GROUP BY and HAVING COUNT(*).",
+        "solution": "SELECT medication_name,COUNT(*) AS prescription_count FROM prescriptions GROUP BY medication_name HAVING COUNT(*)>100;"
+    },
+    {
+        "id": 46,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the ten patients with the earliest registration dates. Return patient ID, full name, and registration date.",
+        "expectedOutput": [
+            {
+                "patient_id": 1110,
+                "patient_name": "Rohan Reddy",
+                "registration_date": "2018-01-02"
+            },
+            {
+                "patient_id": 69,
+                "patient_name": "Neha Kulkarni",
+                "registration_date": "2018-01-04"
+            },
+            {
+                "patient_id": 396,
+                "patient_name": "Aditi Kulkarni",
+                "registration_date": "2018-01-05"
+            },
+            {
+                "patient_id": 121,
+                "patient_name": "Nikhil Kumar",
+                "registration_date": "2018-01-07"
+            },
+            {
+                "patient_id": 985,
+                "patient_name": "Sanjay Jain",
+                "registration_date": "2018-01-07"
+            }
+        ],
+        "hint": "Sort registration_date ascending and limit to ten rows.",
+        "solution": "SELECT patient_id,first_name || ' ' || last_name AS patient_name,registration_date FROM patients ORDER BY registration_date ASC LIMIT 10;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 47,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Find the total number of appointments recorded in the system.",
+        "expectedOutput": [
+            {
+                "total_appointments": 4500
+            }
+        ],
+        "hint": "Use COUNT(*).",
+        "solution": "SELECT COUNT(*) AS total_appointments FROM appointments;"
+    },
+    {
+        "id": 48,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Calculate the average billing amount for each payment status.",
+        "expectedOutput": [
+            {
+                "payment_status": "Insurance Processing",
+                "average_amount": 125606.2247111111
+            },
+            {
+                "payment_status": "Paid",
+                "average_amount": 125332.73666666666
+            },
+            {
+                "payment_status": "Partially Paid",
+                "average_amount": 120865.49676991151
+            },
+            {
+                "payment_status": "Pending",
+                "average_amount": 127216.73321951219
+            }
+        ],
+        "hint": "Group billing by payment_status.",
+        "solution": "SELECT payment_status,AVG(amount) AS average_amount FROM billing GROUP BY payment_status;"
+    },
+    {
+        "id": 49,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "List hospitals located in Delhi. Return hospital ID, hospital name, hospital type, and state.",
+        "expectedOutput": [
+            {
+                "hospital_id": 11,
+                "hospital_name": "Manipal Delhi Hospital",
+                "hospital_type": "Multispecialty",
+                "state": "Delhi"
+            }
+        ],
+        "hint": "Filter hospitals by city.",
+        "solution": "SELECT hospital_id,hospital_name,hospital_type,state FROM hospitals WHERE city='Delhi';"
+    },
+    {
+        "id": 50,
+        "difficulty": "Beginner",
+        "database": "Healthcare",
+        "tables": [
+            "departments"
+        ],
+        "points": 10,
+        "status": "incomplete",
+        "question": "Count the number of departments in each hospital. Return hospital ID and department count.",
+        "expectedOutput": [
+            {
+                "hospital_id": 2,
+                "department_count": 2
+            },
+            {
+                "hospital_id": 3,
+                "department_count": 2
+            },
+            {
+                "hospital_id": 4,
+                "department_count": 3
+            },
+            {
+                "hospital_id": 5,
+                "department_count": 6
+            },
+            {
+                "hospital_id": 6,
+                "department_count": 1
+            }
+        ],
+        "hint": "Group departments by hospital_id.",
+        "solution": "SELECT hospital_id,COUNT(*) AS department_count FROM departments GROUP BY hospital_id;"
+    }
+]

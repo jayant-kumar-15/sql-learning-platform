@@ -1,0 +1,2371 @@
+[
+    {
+        "id": 201,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A banking risk team wants to rank customers within each city by their total account balance. Build the customer-level balance totals first, then assign a rank inside each city from the highest balance to the lowest. Return customer ID, full name, city, total balance, and city rank.",
+        "expectedOutput": [
+            {
+                "customer_id": 264,
+                "customer_name": "Isha Patil",
+                "city": "Ahmedabad",
+                "total_balance": 526265.72,
+                "city_rank": 1
+            },
+            {
+                "customer_id": 587,
+                "customer_name": "Vivaan Kumar",
+                "city": "Ahmedabad",
+                "total_balance": 503460.66000000003,
+                "city_rank": 2
+            },
+            {
+                "customer_id": 835,
+                "customer_name": "Kavya Shah",
+                "city": "Ahmedabad",
+                "total_balance": 447591.17000000004,
+                "city_rank": 3
+            },
+            {
+                "customer_id": 1456,
+                "customer_name": "Sanjay Verma",
+                "city": "Ahmedabad",
+                "total_balance": 444479.15,
+                "city_rank": 4
+            },
+            {
+                "customer_id": 317,
+                "customer_name": "Ananya Reddy",
+                "city": "Ahmedabad",
+                "total_balance": 388705.44,
+                "city_rank": 5
+            }
+        ],
+        "hint": "Use a CTE for customer totals, then RANK partitioned by city.",
+        "solution": "WITH totals AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,c.city,SUM(a.balance) AS total_balance FROM customers c JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name,c.city) SELECT *,RANK() OVER(PARTITION BY city ORDER BY total_balance DESC) AS city_rank FROM totals;"
+    },
+    {
+        "id": 202,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A portfolio analyst needs the second-highest distinct loan principal within every loan status. Rank loans separately inside each status, preserving ties at the same rank. Return loan ID, status, principal amount, and rank, keeping only rank 2.",
+        "expectedOutput": [
+            {
+                "loan_id": 46,
+                "loan_status": "Active",
+                "principal_amount": 3479216.59,
+                "principal_rank": 2
+            },
+            {
+                "loan_id": 274,
+                "loan_status": "Closed",
+                "principal_amount": 3412719.63,
+                "principal_rank": 2
+            },
+            {
+                "loan_id": 165,
+                "loan_status": "Defaulted",
+                "principal_amount": 3448910.63,
+                "principal_rank": 2
+            }
+        ],
+        "hint": "Use DENSE_RANK partitioned by loan_status.",
+        "solution": "WITH ranked AS (SELECT loan_id,loan_status,principal_amount,DENSE_RANK() OVER(PARTITION BY loan_status ORDER BY principal_amount DESC) AS principal_rank FROM loans) SELECT loan_id,loan_status,principal_amount,principal_rank FROM ranked WHERE principal_rank=2;"
+    },
+    {
+        "id": 203,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A risk model needs one row per customer containing total active-loan principal and total account balance. Use those two measures to classify customers as Very High, High, Medium, or Low risk using the thresholds in the query, and return the underlying measures with the final classification.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "customer_name": "Arjun Mehta",
+                "active_loan_principal": 0,
+                "total_balance": 107171.2,
+                "risk_level": "Low"
+            },
+            {
+                "customer_id": 2,
+                "customer_name": "Isha Mehta",
+                "active_loan_principal": 0,
+                "total_balance": 0,
+                "risk_level": "Low"
+            },
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "active_loan_principal": 0,
+                "total_balance": 137157.0,
+                "risk_level": "Low"
+            },
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma",
+                "active_loan_principal": 0,
+                "total_balance": 89251.81,
+                "risk_level": "Low"
+            },
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "active_loan_principal": 5488467.140000001,
+                "total_balance": 132789.96,
+                "risk_level": "High"
+            }
+        ],
+        "hint": "Build customer-level measures with correlated subqueries, then classify with CASE.",
+        "solution": "WITH x AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COALESCE((SELECT SUM(l.principal_amount) FROM loans l WHERE l.customer_id=c.customer_id AND l.loan_status='Active'),0) AS active_loan_principal,COALESCE((SELECT SUM(a.balance) FROM accounts a WHERE a.customer_id=c.customer_id),0) AS total_balance FROM customers c) SELECT *,CASE WHEN active_loan_principal>1500000 AND total_balance<100000 THEN 'Very High' WHEN active_loan_principal>1000000 THEN 'High' WHEN active_loan_principal>500000 THEN 'Medium' ELSE 'Low' END AS risk_level FROM x;"
+    },
+    {
+        "id": 204,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A treasury analyst wants to compare each account with its peers. For every account, calculate its balance, the overall average balance, and the difference from that average. Return account ID, balance, average balance, and difference.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "balance": 104981.71,
+                "average_balance": 79169.19411363637,
+                "difference_from_average": 25812.51588636363
+            },
+            {
+                "account_id": 2,
+                "balance": 12593.12,
+                "average_balance": 79169.19411363637,
+                "difference_from_average": -66576.07411363638
+            },
+            {
+                "account_id": 3,
+                "balance": 177878.16,
+                "average_balance": 79169.19411363637,
+                "difference_from_average": 98708.96588636363
+            },
+            {
+                "account_id": 4,
+                "balance": 22993.5,
+                "average_balance": 79169.19411363637,
+                "difference_from_average": -56175.694113636375
+            },
+            {
+                "account_id": 5,
+                "balance": 121989.55,
+                "average_balance": 79169.19411363637,
+                "difference_from_average": 42820.35588636363
+            }
+        ],
+        "hint": "AVG(balance) OVER() gives the overall average on every row.",
+        "solution": "SELECT account_id,balance,AVG(balance) OVER() AS average_balance,balance-AVG(balance) OVER() AS difference_from_average FROM accounts;"
+    },
+    {
+        "id": 205,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A customer analytics team wants a running transaction total for every account. Within each account, order transactions chronologically and calculate the cumulative amount after each transaction. Return account ID, transaction ID, transaction date, amount, and running total.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "transaction_id": 6755,
+                "transaction_date": "2022-05-18",
+                "amount": 68257.38,
+                "running_total": 68257.38
+            },
+            {
+                "account_id": 1,
+                "transaction_id": 5512,
+                "transaction_date": "2022-06-20",
+                "amount": 40389.15,
+                "running_total": 108646.53
+            },
+            {
+                "account_id": 1,
+                "transaction_id": 2434,
+                "transaction_date": "2023-09-08",
+                "amount": 173024.29,
+                "running_total": 281670.82
+            },
+            {
+                "account_id": 1,
+                "transaction_id": 5108,
+                "transaction_date": "2025-06-24",
+                "amount": 235220.43,
+                "running_total": 516891.25
+            },
+            {
+                "account_id": 1,
+                "transaction_id": 2316,
+                "transaction_date": "2025-11-07",
+                "amount": 111911.1,
+                "running_total": 628802.35
+            }
+        ],
+        "hint": "Use SUM as a window function partitioned by account and ordered by date and ID.",
+        "solution": "SELECT account_id,transaction_id,transaction_date,amount,SUM(amount) OVER(PARTITION BY account_id ORDER BY transaction_date,transaction_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total FROM transactions;"
+    },
+    {
+        "id": 206,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A bank wants to identify customers whose latest transaction amount is larger than their immediately previous transaction amount. For each account, compare consecutive transactions in chronological order, then return the account, transaction, previous amount, and current amount only when the amount increased.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "transaction_id": 2434,
+                "transaction_date": "2023-09-08",
+                "previous_amount": 40389.15,
+                "amount": 173024.29
+            },
+            {
+                "account_id": 1,
+                "transaction_id": 5108,
+                "transaction_date": "2025-06-24",
+                "previous_amount": 173024.29,
+                "amount": 235220.43
+            },
+            {
+                "account_id": 2,
+                "transaction_id": 4194,
+                "transaction_date": "2023-06-24",
+                "previous_amount": 95132.86,
+                "amount": 173189.52
+            },
+            {
+                "account_id": 2,
+                "transaction_id": 5466,
+                "transaction_date": "2024-05-28",
+                "previous_amount": 173189.52,
+                "amount": 203520.56
+            },
+            {
+                "account_id": 3,
+                "transaction_id": 7145,
+                "transaction_date": "2022-12-31",
+                "previous_amount": 175357.52,
+                "amount": 186291.81
+            }
+        ],
+        "hint": "Use LAG to access the previous transaction amount within each account.",
+        "solution": "WITH x AS (SELECT account_id,transaction_id,transaction_date,amount,LAG(amount) OVER(PARTITION BY account_id ORDER BY transaction_date,transaction_id) AS previous_amount FROM transactions) SELECT account_id,transaction_id,transaction_date,previous_amount,amount FROM x WHERE previous_amount IS NOT NULL AND amount>previous_amount;"
+    },
+    {
+        "id": 207,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A finance team wants to find branches whose average account balance is above the average of all branch-level averages. First calculate the average balance for every branch, then compare each branch average with the average of those branch averages. Return branch name and average balance.",
+        "expectedOutput": [
+            {
+                "branch_id": 4,
+                "branch_name": "Kochi Central Branch",
+                "average_balance": 87293.74294117646
+            },
+            {
+                "branch_id": 7,
+                "branch_name": "Indore City Branch",
+                "average_balance": 82824.93222222223
+            },
+            {
+                "branch_id": 9,
+                "branch_name": "Pune Market Branch",
+                "average_balance": 88223.16339285715
+            },
+            {
+                "branch_id": 10,
+                "branch_name": "Kochi Market Branch",
+                "average_balance": 86498.4475
+            },
+            {
+                "branch_id": 12,
+                "branch_name": "Ahmedabad Market Branch",
+                "average_balance": 85382.41303030303
+            }
+        ],
+        "hint": "Use a CTE for branch averages and compare against AVG of the CTE.",
+        "solution": "WITH branch_avg AS (SELECT b.branch_id,b.branch_name,AVG(a.balance) AS average_balance FROM branches b JOIN accounts a ON b.branch_id=a.branch_id GROUP BY b.branch_id,b.branch_name) SELECT branch_id,branch_name,average_balance FROM branch_avg WHERE average_balance>(SELECT AVG(average_balance) FROM branch_avg);"
+    },
+    {
+        "id": 208,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A lending dashboard needs a customer-level loan concentration report. For each customer with loans, calculate total principal, number of loans, average interest rate, and the customer's percentage of the total loan principal across the bank. Return all four measures.",
+        "expectedOutput": [
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "loan_count": 3,
+                "total_principal": 7493091.41,
+                "average_interest_rate": 12.796666666666667,
+                "pct_of_total_principal": 0.52
+            },
+            {
+                "customer_id": 9,
+                "customer_name": "Meera Joshi",
+                "loan_count": 1,
+                "total_principal": 807077.31,
+                "average_interest_rate": 11.27,
+                "pct_of_total_principal": 0.06
+            },
+            {
+                "customer_id": 10,
+                "customer_name": "Sneha Kumar",
+                "loan_count": 1,
+                "total_principal": 3014038.49,
+                "average_interest_rate": 10.49,
+                "pct_of_total_principal": 0.21
+            },
+            {
+                "customer_id": 11,
+                "customer_name": "Pooja Patil",
+                "loan_count": 1,
+                "total_principal": 2398027.71,
+                "average_interest_rate": 9.12,
+                "pct_of_total_principal": 0.17
+            },
+            {
+                "customer_id": 13,
+                "customer_name": "Priya Jain",
+                "loan_count": 3,
+                "total_principal": 4173702.17,
+                "average_interest_rate": 10.676666666666668,
+                "pct_of_total_principal": 0.29
+            }
+        ],
+        "hint": "Aggregate loans by customer, then use a window SUM over customer totals.",
+        "solution": "WITH x AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COUNT(l.loan_id) AS loan_count,SUM(l.principal_amount) AS total_principal,AVG(l.interest_rate) AS average_interest_rate FROM customers c JOIN loans l ON c.customer_id=l.customer_id GROUP BY c.customer_id,c.first_name,c.last_name) SELECT *,ROUND(100.0*total_principal/SUM(total_principal) OVER(),2) AS pct_of_total_principal FROM x;"
+    },
+    {
+        "id": 209,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "employees"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A branch manager wants to rank employees by salary within each branch. Employees with equal salaries should share the same rank. Return employee ID, name, branch ID, salary, and salary rank for every employee.",
+        "expectedOutput": [
+            {
+                "employee_id": 198,
+                "employee_name": "Aditya Kumar",
+                "branch_id": 1,
+                "salary": 125336.26,
+                "salary_rank": 1
+            },
+            {
+                "employee_id": 72,
+                "employee_name": "Vivaan Patil",
+                "branch_id": 1,
+                "salary": 93262.18,
+                "salary_rank": 2
+            },
+            {
+                "employee_id": 158,
+                "employee_name": "Sanjay Singh",
+                "branch_id": 1,
+                "salary": 73421.59,
+                "salary_rank": 3
+            },
+            {
+                "employee_id": 3,
+                "employee_name": "Sneha Sharma",
+                "branch_id": 1,
+                "salary": 50500.48,
+                "salary_rank": 4
+            },
+            {
+                "employee_id": 39,
+                "employee_name": "Riya Shah",
+                "branch_id": 1,
+                "salary": 50204.05,
+                "salary_rank": 5
+            }
+        ],
+        "hint": "Use DENSE_RANK partitioned by branch_id.",
+        "solution": "SELECT employee_id,employee_name,branch_id,salary,DENSE_RANK() OVER(PARTITION BY branch_id ORDER BY salary DESC) AS salary_rank FROM employees;"
+    },
+    {
+        "id": 210,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "loans",
+            "payments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A payments team wants the most recent payment for every loan, including loans that have never received a payment. Build the result from loans so unpaid loans are not lost, and return loan ID, latest payment date, and payment count.",
+        "expectedOutput": [
+            {
+                "loan_id": 1,
+                "latest_payment_date": null,
+                "payment_count": 0
+            },
+            {
+                "loan_id": 2,
+                "latest_payment_date": "2025-07-08",
+                "payment_count": 3
+            },
+            {
+                "loan_id": 3,
+                "latest_payment_date": null,
+                "payment_count": 0
+            },
+            {
+                "loan_id": 4,
+                "latest_payment_date": "2025-10-20",
+                "payment_count": 2
+            },
+            {
+                "loan_id": 5,
+                "latest_payment_date": "2025-04-10",
+                "payment_count": 2
+            }
+        ],
+        "hint": "Start from loans and LEFT JOIN payments. COUNT(payment_id) gives zero for unpaid loans.",
+        "solution": "SELECT l.loan_id,MAX(p.payment_date) AS latest_payment_date,COUNT(p.payment_id) AS payment_count FROM loans l LEFT JOIN payments p ON l.loan_id=p.loan_id GROUP BY l.loan_id;"
+    },
+    {
+        "id": 211,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts",
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A customer-service team wants to identify customers whose account activity is unusually high. Calculate each customer's transaction count and total transaction amount, then keep customers whose transaction count is above the average customer transaction count and whose total amount is above the average customer total.",
+        "expectedOutput": [
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "transaction_count": 6,
+                "total_transaction_amount": 791891.03
+            },
+            {
+                "customer_id": 6,
+                "customer_name": "Neha Sharma",
+                "transaction_count": 7,
+                "total_transaction_amount": 1018408.62
+            },
+            {
+                "customer_id": 8,
+                "customer_name": "Vivaan Kumar",
+                "transaction_count": 9,
+                "total_transaction_amount": 1496323.82
+            },
+            {
+                "customer_id": 9,
+                "customer_name": "Meera Joshi",
+                "transaction_count": 8,
+                "total_transaction_amount": 1185521.62
+            },
+            {
+                "customer_id": 11,
+                "customer_name": "Pooja Patil",
+                "transaction_count": 10,
+                "total_transaction_amount": 1158110.24
+            }
+        ],
+        "hint": "Build customer activity with LEFT JOINs, then compare both measures to their CTE averages.",
+        "solution": "WITH x AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COUNT(t.transaction_id) AS transaction_count,COALESCE(SUM(t.amount),0) AS total_transaction_amount FROM customers c LEFT JOIN accounts a ON c.customer_id=a.customer_id LEFT JOIN transactions t ON a.account_id=t.account_id GROUP BY c.customer_id,c.first_name,c.last_name) SELECT * FROM x WHERE transaction_count>(SELECT AVG(transaction_count) FROM x) AND total_transaction_amount>(SELECT AVG(total_transaction_amount) FROM x);"
+    },
+    {
+        "id": 212,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A risk team wants to detect customers whose active-loan principal is larger than their total account balance. Calculate both customer-level measures, keep only customers meeting that condition, and return the difference between loan principal and balance.",
+        "expectedOutput": [
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "active_loan_principal": 5488467.140000001,
+                "total_balance": 132789.96,
+                "exposure_gap": 5355677.180000001
+            },
+            {
+                "customer_id": 9,
+                "customer_name": "Meera Joshi",
+                "active_loan_principal": 807077.31,
+                "total_balance": 123101.35,
+                "exposure_gap": 683975.9600000001
+            },
+            {
+                "customer_id": 10,
+                "customer_name": "Sneha Kumar",
+                "active_loan_principal": 3014038.49,
+                "total_balance": 59101.78,
+                "exposure_gap": 2954936.7100000004
+            },
+            {
+                "customer_id": 11,
+                "customer_name": "Pooja Patil",
+                "active_loan_principal": 2398027.71,
+                "total_balance": 154619.66999999998,
+                "exposure_gap": 2243408.04
+            },
+            {
+                "customer_id": 13,
+                "customer_name": "Priya Jain",
+                "active_loan_principal": 2797984.8699999996,
+                "total_balance": 86443.38,
+                "exposure_gap": 2711541.4899999998
+            }
+        ],
+        "hint": "Calculate both measures first, then filter on their difference.",
+        "solution": "WITH x AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COALESCE((SELECT SUM(l.principal_amount) FROM loans l WHERE l.customer_id=c.customer_id AND l.loan_status='Active'),0) AS active_loan_principal,COALESCE((SELECT SUM(a.balance) FROM accounts a WHERE a.customer_id=c.customer_id),0) AS total_balance FROM customers c) SELECT customer_id,customer_name,active_loan_principal,total_balance,active_loan_principal-total_balance AS exposure_gap FROM x WHERE active_loan_principal>total_balance;"
+    },
+    {
+        "id": 213,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A monthly finance report needs transaction totals for every month in 2025 and the month-over-month change from the previous month. Build monthly totals first, then use LAG to calculate the change.",
+        "expectedOutput": [
+            {
+                "year_month": "2025-01",
+                "total_amount": 17499137.32,
+                "month_over_month_change": null
+            },
+            {
+                "year_month": "2025-02",
+                "total_amount": 16380922.05,
+                "month_over_month_change": -1118215.2699999996
+            },
+            {
+                "year_month": "2025-03",
+                "total_amount": 16770367.08,
+                "month_over_month_change": 389445.02999999933
+            },
+            {
+                "year_month": "2025-04",
+                "total_amount": 18694729.72,
+                "month_over_month_change": 1924362.6399999987
+            },
+            {
+                "year_month": "2025-05",
+                "total_amount": 17317309.02,
+                "month_over_month_change": -1377420.6999999993
+            }
+        ],
+        "hint": "Aggregate by month in a CTE and use LAG over year_month.",
+        "solution": "WITH m AS (SELECT substr(transaction_date,1,7) AS year_month,SUM(amount) AS total_amount FROM transactions WHERE transaction_date>='2025-01-01' AND transaction_date<'2026-01-01' GROUP BY substr(transaction_date,1,7)) SELECT year_month,total_amount,total_amount-LAG(total_amount) OVER(ORDER BY year_month) AS month_over_month_change FROM m ORDER BY year_month;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 214,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "credit_cards"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A credit-card analyst wants to rank cards by available credit within each card type. Cards with the same available limit should receive the same rank. Return card ID, card type, available limit, and type-specific rank.",
+        "expectedOutput": [
+            {
+                "credit_card_id": 82,
+                "card_type": "Mastercard Gold",
+                "available_limit": 474470.65,
+                "type_rank": 1
+            },
+            {
+                "credit_card_id": 67,
+                "card_type": "Mastercard Gold",
+                "available_limit": 431104.49,
+                "type_rank": 2
+            },
+            {
+                "credit_card_id": 760,
+                "card_type": "Mastercard Gold",
+                "available_limit": 425053.63,
+                "type_rank": 3
+            },
+            {
+                "credit_card_id": 23,
+                "card_type": "Mastercard Gold",
+                "available_limit": 410754.78,
+                "type_rank": 4
+            },
+            {
+                "credit_card_id": 94,
+                "card_type": "Mastercard Gold",
+                "available_limit": 404617.86,
+                "type_rank": 5
+            }
+        ],
+        "hint": "Partition DENSE_RANK by card_type.",
+        "solution": "SELECT credit_card_id,card_type,available_limit,DENSE_RANK() OVER(PARTITION BY card_type ORDER BY available_limit DESC) AS type_rank FROM credit_cards;"
+    },
+    {
+        "id": 215,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans",
+            "accounts",
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A compliance report must identify customers who have an active loan but no transaction activity during the last 180 days from 16 August 2026. Return customer ID and full name, and do not include customers whose recent activity exists on any account.",
+        "expectedOutput": [
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni"
+            },
+            {
+                "customer_id": 11,
+                "customer_name": "Pooja Patil"
+            },
+            {
+                "customer_id": 13,
+                "customer_name": "Priya Jain"
+            },
+            {
+                "customer_id": 14,
+                "customer_name": "Aditya Patil"
+            },
+            {
+                "customer_id": 18,
+                "customer_name": "Amit Desai"
+            }
+        ],
+        "hint": "Use EXISTS for an active loan and NOT EXISTS for recent account activity.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c WHERE EXISTS (SELECT 1 FROM loans l WHERE l.customer_id=c.customer_id AND l.loan_status='Active') AND NOT EXISTS (SELECT 1 FROM accounts a JOIN transactions t ON a.account_id=t.account_id WHERE a.customer_id=c.customer_id AND t.transaction_date>='2026-02-18');"
+    },
+    {
+        "id": 216,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "accounts",
+            "employees",
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A branch performance report needs a composite score based on three independent measures: total account balance, employee count, and transaction volume. Calculate the three measures per branch and produce score = total_balance/100000 + employee_count*10 + transaction_count. Return the components and score.",
+        "expectedOutput": [
+            {
+                "branch_id": 1,
+                "branch_name": "Mumbai Central Branch",
+                "total_balance": 2772920.98,
+                "employee_count": 5,
+                "transaction_count": 155,
+                "performance_score": 232.7292098
+            },
+            {
+                "branch_id": 2,
+                "branch_name": "Kolkata Market Branch",
+                "total_balance": 3945274.1,
+                "employee_count": 6,
+                "transaction_count": 197,
+                "performance_score": 296.452741
+            },
+            {
+                "branch_id": 3,
+                "branch_name": "Gurugram City Branch",
+                "total_balance": 4057030.85,
+                "employee_count": 7,
+                "transaction_count": 161,
+                "performance_score": 271.5703085
+            },
+            {
+                "branch_id": 4,
+                "branch_name": "Kochi Central Branch",
+                "total_balance": 4451980.89,
+                "employee_count": 3,
+                "transaction_count": 186,
+                "performance_score": 260.5198089
+            },
+            {
+                "branch_id": 5,
+                "branch_name": "Bengaluru Central Branch",
+                "total_balance": 3351488.65,
+                "employee_count": 5,
+                "transaction_count": 178,
+                "performance_score": 261.5148865
+            }
+        ],
+        "hint": "Build independent branch measures first, then calculate the composite score.",
+        "solution": "WITH x AS (SELECT b.branch_id,b.branch_name,COALESCE((SELECT SUM(a.balance) FROM accounts a WHERE a.branch_id=b.branch_id),0) AS total_balance,COALESCE((SELECT COUNT(*) FROM employees e WHERE e.branch_id=b.branch_id),0) AS employee_count,COALESCE((SELECT COUNT(*) FROM transactions t JOIN accounts a2 ON t.account_id=a2.account_id WHERE a2.branch_id=b.branch_id),0) AS transaction_count FROM branches b) SELECT *,total_balance/100000.0+employee_count*10+transaction_count AS performance_score FROM x;"
+    },
+    {
+        "id": 217,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A lending analyst wants the top two loans for every loan type, but the ranking must be based on principal amount and ties should be preserved. Return loan ID, loan type, principal amount, and rank for rows whose rank is at most two.",
+        "expectedOutput": [
+            {
+                "loan_id": 610,
+                "loan_type": "Business Loan",
+                "principal_amount": 3465330.16,
+                "loan_rank": 1
+            },
+            {
+                "loan_id": 165,
+                "loan_type": "Business Loan",
+                "principal_amount": 3448910.63,
+                "loan_rank": 2
+            },
+            {
+                "loan_id": 726,
+                "loan_type": "Education Loan",
+                "principal_amount": 3431606.55,
+                "loan_rank": 1
+            },
+            {
+                "loan_id": 374,
+                "loan_type": "Education Loan",
+                "principal_amount": 3396559.92,
+                "loan_rank": 2
+            },
+            {
+                "loan_id": 55,
+                "loan_type": "Home Loan",
+                "principal_amount": 3426408.61,
+                "loan_rank": 1
+            }
+        ],
+        "hint": "Use DENSE_RANK partitioned by loan_type and filter the rank in an outer query.",
+        "solution": "WITH ranked AS (SELECT loan_id,loan_type,principal_amount,DENSE_RANK() OVER(PARTITION BY loan_type ORDER BY principal_amount DESC) AS loan_rank FROM loans) SELECT loan_id,loan_type,principal_amount,loan_rank FROM ranked WHERE loan_rank<=2;"
+    },
+    {
+        "id": 218,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A banking analyst wants to compare every customer with the average customer balance. First calculate total account balance per customer, including customers with no accounts, then return customers whose balance is above the average across all customers.",
+        "expectedOutput": [
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "total_balance": 137157.0
+            },
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "total_balance": 132789.96
+            },
+            {
+                "customer_id": 8,
+                "customer_name": "Vivaan Kumar",
+                "total_balance": 131331.41
+            },
+            {
+                "customer_id": 9,
+                "customer_name": "Meera Joshi",
+                "total_balance": 123101.35
+            },
+            {
+                "customer_id": 11,
+                "customer_name": "Pooja Patil",
+                "total_balance": 154619.66999999998
+            }
+        ],
+        "hint": "Include all customers in the CTE with LEFT JOIN, then compare to the CTE average.",
+        "solution": "WITH x AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COALESCE(SUM(a.balance),0) AS total_balance FROM customers c LEFT JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name) SELECT * FROM x WHERE total_balance>(SELECT AVG(total_balance) FROM x);"
+    },
+    {
+        "id": 219,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A fraud-analytics team wants to find accounts where one transaction is more than three times the average transaction amount for that same account. Calculate the account average first and return transactions exceeding three times it.",
+        "expectedOutput": [
+            {
+                "transaction_id": 6971,
+                "account_id": 352,
+                "transaction_date": "2026-02-18",
+                "amount": 147089.82,
+                "account_average": 44595.116
+            },
+            {
+                "transaction_id": 1147,
+                "account_id": 390,
+                "transaction_date": "2023-10-01",
+                "amount": 219533.01,
+                "account_average": 63579.462
+            },
+            {
+                "transaction_id": 6388,
+                "account_id": 569,
+                "transaction_date": "2025-09-12",
+                "amount": 238255.52,
+                "account_average": 77425.5
+            },
+            {
+                "transaction_id": 2559,
+                "account_id": 794,
+                "transaction_date": "2022-08-18",
+                "amount": 228178.32,
+                "account_average": 73165.2
+            },
+            {
+                "transaction_id": 5967,
+                "account_id": 1262,
+                "transaction_date": "2023-12-28",
+                "amount": 155850.35,
+                "account_average": 46922.8575
+            }
+        ],
+        "hint": "Use AVG as a partitioned window function and filter in an outer query.",
+        "solution": "WITH x AS (SELECT transaction_id,account_id,transaction_date,amount,AVG(amount) OVER(PARTITION BY account_id) AS account_average FROM transactions) SELECT transaction_id,account_id,transaction_date,amount,account_average FROM x WHERE amount>3*account_average;"
+    },
+    {
+        "id": 220,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "accounts",
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A treasury report needs the first and latest transaction date for every account, along with the number of transactions and the total transaction amount. Accounts with no transactions must remain visible.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "first_transaction_date": "2022-05-18",
+                "latest_transaction_date": "2025-11-07",
+                "transaction_count": 5,
+                "total_transaction_amount": 628802.35
+            },
+            {
+                "account_id": 2,
+                "first_transaction_date": "2023-05-09",
+                "latest_transaction_date": "2026-07-23",
+                "transaction_count": 5,
+                "total_transaction_amount": 634953.29
+            },
+            {
+                "account_id": 3,
+                "first_transaction_date": "2022-02-04",
+                "latest_transaction_date": "2025-01-18",
+                "transaction_count": 6,
+                "total_transaction_amount": 1189259.58
+            },
+            {
+                "account_id": 4,
+                "first_transaction_date": "2022-03-05",
+                "latest_transaction_date": "2025-12-07",
+                "transaction_count": 5,
+                "total_transaction_amount": 385172.96
+            },
+            {
+                "account_id": 5,
+                "first_transaction_date": "2023-09-19",
+                "latest_transaction_date": "2024-12-25",
+                "transaction_count": 3,
+                "total_transaction_amount": 502513.37
+            }
+        ],
+        "hint": "Start from accounts and LEFT JOIN transactions so zero-activity accounts remain.",
+        "solution": "SELECT a.account_id,MIN(t.transaction_date) AS first_transaction_date,MAX(t.transaction_date) AS latest_transaction_date,COUNT(t.transaction_id) AS transaction_count,COALESCE(SUM(t.amount),0) AS total_transaction_amount FROM accounts a LEFT JOIN transactions t ON a.account_id=t.account_id GROUP BY a.account_id;"
+    },
+    {
+        "id": 221,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "loans",
+            "payments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A loan-servicing team wants to measure payment coverage for each loan. For every loan, calculate principal amount, total payments received, payment count, and the percentage of principal covered by payments. Keep all loans, including those with no payments.",
+        "expectedOutput": [
+            {
+                "loan_id": 1,
+                "principal_amount": 346922.09,
+                "total_payments": 0,
+                "payment_count": 0,
+                "payment_coverage_pct": 0.0
+            },
+            {
+                "loan_id": 2,
+                "principal_amount": 1298412.48,
+                "total_payments": 57417.37,
+                "payment_count": 3,
+                "payment_coverage_pct": 4.42
+            },
+            {
+                "loan_id": 3,
+                "principal_amount": 134515.93,
+                "total_payments": 0,
+                "payment_count": 0,
+                "payment_coverage_pct": 0.0
+            },
+            {
+                "loan_id": 4,
+                "principal_amount": 1054067.76,
+                "total_payments": 121137.44,
+                "payment_count": 2,
+                "payment_coverage_pct": 11.49
+            },
+            {
+                "loan_id": 5,
+                "principal_amount": 1375717.3,
+                "total_payments": 173689.76,
+                "payment_count": 2,
+                "payment_coverage_pct": 12.63
+            }
+        ],
+        "hint": "LEFT JOIN payments and protect the percentage calculation with NULLIF.",
+        "solution": "SELECT l.loan_id,l.principal_amount,COALESCE(SUM(p.payment_amount),0) AS total_payments,COUNT(p.payment_id) AS payment_count,ROUND(100.0*COALESCE(SUM(p.payment_amount),0)/NULLIF(l.principal_amount,0),2) AS payment_coverage_pct FROM loans l LEFT JOIN payments p ON l.loan_id=p.loan_id GROUP BY l.loan_id,l.principal_amount;"
+    },
+    {
+        "id": 222,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A customer analytics team wants the top customer in every city by total account balance. Build customer totals first, rank customers within city using ROW_NUMBER, and return only the city leader from each city.",
+        "expectedOutput": [
+            {
+                "customer_id": 264,
+                "customer_name": "Isha Patil",
+                "city": "Ahmedabad",
+                "total_balance": 526265.72
+            },
+            {
+                "customer_id": 209,
+                "customer_name": "Vivaan Singh",
+                "city": "Bengaluru",
+                "total_balance": 529980.25
+            },
+            {
+                "customer_id": 800,
+                "customer_name": "Aarav Gupta",
+                "city": "Chennai",
+                "total_balance": 416216.92000000004
+            },
+            {
+                "customer_id": 1222,
+                "customer_name": "Karan Patil",
+                "city": "Delhi",
+                "total_balance": 591106.98
+            },
+            {
+                "customer_id": 1074,
+                "customer_name": "Aditya Desai",
+                "city": "Gurugram",
+                "total_balance": 660888.6900000001
+            }
+        ],
+        "hint": "Aggregate customer balances, then use ROW_NUMBER partitioned by city.",
+        "solution": "WITH totals AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,c.city,SUM(a.balance) AS total_balance FROM customers c JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name,c.city), ranked AS (SELECT *,ROW_NUMBER() OVER(PARTITION BY city ORDER BY total_balance DESC,customer_id) AS rn FROM totals) SELECT customer_id,customer_name,city,total_balance FROM ranked WHERE rn=1;"
+    },
+    {
+        "id": 223,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "accounts",
+            "transactions"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A management dashboard wants to identify branches whose transaction volume is above the average branch transaction volume. Calculate transaction count per branch, including branches with no transactions, and compare each branch with the overall branch average.",
+        "expectedOutput": [
+            {
+                "branch_id": 12,
+                "branch_name": "Ahmedabad Market Branch",
+                "transaction_count": 223
+            },
+            {
+                "branch_id": 16,
+                "branch_name": "Indore Market Branch",
+                "transaction_count": 216
+            },
+            {
+                "branch_id": 20,
+                "branch_name": "Ahmedabad Central Branch",
+                "transaction_count": 213
+            },
+            {
+                "branch_id": 21,
+                "branch_name": "Ahmedabad Market Branch",
+                "transaction_count": 220
+            },
+            {
+                "branch_id": 22,
+                "branch_name": "Noida Central Branch",
+                "transaction_count": 209
+            }
+        ],
+        "hint": "Build branch transaction counts with LEFT JOINs, then compare to the CTE average.",
+        "solution": "WITH x AS (SELECT b.branch_id,b.branch_name,COUNT(t.transaction_id) AS transaction_count FROM branches b LEFT JOIN accounts a ON b.branch_id=a.branch_id LEFT JOIN transactions t ON a.account_id=t.account_id GROUP BY b.branch_id,b.branch_name) SELECT * FROM x WHERE transaction_count>(SELECT AVG(transaction_count) FROM x);"
+    },
+    {
+        "id": 224,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A risk dashboard wants to identify customers with a high concentration of borrowing. Calculate each customer's total loan principal, total account balance, and loan-to-balance ratio. Return customers whose ratio exceeds 5, while excluding customers with zero balance.",
+        "expectedOutput": [
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "total_loan_principal": 7493091.41,
+                "total_balance": 132789.96,
+                "loan_to_balance_ratio": 56.43
+            },
+            {
+                "customer_id": 9,
+                "customer_name": "Meera Joshi",
+                "total_loan_principal": 807077.31,
+                "total_balance": 123101.35,
+                "loan_to_balance_ratio": 6.56
+            },
+            {
+                "customer_id": 10,
+                "customer_name": "Sneha Kumar",
+                "total_loan_principal": 3014038.49,
+                "total_balance": 59101.78,
+                "loan_to_balance_ratio": 51.0
+            },
+            {
+                "customer_id": 11,
+                "customer_name": "Pooja Patil",
+                "total_loan_principal": 2398027.71,
+                "total_balance": 154619.66999999998,
+                "loan_to_balance_ratio": 15.51
+            },
+            {
+                "customer_id": 13,
+                "customer_name": "Priya Jain",
+                "total_loan_principal": 4173702.17,
+                "total_balance": 86443.38,
+                "loan_to_balance_ratio": 48.28
+            }
+        ],
+        "hint": "Calculate both measures first and use NULLIF to avoid division by zero.",
+        "solution": "WITH x AS (SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COALESCE((SELECT SUM(l.principal_amount) FROM loans l WHERE l.customer_id=c.customer_id),0) AS total_loan_principal,COALESCE((SELECT SUM(a.balance) FROM accounts a WHERE a.customer_id=c.customer_id),0) AS total_balance FROM customers c) SELECT customer_id,customer_name,total_loan_principal,total_balance,ROUND(total_loan_principal/NULLIF(total_balance,0),2) AS loan_to_balance_ratio FROM x WHERE total_balance>0 AND total_loan_principal/total_balance>5;"
+    },
+    {
+        "id": 225,
+        "difficulty": "Expert",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A senior analyst needs a customer lifecycle report. For every customer with at least one account, return the first account opening date, latest account opening date, account count, total balance, and the number of distinct branches used by that customer. This should be one row per customer.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "customer_name": "Arjun Mehta",
+                "first_account_date": "2019-05-16",
+                "latest_account_date": "2026-02-08",
+                "account_count": 2,
+                "total_balance": 107171.2,
+                "branch_count": 2
+            },
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "first_account_date": "2023-01-17",
+                "latest_account_date": "2024-09-20",
+                "account_count": 2,
+                "total_balance": 137157.0,
+                "branch_count": 1
+            },
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma",
+                "first_account_date": "2025-02-20",
+                "latest_account_date": "2026-04-04",
+                "account_count": 2,
+                "total_balance": 89251.81,
+                "branch_count": 2
+            },
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "first_account_date": "2018-04-22",
+                "latest_account_date": "2026-05-11",
+                "account_count": 2,
+                "total_balance": 132789.96,
+                "branch_count": 2
+            },
+            {
+                "customer_id": 6,
+                "customer_name": "Neha Sharma",
+                "first_account_date": "2022-09-09",
+                "latest_account_date": "2025-10-27",
+                "account_count": 3,
+                "total_balance": 107706.3,
+                "branch_count": 2
+            }
+        ],
+        "hint": "Join customers to accounts and aggregate all requested lifecycle measures per customer.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,MIN(a.opened_date) AS first_account_date,MAX(a.opened_date) AS latest_account_date,COUNT(a.account_id) AS account_count,SUM(a.balance) AS total_balance,COUNT(DISTINCT a.branch_id) AS branch_count FROM customers c JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name;"
+    },
+    {
+        "id": 226,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "doctors"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A hospital leadership team wants to rank doctors by experience within each hospital. Doctors with the same experience should share the same rank. Return doctor ID, doctor name, hospital ID, experience years, and hospital-specific rank.",
+        "expectedOutput": [
+            {
+                "doctor_id": 8,
+                "doctor_name": "Dr. Vivaan Gupta",
+                "hospital_id": 2,
+                "experience_years": 15,
+                "hospital_rank": 1
+            },
+            {
+                "doctor_id": 28,
+                "doctor_name": "Dr. Vivaan Sharma",
+                "hospital_id": 2,
+                "experience_years": 14,
+                "hospital_rank": 2
+            },
+            {
+                "doctor_id": 31,
+                "doctor_name": "Dr. Meera Jain",
+                "hospital_id": 2,
+                "experience_years": 14,
+                "hospital_rank": 2
+            },
+            {
+                "doctor_id": 152,
+                "doctor_name": "Dr. Rohan Joshi",
+                "hospital_id": 2,
+                "experience_years": 14,
+                "hospital_rank": 2
+            },
+            {
+                "doctor_id": 137,
+                "doctor_name": "Dr. Aditi Nair",
+                "hospital_id": 2,
+                "experience_years": 10,
+                "hospital_rank": 3
+            }
+        ],
+        "hint": "Use DENSE_RANK partitioned by hospital_id.",
+        "solution": "SELECT doctor_id,doctor_name,hospital_id,experience_years,DENSE_RANK() OVER(PARTITION BY hospital_id ORDER BY experience_years DESC) AS hospital_rank FROM doctors;"
+    },
+    {
+        "id": 227,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "doctors"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A specialty coordinator needs the top two most experienced doctors in every specialization. Build a ranking within each specialization and return only doctors whose rank is at most two.",
+        "expectedOutput": [
+            {
+                "doctor_id": 125,
+                "doctor_name": "Dr. Rahul Jain",
+                "specialization": "Cardiology",
+                "experience_years": 30,
+                "specialty_rank": 1
+            },
+            {
+                "doctor_id": 81,
+                "doctor_name": "Dr. Riya Kulkarni",
+                "specialization": "Cardiology",
+                "experience_years": 28,
+                "specialty_rank": 2
+            },
+            {
+                "doctor_id": 135,
+                "doctor_name": "Dr. Aditya Patil",
+                "specialization": "Cardiology",
+                "experience_years": 28,
+                "specialty_rank": 2
+            },
+            {
+                "doctor_id": 173,
+                "doctor_name": "Dr. Pooja Reddy",
+                "specialization": "Dermatology",
+                "experience_years": 12,
+                "specialty_rank": 1
+            },
+            {
+                "doctor_id": 59,
+                "doctor_name": "Dr. Aditya Kulkarni",
+                "specialization": "ENT",
+                "experience_years": 29,
+                "specialty_rank": 1
+            }
+        ],
+        "hint": "Rank doctors inside specialization and filter in an outer query.",
+        "solution": "WITH x AS (SELECT doctor_id,doctor_name,specialization,experience_years,DENSE_RANK() OVER(PARTITION BY specialization ORDER BY experience_years DESC) AS specialty_rank FROM doctors) SELECT doctor_id,doctor_name,specialization,experience_years,specialty_rank FROM x WHERE specialty_rank<=2;"
+    },
+    {
+        "id": 228,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A finance analyst wants a running billing total for every patient. Within each patient, order bills chronologically and calculate the cumulative amount after each bill. Return patient ID, billing ID, billing date, amount, and running total.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "billing_id": 101,
+                "billing_date": "2025-06-10",
+                "amount": 239297.49,
+                "running_billing": 239297.49
+            },
+            {
+                "patient_id": 2,
+                "billing_id": 2920,
+                "billing_date": "2023-04-25",
+                "amount": 130880.0,
+                "running_billing": 130880.0
+            },
+            {
+                "patient_id": 2,
+                "billing_id": 2327,
+                "billing_date": "2026-04-10",
+                "amount": 109780.78,
+                "running_billing": 240660.78
+            },
+            {
+                "patient_id": 3,
+                "billing_id": 765,
+                "billing_date": "2025-11-15",
+                "amount": 152557.01,
+                "running_billing": 152557.01
+            },
+            {
+                "patient_id": 4,
+                "billing_id": 2727,
+                "billing_date": "2026-01-18",
+                "amount": 241680.17,
+                "running_billing": 241680.17
+            }
+        ],
+        "hint": "Use SUM as a window function partitioned by patient and ordered by billing date and ID.",
+        "solution": "SELECT patient_id,billing_id,billing_date,amount,SUM(amount) OVER(PARTITION BY patient_id ORDER BY billing_date,billing_id ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_billing FROM billing;"
+    },
+    {
+        "id": 229,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A revenue team wants the highest bill for every patient, including the payment status of that bill. If a patient has multiple bills at the same amount, choose the most recent one. Return one row per patient.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "billing_id": 101,
+                "billing_date": "2025-06-10",
+                "amount": 239297.49,
+                "payment_status": "Paid"
+            },
+            {
+                "patient_id": 2,
+                "billing_id": 2920,
+                "billing_date": "2023-04-25",
+                "amount": 130880.0,
+                "payment_status": "Paid"
+            },
+            {
+                "patient_id": 3,
+                "billing_id": 765,
+                "billing_date": "2025-11-15",
+                "amount": 152557.01,
+                "payment_status": "Paid"
+            },
+            {
+                "patient_id": 4,
+                "billing_id": 2727,
+                "billing_date": "2026-01-18",
+                "amount": 241680.17,
+                "payment_status": "Paid"
+            },
+            {
+                "patient_id": 5,
+                "billing_id": 1386,
+                "billing_date": "2022-06-12",
+                "amount": 211275.97,
+                "payment_status": "Insurance Processing"
+            }
+        ],
+        "hint": "Use ROW_NUMBER partitioned by patient with amount and date as ordering criteria.",
+        "solution": "WITH x AS (SELECT b.patient_id,b.billing_id,b.billing_date,b.amount,b.payment_status,ROW_NUMBER() OVER(PARTITION BY b.patient_id ORDER BY b.amount DESC,b.billing_date DESC,b.billing_id DESC) AS rn FROM billing b) SELECT patient_id,billing_id,billing_date,amount,payment_status FROM x WHERE rn=1;"
+    },
+    {
+        "id": 230,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A hospital finance team wants patients whose total billing is above the average total billing of all patients with at least one bill. Build patient totals first, then compare each patient total with the average of those totals.",
+        "expectedOutput": [
+            {
+                "patient_id": 5,
+                "total_billing": 350886.53
+            },
+            {
+                "patient_id": 11,
+                "total_billing": 420429.27
+            },
+            {
+                "patient_id": 15,
+                "total_billing": 673408.6799999999
+            },
+            {
+                "patient_id": 17,
+                "total_billing": 579082.9299999999
+            },
+            {
+                "patient_id": 24,
+                "total_billing": 529170.87
+            }
+        ],
+        "hint": "Aggregate billing by patient in a CTE and compare with AVG of the CTE.",
+        "solution": "WITH x AS (SELECT patient_id,SUM(amount) AS total_billing FROM billing GROUP BY patient_id) SELECT patient_id,total_billing FROM x WHERE total_billing>(SELECT AVG(total_billing) FROM x);"
+    },
+    {
+        "id": 231,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A care-management dashboard needs a financial-burden classification. For every patient, calculate total billing including patients with no bills, then classify Low below 10000, Medium from 10000 to below 50000, High from 50000 to 100000, and Critical above 100000. Return the measures and classification.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "total_billing": 239297.49,
+                "financial_burden": "Critical"
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "total_billing": 240660.78,
+                "financial_burden": "Critical"
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "total_billing": 152557.01,
+                "financial_burden": "Critical"
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "total_billing": 241680.17,
+                "financial_burden": "Critical"
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "total_billing": 350886.53,
+                "financial_burden": "Critical"
+            }
+        ],
+        "hint": "Build patient totals with LEFT JOIN, then classify with CASE.",
+        "solution": "WITH x AS (SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,COALESCE(SUM(b.amount),0) AS total_billing FROM patients p LEFT JOIN billing b ON p.patient_id=b.patient_id GROUP BY p.patient_id,p.first_name,p.last_name) SELECT *,CASE WHEN total_billing>100000 THEN 'Critical' WHEN total_billing>=50000 THEN 'High' WHEN total_billing>=10000 THEN 'Medium' ELSE 'Low' END AS financial_burden FROM x;"
+    },
+    {
+        "id": 232,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A clinical analytics team wants to detect whether a patient's appointment dates are progressing forward. For each patient, compare every appointment with the immediately previous appointment date and return only rows where the current date is later than the previous date.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "appointment_id": 423,
+                "appointment_date": "2022-06-29",
+                "previous_date": "2022-05-01"
+            },
+            {
+                "patient_id": 1,
+                "appointment_id": 3843,
+                "appointment_date": "2022-12-15",
+                "previous_date": "2022-06-29"
+            },
+            {
+                "patient_id": 1,
+                "appointment_id": 1246,
+                "appointment_date": "2024-03-05",
+                "previous_date": "2022-12-15"
+            },
+            {
+                "patient_id": 1,
+                "appointment_id": 4195,
+                "appointment_date": "2024-06-09",
+                "previous_date": "2024-03-05"
+            },
+            {
+                "patient_id": 1,
+                "appointment_id": 3152,
+                "appointment_date": "2026-07-16",
+                "previous_date": "2024-06-09"
+            }
+        ],
+        "hint": "Use LAG partitioned by patient and ordered by appointment date.",
+        "solution": "WITH x AS (SELECT patient_id,appointment_id,appointment_date,LAG(appointment_date) OVER(PARTITION BY patient_id ORDER BY appointment_date,appointment_id) AS previous_date FROM appointments) SELECT patient_id,appointment_id,appointment_date,previous_date FROM x WHERE previous_date IS NOT NULL AND appointment_date>previous_date;"
+    },
+    {
+        "id": 233,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "Hospital management wants each hospital's percentage contribution to all completed appointments. First calculate completed appointments per hospital, then divide each hospital count by the total completed count across the system.",
+        "expectedOutput": [
+            {
+                "hospital_id": 1,
+                "hospital_name": "Max Hyderabad Hospital",
+                "completed": 0,
+                "pct_of_completed_appointments": 0.0
+            },
+            {
+                "hospital_id": 2,
+                "hospital_name": "Narayana Gurugram Hospital",
+                "completed": 152,
+                "pct_of_completed_appointments": 4.1
+            },
+            {
+                "hospital_id": 3,
+                "hospital_name": "Manipal Mumbai Hospital",
+                "completed": 117,
+                "pct_of_completed_appointments": 3.15
+            },
+            {
+                "hospital_id": 4,
+                "hospital_name": "Max Kolkata Hospital",
+                "completed": 166,
+                "pct_of_completed_appointments": 4.47
+            },
+            {
+                "hospital_id": 5,
+                "hospital_name": "Aster Mumbai Hospital",
+                "completed": 187,
+                "pct_of_completed_appointments": 5.04
+            }
+        ],
+        "hint": "Aggregate completed appointments per hospital, then use a window SUM for the denominator.",
+        "solution": "WITH x AS (SELECT h.hospital_id,h.hospital_name,COUNT(a.appointment_id) AS completed FROM hospitals h LEFT JOIN appointments a ON h.hospital_id=a.hospital_id AND a.appointment_status='Completed' GROUP BY h.hospital_id,h.hospital_name) SELECT hospital_id,hospital_name,completed,ROUND(100.0*completed/NULLIF(SUM(completed) OVER(),0),2) AS pct_of_completed_appointments FROM x;"
+    },
+    {
+        "id": 234,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "doctors"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A scheduling team needs the second-most experienced doctor in every hospital. Use a hospital-level ranking that preserves ties, then return only doctors with rank two.",
+        "expectedOutput": [
+            {
+                "doctor_id": 28,
+                "doctor_name": "Dr. Vivaan Sharma",
+                "hospital_id": 2,
+                "experience_years": 14,
+                "experience_rank": 2
+            },
+            {
+                "doctor_id": 31,
+                "doctor_name": "Dr. Meera Jain",
+                "hospital_id": 2,
+                "experience_years": 14,
+                "experience_rank": 2
+            },
+            {
+                "doctor_id": 152,
+                "doctor_name": "Dr. Rohan Joshi",
+                "hospital_id": 2,
+                "experience_years": 14,
+                "experience_rank": 2
+            },
+            {
+                "doctor_id": 85,
+                "doctor_name": "Dr. Riya Patil",
+                "hospital_id": 3,
+                "experience_years": 18,
+                "experience_rank": 2
+            },
+            {
+                "doctor_id": 58,
+                "doctor_name": "Dr. Pooja Shah",
+                "hospital_id": 4,
+                "experience_years": 19,
+                "experience_rank": 2
+            }
+        ],
+        "hint": "Use DENSE_RANK partitioned by hospital_id.",
+        "solution": "WITH x AS (SELECT doctor_id,doctor_name,hospital_id,experience_years,DENSE_RANK() OVER(PARTITION BY hospital_id ORDER BY experience_years DESC) AS experience_rank FROM doctors) SELECT doctor_id,doctor_name,hospital_id,experience_years,experience_rank FROM x WHERE experience_rank=2;"
+    },
+    {
+        "id": 235,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments",
+            "lab_reports"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A clinical operations team wants to flag patients needing high attention. A patient qualifies when they have at least three appointments or at least two lab reports whose result status is not Normal. Build the two measures first and return the final attention level.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "appointment_count": 6,
+                "non_normal_reports": 2,
+                "attention_level": "High Attention"
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "appointment_count": 5,
+                "non_normal_reports": 0,
+                "attention_level": "High Attention"
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "appointment_count": 5,
+                "non_normal_reports": 0,
+                "attention_level": "High Attention"
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "appointment_count": 7,
+                "non_normal_reports": 1,
+                "attention_level": "High Attention"
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "appointment_count": 1,
+                "non_normal_reports": 0,
+                "attention_level": "Routine"
+            }
+        ],
+        "hint": "Use correlated subqueries for appointment and non-normal report counts, then CASE.",
+        "solution": "WITH x AS (SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,(SELECT COUNT(*) FROM appointments a WHERE a.patient_id=p.patient_id) AS appointment_count,(SELECT COUNT(*) FROM lab_reports l WHERE l.patient_id=p.patient_id AND l.result_status<>'Normal') AS non_normal_reports FROM patients p) SELECT *,CASE WHEN appointment_count>=3 OR non_normal_reports>=2 THEN 'High Attention' ELSE 'Routine' END AS attention_level FROM x;"
+    },
+    {
+        "id": 236,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A physician performance team wants doctors whose appointment volume is above the average doctor appointment volume. Include doctors with zero appointments when calculating the average so the benchmark represents the whole medical staff.",
+        "expectedOutput": [
+            {
+                "doctor_id": 6,
+                "doctor_name": "Dr. Kavya Singh",
+                "appointment_count": 33
+            },
+            {
+                "doctor_id": 12,
+                "doctor_name": "Dr. Karan Nair",
+                "appointment_count": 34
+            },
+            {
+                "doctor_id": 13,
+                "doctor_name": "Dr. Priya Kumar",
+                "appointment_count": 28
+            },
+            {
+                "doctor_id": 16,
+                "doctor_name": "Dr. Rahul Jain",
+                "appointment_count": 26
+            },
+            {
+                "doctor_id": 17,
+                "doctor_name": "Dr. Priya Mehta",
+                "appointment_count": 28
+            }
+        ],
+        "hint": "Use a LEFT JOIN to build counts for every doctor, then compare with the CTE average.",
+        "solution": "WITH x AS (SELECT d.doctor_id,d.doctor_name,COUNT(a.appointment_id) AS appointment_count FROM doctors d LEFT JOIN appointments a ON d.doctor_id=a.doctor_id GROUP BY d.doctor_id,d.doctor_name) SELECT * FROM x WHERE appointment_count>(SELECT AVG(appointment_count) FROM x);"
+    },
+    {
+        "id": 237,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A data-quality team wants one representative patient row for each non-null phone number, keeping the lowest patient ID when duplicate phone numbers exist. Return the retained patient ID and phone number.",
+        "expectedOutput": [
+            {
+                "patient_id": 705,
+                "phone": "+91-7003967042"
+            },
+            {
+                "patient_id": 322,
+                "phone": "+91-7010992220"
+            },
+            {
+                "patient_id": 1449,
+                "phone": "+91-7011318416"
+            },
+            {
+                "patient_id": 670,
+                "phone": "+91-7013027859"
+            },
+            {
+                "patient_id": 1553,
+                "phone": "+91-7016942067"
+            }
+        ],
+        "hint": "Partition ROW_NUMBER by phone and keep rn = 1.",
+        "solution": "WITH x AS (SELECT patient_id,phone,ROW_NUMBER() OVER(PARTITION BY phone ORDER BY patient_id) AS rn FROM patients WHERE phone IS NOT NULL) SELECT patient_id,phone FROM x WHERE rn=1;"
+    },
+    {
+        "id": 238,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing",
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A care-management team wants patients who have a pending bill but have not had any appointment during the last 180 days as of 16 August 2026. Return patient ID and full name, and make sure recent activity on any appointment is considered.",
+        "expectedOutput": [
+            {
+                "patient_id": 34,
+                "patient_name": "Isha Mehta"
+            },
+            {
+                "patient_id": 76,
+                "patient_name": "Karan Nair"
+            },
+            {
+                "patient_id": 78,
+                "patient_name": "Aditya Joshi"
+            },
+            {
+                "patient_id": 79,
+                "patient_name": "Karan Verma"
+            },
+            {
+                "patient_id": 81,
+                "patient_name": "Aarav Kulkarni"
+            }
+        ],
+        "hint": "Use EXISTS for pending billing and NOT EXISTS for appointments since 18 Feb 2026.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p WHERE EXISTS (SELECT 1 FROM billing b WHERE b.patient_id=p.patient_id AND b.payment_status='Pending') AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.patient_id=p.patient_id AND a.appointment_date>='2026-02-18');"
+    },
+    {
+        "id": 239,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A scheduling report needs monthly completed-appointment totals for 2025 and the month-over-month change. Build monthly totals first, then use LAG to compare each month with the previous month.",
+        "expectedOutput": [
+            {
+                "year_month": "2025-01",
+                "completed": 75,
+                "month_over_month_change": null
+            },
+            {
+                "year_month": "2025-02",
+                "completed": 63,
+                "month_over_month_change": -12
+            },
+            {
+                "year_month": "2025-03",
+                "completed": 77,
+                "month_over_month_change": 14
+            },
+            {
+                "year_month": "2025-04",
+                "completed": 58,
+                "month_over_month_change": -19
+            },
+            {
+                "year_month": "2025-05",
+                "completed": 73,
+                "month_over_month_change": 15
+            }
+        ],
+        "hint": "Aggregate completed appointments by month, then use LAG.",
+        "solution": "WITH m AS (SELECT substr(appointment_date,1,7) AS year_month,COUNT(*) AS completed FROM appointments WHERE appointment_status='Completed' AND appointment_date>='2025-01-01' AND appointment_date<'2026-01-01' GROUP BY substr(appointment_date,1,7)) SELECT year_month,completed,completed-LAG(completed) OVER(ORDER BY year_month) AS month_over_month_change FROM m ORDER BY year_month;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 240,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing",
+            "appointments",
+            "prescriptions",
+            "lab_reports"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "Hospital leadership wants a combined patient-care score. For every patient, calculate billing amount, appointment count, prescription count, and lab-report count. Then score the patient as appointments*2 + prescriptions + reports + billing/10000. Return only patients with activity in all four areas.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "billing_amount": 239297.49,
+                "appointments": 6,
+                "prescriptions": 5,
+                "reports": 5,
+                "care_activity_score": 45.929749
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "billing_amount": 240660.78,
+                "appointments": 5,
+                "prescriptions": 1,
+                "reports": 6,
+                "care_activity_score": 41.066078000000005
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "billing_amount": 152557.01,
+                "appointments": 5,
+                "prescriptions": 7,
+                "reports": 2,
+                "care_activity_score": 34.255701
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "billing_amount": 241680.17,
+                "appointments": 7,
+                "prescriptions": 5,
+                "reports": 7,
+                "care_activity_score": 50.168017000000006
+            },
+            {
+                "patient_id": 6,
+                "patient_name": "Arjun Kulkarni",
+                "billing_amount": 224265.74,
+                "appointments": 3,
+                "prescriptions": 2,
+                "reports": 1,
+                "care_activity_score": 31.426574
+            }
+        ],
+        "hint": "Build all four patient-level measures with correlated subqueries, then calculate the score.",
+        "solution": "WITH x AS (SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,(SELECT COALESCE(SUM(amount),0) FROM billing b WHERE b.patient_id=p.patient_id) AS billing_amount,(SELECT COUNT(*) FROM appointments a WHERE a.patient_id=p.patient_id) AS appointments,(SELECT COUNT(*) FROM prescriptions pr WHERE pr.patient_id=p.patient_id) AS prescriptions,(SELECT COUNT(*) FROM lab_reports lr WHERE lr.patient_id=p.patient_id) AS reports FROM patients p) SELECT *,appointments*2+prescriptions+reports+billing_amount/10000.0 AS care_activity_score FROM x WHERE appointments>0 AND prescriptions>0 AND reports>0 AND billing_amount>0;"
+    },
+    {
+        "id": 241,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "departments",
+            "doctors"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A hospital quality team wants departments where the most experienced doctor has more than 20 years of experience. Return department ID, department name, and maximum doctor experience.",
+        "expectedOutput": [
+            {
+                "department_id": 1,
+                "department_name": "Gynecology",
+                "max_experience": 30
+            },
+            {
+                "department_id": 6,
+                "department_name": "Orthopedics",
+                "max_experience": 27
+            },
+            {
+                "department_id": 7,
+                "department_name": "Radiology",
+                "max_experience": 28
+            },
+            {
+                "department_id": 8,
+                "department_name": "Gastroenterology",
+                "max_experience": 21
+            },
+            {
+                "department_id": 9,
+                "department_name": "ENT",
+                "max_experience": 29
+            }
+        ],
+        "hint": "Group doctors by department and filter the maximum experience with HAVING.",
+        "solution": "SELECT dep.department_id,dep.department_name,MAX(d.experience_years) AS max_experience FROM departments dep JOIN doctors d ON dep.department_id=d.department_id GROUP BY dep.department_id,dep.department_name HAVING MAX(d.experience_years)>20;"
+    },
+    {
+        "id": 242,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A patient journey report needs the first and latest appointment date for every patient who has at least one appointment, together with the total number of appointments. Return one row per patient.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "first_appointment": "2022-05-01",
+                "latest_appointment": "2026-07-16",
+                "appointment_count": 6
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "first_appointment": "2022-04-24",
+                "latest_appointment": "2026-01-10",
+                "appointment_count": 5
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "first_appointment": "2023-06-01",
+                "latest_appointment": "2026-04-27",
+                "appointment_count": 5
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "first_appointment": "2023-03-14",
+                "latest_appointment": "2025-03-21",
+                "appointment_count": 7
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "first_appointment": "2024-01-01",
+                "latest_appointment": "2024-01-01",
+                "appointment_count": 1
+            }
+        ],
+        "hint": "Aggregate appointment dates and count by patient.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,MIN(a.appointment_date) AS first_appointment,MAX(a.appointment_date) AS latest_appointment,COUNT(a.appointment_id) AS appointment_count FROM patients p JOIN appointments a ON p.patient_id=a.patient_id GROUP BY p.patient_id,p.first_name,p.last_name;"
+    },
+    {
+        "id": 243,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "appointments",
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A hospital finance team wants to compare each hospital with the average hospital billing total. First calculate total billing generated by each hospital, including hospitals with no billing, then return only hospitals above the average hospital total.",
+        "expectedOutput": [
+            {
+                "hospital_id": 2,
+                "hospital_name": "Narayana Gurugram Hospital",
+                "total_billing": 14963224.29
+            },
+            {
+                "hospital_id": 4,
+                "hospital_name": "Max Kolkata Hospital",
+                "total_billing": 15482793.07
+            },
+            {
+                "hospital_id": 5,
+                "hospital_name": "Aster Mumbai Hospital",
+                "total_billing": 19859783.34
+            },
+            {
+                "hospital_id": 6,
+                "hospital_name": "Narayana Kolkata Hospital",
+                "total_billing": 17166921.34
+            },
+            {
+                "hospital_id": 7,
+                "hospital_name": "Narayana Kolkata Hospital",
+                "total_billing": 13388034.93
+            }
+        ],
+        "hint": "Build hospital totals with LEFT JOINs, then compare to the average of those totals.",
+        "solution": "WITH x AS (SELECT h.hospital_id,h.hospital_name,COALESCE(SUM(b.amount),0) AS total_billing FROM hospitals h LEFT JOIN appointments a ON h.hospital_id=a.hospital_id LEFT JOIN billing b ON a.appointment_id=b.appointment_id GROUP BY h.hospital_id,h.hospital_name) SELECT * FROM x WHERE total_billing>(SELECT AVG(total_billing) FROM x);"
+    },
+    {
+        "id": 244,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "doctors",
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A clinical finance analyst wants the best completed-appointment-to-doctor ratio for hospitals that have at least one doctor. Calculate completed appointments, distinct doctors, and the ratio, then return only the hospital with the highest ratio.",
+        "expectedOutput": [
+            {
+                "hospital_name": "Apollo Kolkata Hospital",
+                "doctors": 1,
+                "completed": 27,
+                "appointments_per_doctor": 27.0
+            }
+        ],
+        "hint": "Aggregate doctors and completed appointments per hospital, then calculate the ratio and select the highest.",
+        "solution": "WITH x AS (SELECT h.hospital_id,h.hospital_name,COUNT(DISTINCT d.doctor_id) AS doctors,COUNT(a.appointment_id) AS completed FROM hospitals h JOIN doctors d ON h.hospital_id=d.hospital_id LEFT JOIN appointments a ON d.doctor_id=a.doctor_id AND a.appointment_status='Completed' GROUP BY h.hospital_id,h.hospital_name) SELECT hospital_name,doctors,completed,ROUND(1.0*completed/NULLIF(doctors,0),2) AS appointments_per_doctor FROM x ORDER BY appointments_per_doctor DESC LIMIT 1;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 245,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A billing audit team wants patients whose latest bill is higher than their previous bill. For each patient, order bills chronologically, use LAG to retrieve the previous amount, and return only increases.",
+        "expectedOutput": [
+            {
+                "patient_id": 5,
+                "billing_id": 1428,
+                "billing_date": "2026-07-13",
+                "amount": 109574.41,
+                "previous_amount": 30036.15
+            },
+            {
+                "patient_id": 9,
+                "billing_id": 3197,
+                "billing_date": "2025-07-31",
+                "amount": 131638.75,
+                "previous_amount": 18424.45
+            },
+            {
+                "patient_id": 11,
+                "billing_id": 742,
+                "billing_date": "2023-11-11",
+                "amount": 189671.63,
+                "previous_amount": 134347.41
+            },
+            {
+                "patient_id": 12,
+                "billing_id": 3182,
+                "billing_date": "2025-06-27",
+                "amount": 172080.46,
+                "previous_amount": 47822.3
+            },
+            {
+                "patient_id": 15,
+                "billing_id": 3168,
+                "billing_date": "2025-08-22",
+                "amount": 232946.62,
+                "previous_amount": 110629.73
+            }
+        ],
+        "hint": "Use LAG partitioned by patient and ordered by billing date and ID.",
+        "solution": "WITH x AS (SELECT patient_id,billing_id,billing_date,amount,LAG(amount) OVER(PARTITION BY patient_id ORDER BY billing_date,billing_id) AS previous_amount FROM billing) SELECT patient_id,billing_id,billing_date,amount,previous_amount FROM x WHERE previous_amount IS NOT NULL AND amount>previous_amount;"
+    },
+    {
+        "id": 246,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "insurance",
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "An insurance analytics team wants to rank providers by total billed amount and calculate each provider's percentage of all insured billing. Aggregate billing by provider first, then add rank and percentage using window functions.",
+        "expectedOutput": [
+            {
+                "provider_name": "Niva Bupa",
+                "total_billing": 47723162.86,
+                "billing_rank": 1,
+                "pct_of_insured_billing": 17.99
+            },
+            {
+                "provider_name": "Star Health",
+                "total_billing": 45196043.03,
+                "billing_rank": 2,
+                "pct_of_insured_billing": 17.04
+            },
+            {
+                "provider_name": "HDFC ERGO",
+                "total_billing": 44816231.25,
+                "billing_rank": 3,
+                "pct_of_insured_billing": 16.89
+            },
+            {
+                "provider_name": "Aditya Birla Health",
+                "total_billing": 44729897.95,
+                "billing_rank": 4,
+                "pct_of_insured_billing": 16.86
+            },
+            {
+                "provider_name": "ICICI Lombard",
+                "total_billing": 44106954.23,
+                "billing_rank": 5,
+                "pct_of_insured_billing": 16.63
+            }
+        ],
+        "hint": "Aggregate provider totals in a CTE, then use RANK and a window SUM.",
+        "solution": "WITH x AS (SELECT i.provider_name,SUM(b.amount) AS total_billing FROM insurance i JOIN billing b ON i.insurance_id=b.insurance_id GROUP BY i.provider_name) SELECT provider_name,total_billing,RANK() OVER(ORDER BY total_billing DESC) AS billing_rank,ROUND(100.0*total_billing/SUM(total_billing) OVER(),2) AS pct_of_insured_billing FROM x;"
+    },
+    {
+        "id": 247,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A medical quality team wants doctors who have completed appointments in at least three different calendar years. Return doctor ID, doctor name, and the number of completed years represented by their appointments.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "years_active": 4
+            }
+        ],
+        "hint": "Filter completed appointments, extract the year, and count distinct years per doctor.",
+        "solution": "SELECT d.doctor_id,d.doctor_name,COUNT(DISTINCT substr(a.appointment_date,1,4)) AS years_active FROM doctors d JOIN appointments a ON d.doctor_id=a.doctor_id WHERE a.appointment_status='Completed' GROUP BY d.doctor_id,d.doctor_name HAVING COUNT(DISTINCT substr(a.appointment_date,1,4))>=3;"
+    },
+    {
+        "id": 248,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "departments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A hospital analytics team wants the strongest department in each hospital by average doctor experience. First calculate average experience for every department that has doctors, then rank departments within each hospital and return only the department at rank 1 for each hospital. Include hospital ID, department ID, department name, average experience, and rank.",
+        "expectedOutput": [
+            {
+                "hospital_id": 2,
+                "department_id": 20,
+                "department_name": "Cardiology",
+                "average_experience": 12.4,
+                "department_rank": 1
+            },
+            {
+                "hospital_id": 3,
+                "department_id": 8,
+                "department_name": "Gastroenterology",
+                "average_experience": 11.4,
+                "department_rank": 1
+            },
+            {
+                "hospital_id": 4,
+                "department_id": 13,
+                "department_name": "Orthopedics",
+                "average_experience": 20.0,
+                "department_rank": 1
+            },
+            {
+                "hospital_id": 5,
+                "department_id": 17,
+                "department_name": "Pediatrics",
+                "average_experience": 21.0,
+                "department_rank": 1
+            },
+            {
+                "hospital_id": 6,
+                "department_id": 1,
+                "department_name": "Gynecology",
+                "average_experience": 20.875,
+                "department_rank": 1
+            }
+        ],
+        "hint": "Aggregate experience by department first, then use DENSE_RANK within hospital.",
+        "solution": "WITH dept_avg AS (SELECT dep.hospital_id,dep.department_id,dep.department_name,AVG(d.experience_years) AS average_experience FROM departments dep JOIN doctors d ON dep.department_id=d.department_id GROUP BY dep.hospital_id,dep.department_id,dep.department_name), ranked AS (SELECT *,DENSE_RANK() OVER(PARTITION BY hospital_id ORDER BY average_experience DESC) AS department_rank FROM dept_avg) SELECT hospital_id,department_id,department_name,average_experience,department_rank FROM ranked WHERE department_rank=1;"
+    },
+    {
+        "id": 249,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing",
+            "lab_reports",
+            "appointments"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A clinical risk dashboard needs a patient risk profile using four signals: age as of 16 August 2026, pending billing, non-normal lab reports, and appointment volume. Classify High Risk when pending billing exceeds 50000, non-normal reports are at least 3, appointments are at least 5, or age is at least 75; classify Medium Risk when pending billing exceeds 10000, at least one non-normal report exists, appointments are at least 3, or age is at least 60; otherwise classify Low Risk.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "age": 35,
+                "pending_bill": 0,
+                "non_normal_reports": 2,
+                "appointment_count": 6,
+                "risk_level": "High Risk"
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "age": 38,
+                "pending_bill": 0,
+                "non_normal_reports": 0,
+                "appointment_count": 5,
+                "risk_level": "High Risk"
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "age": 62,
+                "pending_bill": 0,
+                "non_normal_reports": 0,
+                "appointment_count": 5,
+                "risk_level": "High Risk"
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "age": 37,
+                "pending_bill": 0,
+                "non_normal_reports": 1,
+                "appointment_count": 7,
+                "risk_level": "High Risk"
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "age": 39,
+                "pending_bill": 0,
+                "non_normal_reports": 0,
+                "appointment_count": 1,
+                "risk_level": "Low Risk"
+            }
+        ],
+        "hint": "Build four patient-level measures first, then apply the stated CASE thresholds.",
+        "solution": "WITH x AS (SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,CAST((julianday('2026-08-16')-julianday(p.date_of_birth))/365.25 AS INTEGER) AS age,COALESCE((SELECT SUM(b.amount) FROM billing b WHERE b.patient_id=p.patient_id AND b.payment_status='Pending'),0) AS pending_bill,COALESCE((SELECT COUNT(*) FROM lab_reports l WHERE l.patient_id=p.patient_id AND l.result_status<>'Normal'),0) AS non_normal_reports,COALESCE((SELECT COUNT(*) FROM appointments a WHERE a.patient_id=p.patient_id),0) AS appointment_count FROM patients p) SELECT *,CASE WHEN pending_bill>50000 OR non_normal_reports>=3 OR appointment_count>=5 OR age>=75 THEN 'High Risk' WHEN pending_bill>10000 OR non_normal_reports>=1 OR appointment_count>=3 OR age>=60 THEN 'Medium Risk' ELSE 'Low Risk' END AS risk_level FROM x;"
+    },
+    {
+        "id": 250,
+        "difficulty": "Expert",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments",
+            "prescriptions",
+            "lab_reports",
+            "billing"
+        ],
+        "points": 50,
+        "status": "incomplete",
+        "question": "A senior hospital analyst needs a patient-care portfolio view. For every patient with activity, calculate appointment count, prescription count, lab-report count, total billing, and the percentage of the patient's billing that is still pending. Then rank patients by a composite score of appointments*2 + prescriptions + reports + total_billing/10000.",
+        "expectedOutput": [
+            {
+                "patient_id": 758,
+                "patient_name": "Aditya Joshi",
+                "appointment_count": 3,
+                "prescription_count": 2,
+                "report_count": 0,
+                "total_billing": 1176441.78,
+                "pending_billing": 309207.29,
+                "pending_billing_pct": 26.28,
+                "care_score": 125.644178,
+                "care_rank": 1
+            },
+            {
+                "patient_id": 764,
+                "patient_name": "Arjun Joshi",
+                "appointment_count": 4,
+                "prescription_count": 2,
+                "report_count": 2,
+                "total_billing": 1090964.85,
+                "pending_billing": 0,
+                "pending_billing_pct": 0.0,
+                "care_score": 121.09648500000002,
+                "care_rank": 2
+            },
+            {
+                "patient_id": 415,
+                "patient_name": "Amit Sharma",
+                "appointment_count": 3,
+                "prescription_count": 2,
+                "report_count": 1,
+                "total_billing": 1096610.66,
+                "pending_billing": 0,
+                "pending_billing_pct": 0.0,
+                "care_score": 118.66106599999999,
+                "care_rank": 3
+            },
+            {
+                "patient_id": 851,
+                "patient_name": "Karan Reddy",
+                "appointment_count": 6,
+                "prescription_count": 3,
+                "report_count": 3,
+                "total_billing": 980219.65,
+                "pending_billing": 0,
+                "pending_billing_pct": 0.0,
+                "care_score": 116.02196500000001,
+                "care_rank": 4
+            },
+            {
+                "patient_id": 972,
+                "patient_name": "Aditi Desai",
+                "appointment_count": 6,
+                "prescription_count": 5,
+                "report_count": 4,
+                "total_billing": 875816.9299999999,
+                "pending_billing": 0,
+                "pending_billing_pct": 0.0,
+                "care_score": 108.58169299999999,
+                "care_rank": 5
+            }
+        ],
+        "hint": "Build patient-level measures in a CTE, calculate the pending percentage and score, then rank by the score.",
+        "solution": "WITH x AS (SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,(SELECT COUNT(*) FROM appointments a WHERE a.patient_id=p.patient_id) AS appointment_count,(SELECT COUNT(*) FROM prescriptions pr WHERE pr.patient_id=p.patient_id) AS prescription_count,(SELECT COUNT(*) FROM lab_reports lr WHERE lr.patient_id=p.patient_id) AS report_count,COALESCE((SELECT SUM(b.amount) FROM billing b WHERE b.patient_id=p.patient_id),0) AS total_billing,COALESCE((SELECT SUM(b.amount) FROM billing b WHERE b.patient_id=p.patient_id AND b.payment_status='Pending'),0) AS pending_billing FROM patients p) SELECT *,ROUND(100.0*pending_billing/NULLIF(total_billing,0),2) AS pending_billing_pct,appointment_count*2+prescription_count+report_count+total_billing/10000.0 AS care_score,RANK() OVER(ORDER BY appointment_count*2+prescription_count+report_count+total_billing/10000.0 DESC) AS care_rank FROM x WHERE appointment_count>0 OR prescription_count>0 OR report_count>0 OR total_billing>0;"
+    }
+]

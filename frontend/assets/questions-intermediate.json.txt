@@ -1,0 +1,3792 @@
+[
+    {
+        "id": 101,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts",
+            "customers"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every account, display the account ID, customer full name, account type, and current balance by joining accounts to customers.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "customer_name": "Neha Joshi",
+                "account_type": "Salary",
+                "balance": 104981.71
+            },
+            {
+                "account_id": 2,
+                "customer_name": "Nikhil Sharma",
+                "account_type": "Current",
+                "balance": 12593.12
+            },
+            {
+                "account_id": 3,
+                "customer_name": "Amit Jain",
+                "account_type": "Savings",
+                "balance": 177878.16
+            },
+            {
+                "account_id": 4,
+                "customer_name": "Neha Shah",
+                "account_type": "Salary",
+                "balance": 22993.5
+            },
+            {
+                "account_id": 5,
+                "customer_name": "Neha Sharma",
+                "account_type": "Savings",
+                "balance": 121989.55
+            }
+        ],
+        "hint": "Join accounts to customers using customer_id.",
+        "solution": "SELECT a.account_id, c.first_name || ' ' || c.last_name AS customer_name, a.account_type, a.balance FROM accounts a JOIN customers c ON a.customer_id=c.customer_id;"
+    },
+    {
+        "id": 102,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts",
+            "branches"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every account, show the account ID, branch name, branch city, and balance. Include only accounts that have a matching branch.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "branch_name": "Kolkata Market Branch",
+                "city": "Kolkata",
+                "balance": 104981.71
+            },
+            {
+                "account_id": 2,
+                "branch_name": "Indore Market Branch",
+                "city": "Indore",
+                "balance": 12593.12
+            },
+            {
+                "account_id": 3,
+                "branch_name": "Chennai Main Branch",
+                "city": "Chennai",
+                "balance": 177878.16
+            },
+            {
+                "account_id": 4,
+                "branch_name": "Kolkata City Branch",
+                "city": "Kolkata",
+                "balance": 22993.5
+            },
+            {
+                "account_id": 5,
+                "branch_name": "Chennai Market Branch",
+                "city": "Chennai",
+                "balance": 121989.55
+            }
+        ],
+        "hint": "Join accounts to branches using branch_id.",
+        "solution": "SELECT a.account_id, b.branch_name, b.city, a.balance FROM accounts a JOIN branches b ON a.branch_id=b.branch_id;"
+    },
+    {
+        "id": 103,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have at least one account with a balance above 200000. Return each qualifying customer once with the customer ID and full name.",
+        "expectedOutput": [
+            {
+                "customer_id": 101,
+                "customer_name": "Sanjay Jain"
+            },
+            {
+                "customer_id": 1032,
+                "customer_name": "Ananya Nair"
+            },
+            {
+                "customer_id": 1083,
+                "customer_name": "Ananya Jain"
+            },
+            {
+                "customer_id": 264,
+                "customer_name": "Isha Patil"
+            },
+            {
+                "customer_id": 1324,
+                "customer_name": "Karan Sharma"
+            }
+        ],
+        "hint": "Use DISTINCT because a customer may have multiple accounts.",
+        "solution": "SELECT DISTINCT c.customer_id, c.first_name || ' ' || c.last_name AS customer_name FROM customers c JOIN accounts a ON c.customer_id=a.customer_id WHERE a.balance>200000;"
+    },
+    {
+        "id": 104,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Calculate the total account balance held in each branch city. Return the city and total balance.",
+        "expectedOutput": [
+            {
+                "city": "Ahmedabad",
+                "total_balance": 28146139.05
+            },
+            {
+                "city": "Bengaluru",
+                "total_balance": 15755965.63
+            },
+            {
+                "city": "Chennai",
+                "total_balance": 10026175.94
+            },
+            {
+                "city": "Gurugram",
+                "total_balance": 13737515.96
+            },
+            {
+                "city": "Indore",
+                "total_balance": 25101552.75
+            }
+        ],
+        "hint": "Join branches to accounts and aggregate by city.",
+        "solution": "SELECT b.city, SUM(a.balance) AS total_balance FROM branches b JOIN accounts a ON b.branch_id=a.branch_id GROUP BY b.city;"
+    },
+    {
+        "id": 105,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Identify branches whose combined account balances exceed 1000000. Return branch ID, branch name, and total balance.",
+        "expectedOutput": [
+            {
+                "branch_id": 1,
+                "branch_name": "Mumbai Central Branch",
+                "total_balance": 2772920.98
+            },
+            {
+                "branch_id": 2,
+                "branch_name": "Kolkata Market Branch",
+                "total_balance": 3945274.1
+            },
+            {
+                "branch_id": 3,
+                "branch_name": "Gurugram City Branch",
+                "total_balance": 4057030.85
+            },
+            {
+                "branch_id": 4,
+                "branch_name": "Kochi Central Branch",
+                "total_balance": 4451980.89
+            },
+            {
+                "branch_id": 5,
+                "branch_name": "Bengaluru Central Branch",
+                "total_balance": 3351488.65
+            }
+        ],
+        "hint": "Use GROUP BY branch and HAVING on SUM(balance).",
+        "solution": "SELECT b.branch_id,b.branch_name,SUM(a.balance) AS total_balance FROM branches b JOIN accounts a ON b.branch_id=a.branch_id GROUP BY b.branch_id,b.branch_name HAVING SUM(a.balance)>1000000;"
+    },
+    {
+        "id": 106,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who own more than one account. Return customer ID, full name, and the number of accounts.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "customer_name": "Arjun Mehta",
+                "account_count": 2
+            },
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "account_count": 2
+            },
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma",
+                "account_count": 2
+            },
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "account_count": 2
+            },
+            {
+                "customer_id": 6,
+                "customer_name": "Neha Sharma",
+                "account_count": 3
+            }
+        ],
+        "hint": "Group accounts by customer and filter groups with HAVING.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COUNT(a.account_id) AS account_count FROM customers c JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name HAVING COUNT(a.account_id)>1;"
+    },
+    {
+        "id": 107,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Produce one summary row per transaction type showing the total transaction amount for each type.",
+        "expectedOutput": [
+            {
+                "transaction_type": "ATM_WITHDRAWAL",
+                "total_amount": 164517578.9
+            },
+            {
+                "transaction_type": "CARD_PAYMENT",
+                "total_amount": 170739592.21
+            },
+            {
+                "transaction_type": "DEPOSIT",
+                "total_amount": 160078930.94
+            },
+            {
+                "transaction_type": "INTEREST",
+                "total_amount": 163173957.33
+            },
+            {
+                "transaction_type": "TRANSFER",
+                "total_amount": 174663125.31
+            }
+        ],
+        "hint": "Group transactions by transaction_type and SUM amount.",
+        "solution": "SELECT transaction_type,SUM(amount) AS total_amount FROM transactions GROUP BY transaction_type;"
+    },
+    {
+        "id": 108,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each transaction type, calculate the average transaction amount and return the transaction type with its average.",
+        "expectedOutput": [
+            {
+                "transaction_type": "ATM_WITHDRAWAL",
+                "average_amount": 121684.59977810651
+            },
+            {
+                "transaction_type": "CARD_PAYMENT",
+                "average_amount": 127608.06592675636
+            },
+            {
+                "transaction_type": "DEPOSIT",
+                "average_amount": 123996.07353989156
+            },
+            {
+                "transaction_type": "INTEREST",
+                "average_amount": 125133.40286042946
+            },
+            {
+                "transaction_type": "TRANSFER",
+                "average_amount": 128052.14465542522
+            }
+        ],
+        "hint": "Use AVG with GROUP BY.",
+        "solution": "SELECT transaction_type,AVG(amount) AS average_amount FROM transactions GROUP BY transaction_type;"
+    },
+    {
+        "id": 109,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts",
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find accounts that have never had a transaction. The result must still include accounts even though they have no matching transaction rows.",
+        "expectedOutput": [
+            {
+                "account_id": 939,
+                "customer_id": 1
+            },
+            {
+                "account_id": 756,
+                "customer_id": 5
+            },
+            {
+                "account_id": 213,
+                "customer_id": 45
+            },
+            {
+                "account_id": 1709,
+                "customer_id": 70
+            },
+            {
+                "account_id": 930,
+                "customer_id": 93
+            }
+        ],
+        "hint": "A LEFT JOIN is required to preserve accounts without transactions.",
+        "solution": "SELECT a.account_id,a.customer_id FROM accounts a LEFT JOIN transactions t ON a.account_id=t.account_id WHERE t.transaction_id IS NULL;"
+    },
+    {
+        "id": 110,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans",
+            "credit_cards"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have at least one loan but do not hold any credit card. Return each customer only once.",
+        "expectedOutput": [
+            {
+                "customer_id": 9,
+                "customer_name": "Meera Joshi"
+            },
+            {
+                "customer_id": 10,
+                "customer_name": "Sneha Kumar"
+            },
+            {
+                "customer_id": 16,
+                "customer_name": "Amit Gupta"
+            },
+            {
+                "customer_id": 17,
+                "customer_name": "Rohan Jain"
+            },
+            {
+                "customer_id": 20,
+                "customer_name": "Sanjay Shah"
+            }
+        ],
+        "hint": "Use a LEFT JOIN to detect customers with no matching credit card.",
+        "solution": "SELECT DISTINCT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c JOIN loans l ON c.customer_id=l.customer_id LEFT JOIN credit_cards cc ON c.customer_id=cc.customer_id WHERE cc.credit_card_id IS NULL;"
+    },
+    {
+        "id": 111,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Calculate the average loan principal for each loan status. Return loan status and average principal amount.",
+        "expectedOutput": [
+            {
+                "loan_status": "Active",
+                "average_loan": 1798862.1241184974
+            },
+            {
+                "loan_status": "Closed",
+                "average_loan": 1612154.1651923077
+            },
+            {
+                "loan_status": "Defaulted",
+                "average_loan": 1910386.114107143
+            }
+        ],
+        "hint": "Group loans by loan_status.",
+        "solution": "SELECT loan_status,AVG(principal_amount) AS average_loan FROM loans GROUP BY loan_status;"
+    },
+    {
+        "id": 112,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find every loan whose principal amount is greater than the average principal amount across all loans. Return loan ID, customer ID, and principal amount.",
+        "expectedOutput": [
+            {
+                "loan_id": 8,
+                "customer_id": 547,
+                "principal_amount": 2865296.64
+            },
+            {
+                "loan_id": 9,
+                "customer_id": 234,
+                "principal_amount": 3126598.57
+            },
+            {
+                "loan_id": 14,
+                "customer_id": 532,
+                "principal_amount": 3269553.96
+            },
+            {
+                "loan_id": 15,
+                "customer_id": 95,
+                "principal_amount": 2985703.42
+            },
+            {
+                "loan_id": 16,
+                "customer_id": 845,
+                "principal_amount": 3253208.03
+            }
+        ],
+        "hint": "Use a scalar subquery containing AVG(principal_amount).",
+        "solution": "SELECT loan_id,customer_id,principal_amount FROM loans WHERE principal_amount>(SELECT AVG(principal_amount) FROM loans);"
+    },
+    {
+        "id": 113,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the second-highest distinct account balance. Return the balance as second_highest_balance.",
+        "expectedOutput": [
+            {
+                "second_highest_balance": 298669.38
+            }
+        ],
+        "hint": "Find the maximum balance below the overall maximum.",
+        "solution": "SELECT MAX(balance) AS second_highest_balance FROM accounts WHERE balance < (SELECT MAX(balance) FROM accounts);"
+    },
+    {
+        "id": 114,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Identify the three customers with the largest combined balance across all of their accounts. Return customer ID, full name, and total balance.",
+        "expectedOutput": [
+            {
+                "customer_id": 912,
+                "customer_name": "Karan Patil",
+                "total_balance": 715391.38
+            },
+            {
+                "customer_id": 469,
+                "customer_name": "Pooja Gupta",
+                "total_balance": 682092.12
+            },
+            {
+                "customer_id": 1074,
+                "customer_name": "Aditya Desai",
+                "total_balance": 660888.6900000001
+            }
+        ],
+        "hint": "Aggregate balances by customer, then sort and limit.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,SUM(a.balance) AS total_balance FROM customers c JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name ORDER BY total_balance DESC LIMIT 3;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 115,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Calculate the total transaction amount for each account. Return account ID and total transaction amount.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "total_transaction_amount": 628802.35
+            },
+            {
+                "account_id": 2,
+                "total_transaction_amount": 634953.29
+            },
+            {
+                "account_id": 3,
+                "total_transaction_amount": 1189259.58
+            },
+            {
+                "account_id": 4,
+                "total_transaction_amount": 385172.96
+            },
+            {
+                "account_id": 5,
+                "total_transaction_amount": 502513.37
+            }
+        ],
+        "hint": "Group transactions by account_id.",
+        "solution": "SELECT account_id,SUM(amount) AS total_transaction_amount FROM transactions GROUP BY account_id;"
+    },
+    {
+        "id": 116,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find accounts whose total transaction amount is greater than 500000. Return account ID and total transaction amount.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "total_transaction_amount": 628802.35
+            },
+            {
+                "account_id": 2,
+                "total_transaction_amount": 634953.29
+            },
+            {
+                "account_id": 3,
+                "total_transaction_amount": 1189259.58
+            },
+            {
+                "account_id": 5,
+                "total_transaction_amount": 502513.37
+            },
+            {
+                "account_id": 10,
+                "total_transaction_amount": 745637.4299999999
+            }
+        ],
+        "hint": "Use HAVING after grouping by account_id.",
+        "solution": "SELECT account_id,SUM(amount) AS total_transaction_amount FROM transactions GROUP BY account_id HAVING SUM(amount)>500000;"
+    },
+    {
+        "id": 117,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "credit_cards"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every customer, count how many credit cards they hold. Customers with no credit cards must also appear with a count of zero.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "customer_name": "Arjun Mehta",
+                "card_count": 1
+            },
+            {
+                "customer_id": 2,
+                "customer_name": "Isha Mehta",
+                "card_count": 0
+            },
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "card_count": 1
+            },
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma",
+                "card_count": 0
+            },
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "card_count": 1
+            }
+        ],
+        "hint": "LEFT JOIN customers to credit_cards so customers with zero cards remain.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COUNT(cc.credit_card_id) AS card_count FROM customers c LEFT JOIN credit_cards cc ON c.customer_id=cc.customer_id GROUP BY c.customer_id,c.first_name,c.last_name;"
+    },
+    {
+        "id": 118,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have both an active loan and at least one active account. Return each qualifying customer once.",
+        "expectedOutput": [
+            {
+                "customer_id": 1449,
+                "customer_name": "Kavya Mehta"
+            },
+            {
+                "customer_id": 286,
+                "customer_name": "Ananya Verma"
+            },
+            {
+                "customer_id": 559,
+                "customer_name": "Karan Sharma"
+            },
+            {
+                "customer_id": 638,
+                "customer_name": "Vivaan Shah"
+            },
+            {
+                "customer_id": 1263,
+                "customer_name": "Riya Sharma"
+            }
+        ],
+        "hint": "Join both tables and filter both status columns.",
+        "solution": "SELECT DISTINCT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c JOIN loans l ON c.customer_id=l.customer_id JOIN accounts a ON c.customer_id=a.customer_id WHERE l.loan_status='Active' AND a.account_status='Active';"
+    },
+    {
+        "id": 119,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Identify the branch with the highest average account balance. Return branch name and average balance.",
+        "expectedOutput": [
+            {
+                "branch_name": "Bengaluru Market Branch",
+                "avg_balance": 89438.97
+            }
+        ],
+        "hint": "Aggregate by branch, sort the average descending, and keep one row.",
+        "solution": "SELECT b.branch_name,AVG(a.balance) AS avg_balance FROM branches b JOIN accounts a ON b.branch_id=a.branch_id GROUP BY b.branch_id,b.branch_name ORDER BY avg_balance DESC LIMIT 1;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 120,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "loans",
+            "customers"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each loan, show the customer full name, customer city, principal amount, and loan status.",
+        "expectedOutput": [
+            {
+                "loan_id": 1,
+                "customer_name": "Kavya Mehta",
+                "city": "Ahmedabad",
+                "principal_amount": 346922.09,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 2,
+                "customer_name": "Ananya Verma",
+                "city": "Chennai",
+                "principal_amount": 1298412.48,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 3,
+                "customer_name": "Karan Sharma",
+                "city": "Pune",
+                "principal_amount": 134515.93,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 4,
+                "customer_name": "Vivaan Shah",
+                "city": "Kochi",
+                "principal_amount": 1054067.76,
+                "loan_status": "Active"
+            },
+            {
+                "loan_id": 5,
+                "customer_name": "Priya Jain",
+                "city": "Chennai",
+                "principal_amount": 1375717.3,
+                "loan_status": "Closed"
+            }
+        ],
+        "hint": "Join loans to customers on customer_id.",
+        "solution": "SELECT l.loan_id,c.first_name || ' ' || c.last_name AS customer_name,c.city,l.principal_amount,l.loan_status FROM loans l JOIN customers c ON l.customer_id=c.customer_id;"
+    },
+    {
+        "id": 121,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "employees"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "A banking operations team needs a branch staffing view. Display every branch and the number of employees assigned to it, including branches that currently have no employees.",
+        "expectedOutput": [
+            {
+                "branch_id": 1,
+                "branch_name": "Mumbai Central Branch",
+                "employee_count": 5
+            },
+            {
+                "branch_id": 2,
+                "branch_name": "Kolkata Market Branch",
+                "employee_count": 6
+            },
+            {
+                "branch_id": 3,
+                "branch_name": "Gurugram City Branch",
+                "employee_count": 7
+            },
+            {
+                "branch_id": 4,
+                "branch_name": "Kochi Central Branch",
+                "employee_count": 3
+            },
+            {
+                "branch_id": 5,
+                "branch_name": "Bengaluru Central Branch",
+                "employee_count": 5
+            }
+        ],
+        "hint": "Use LEFT JOIN and COUNT(employee_id) so zero-employee branches remain.",
+        "solution": "SELECT b.branch_id,b.branch_name,COUNT(e.employee_id) AS employee_count FROM branches b LEFT JOIN employees e ON b.branch_id=e.branch_id GROUP BY b.branch_id,b.branch_name;"
+    },
+    {
+        "id": 122,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts",
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have at least one account but no loan. Return customer ID and full name, with each customer listed once.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "customer_name": "Arjun Mehta"
+            },
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah"
+            },
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma"
+            },
+            {
+                "customer_id": 6,
+                "customer_name": "Neha Sharma"
+            },
+            {
+                "customer_id": 8,
+                "customer_name": "Vivaan Kumar"
+            }
+        ],
+        "hint": "Use a LEFT JOIN to loans and test for NULL loan_id.",
+        "solution": "SELECT DISTINCT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c JOIN accounts a ON c.customer_id=a.customer_id LEFT JOIN loans l ON c.customer_id=l.customer_id WHERE l.loan_id IS NULL;"
+    },
+    {
+        "id": 123,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each account that has transactions, determine the most recent transaction date.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "latest_transaction_date": "2025-11-07"
+            },
+            {
+                "account_id": 2,
+                "latest_transaction_date": "2026-07-23"
+            },
+            {
+                "account_id": 3,
+                "latest_transaction_date": "2025-01-18"
+            },
+            {
+                "account_id": 4,
+                "latest_transaction_date": "2025-12-07"
+            },
+            {
+                "account_id": 5,
+                "latest_transaction_date": "2024-12-25"
+            }
+        ],
+        "hint": "Use MAX(transaction_date) grouped by account.",
+        "solution": "SELECT account_id,MAX(transaction_date) AS latest_transaction_date FROM transactions GROUP BY account_id;"
+    },
+    {
+        "id": 124,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each account, find the largest single transaction amount recorded against that account.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "largest_transaction": 235220.43
+            },
+            {
+                "account_id": 2,
+                "largest_transaction": 203520.56
+            },
+            {
+                "account_id": 3,
+                "largest_transaction": 239827.72
+            },
+            {
+                "account_id": 4,
+                "largest_transaction": 202629.51
+            },
+            {
+                "account_id": 5,
+                "largest_transaction": 209967.58
+            }
+        ],
+        "hint": "Use MAX(amount) grouped by account_id.",
+        "solution": "SELECT account_id,MAX(amount) AS largest_transaction FROM transactions GROUP BY account_id;"
+    },
+    {
+        "id": 125,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Classify every account by balance: High when balance is above 200000, Medium when it is at least 50000 but not above 200000, and Low otherwise. Return account ID, balance, and category.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "balance": 104981.71,
+                "balance_category": "Medium"
+            },
+            {
+                "account_id": 2,
+                "balance": 12593.12,
+                "balance_category": "Low"
+            },
+            {
+                "account_id": 3,
+                "balance": 177878.16,
+                "balance_category": "Medium"
+            },
+            {
+                "account_id": 4,
+                "balance": 22993.5,
+                "balance_category": "Low"
+            },
+            {
+                "account_id": 5,
+                "balance": 121989.55,
+                "balance_category": "Medium"
+            }
+        ],
+        "hint": "Use a CASE expression with the thresholds in the question.",
+        "solution": "SELECT account_id,balance,CASE WHEN balance>200000 THEN 'High' WHEN balance>=50000 THEN 'Medium' ELSE 'Low' END AS balance_category FROM accounts;"
+    },
+    {
+        "id": 126,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "A finance dashboard needs monthly transaction totals for 2025. Group transactions by year-month and calculate the total amount for each month.",
+        "expectedOutput": [
+            {
+                "year_month": "2025-01",
+                "total_amount": 17499137.32
+            },
+            {
+                "year_month": "2025-02",
+                "total_amount": 16380922.05
+            },
+            {
+                "year_month": "2025-03",
+                "total_amount": 16770367.08
+            },
+            {
+                "year_month": "2025-04",
+                "total_amount": 18694729.72
+            },
+            {
+                "year_month": "2025-05",
+                "total_amount": 17317309.02
+            }
+        ],
+        "hint": "Extract YYYY-MM with substr(transaction_date,1,7).",
+        "solution": "SELECT substr(transaction_date,1,7) AS year_month,SUM(amount) AS total_amount FROM transactions WHERE transaction_date>='2025-01-01' AND transaction_date<'2026-01-01' GROUP BY substr(transaction_date,1,7);"
+    },
+    {
+        "id": 127,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts",
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have at least one transaction larger than 100000 on any of their accounts. Return customer ID and full name.",
+        "expectedOutput": [
+            {
+                "customer_id": 1124,
+                "customer_name": "Aarav Verma"
+            },
+            {
+                "customer_id": 664,
+                "customer_name": "Riya Mehta"
+            },
+            {
+                "customer_id": 849,
+                "customer_name": "Nikhil Singh"
+            },
+            {
+                "customer_id": 451,
+                "customer_name": "Rahul Desai"
+            },
+            {
+                "customer_id": 14,
+                "customer_name": "Aditya Patil"
+            }
+        ],
+        "hint": "Join customer -> account -> transaction and use DISTINCT.",
+        "solution": "SELECT DISTINCT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c JOIN accounts a ON c.customer_id=a.customer_id JOIN transactions t ON a.account_id=t.account_id WHERE t.amount>100000;"
+    },
+    {
+        "id": 128,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Identify loan statuses that contain more than 250 loans. Return the status and loan count.",
+        "expectedOutput": [
+            {
+                "loan_status": "Active",
+                "loan_count": 692
+            }
+        ],
+        "hint": "Group by loan_status and filter with HAVING.",
+        "solution": "SELECT loan_status,COUNT(*) AS loan_count FROM loans GROUP BY loan_status HAVING COUNT(*)>250;"
+    },
+    {
+        "id": 129,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have more than one loan. Return customer ID, full name, and loan count.",
+        "expectedOutput": [
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "loan_count": 3
+            },
+            {
+                "customer_id": 13,
+                "customer_name": "Priya Jain",
+                "loan_count": 3
+            },
+            {
+                "customer_id": 15,
+                "customer_name": "Aditi Sharma",
+                "loan_count": 2
+            },
+            {
+                "customer_id": 31,
+                "customer_name": "Aarav Kulkarni",
+                "loan_count": 2
+            },
+            {
+                "customer_id": 33,
+                "customer_name": "Aarav Kulkarni",
+                "loan_count": 3
+            }
+        ],
+        "hint": "Count loans per customer and filter groups.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COUNT(l.loan_id) AS loan_count FROM customers c JOIN loans l ON c.customer_id=l.customer_id GROUP BY c.customer_id,c.first_name,c.last_name HAVING COUNT(l.loan_id)>1;"
+    },
+    {
+        "id": 130,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "credit_cards",
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who hold a credit card and also have at least one loan with principal above 1000000.",
+        "expectedOutput": [
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni"
+            },
+            {
+                "customer_id": 11,
+                "customer_name": "Pooja Patil"
+            },
+            {
+                "customer_id": 13,
+                "customer_name": "Priya Jain"
+            },
+            {
+                "customer_id": 14,
+                "customer_name": "Aditya Patil"
+            },
+            {
+                "customer_id": 15,
+                "customer_name": "Aditi Sharma"
+            }
+        ],
+        "hint": "Join customers to both credit_cards and loans.",
+        "solution": "SELECT DISTINCT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c JOIN credit_cards cc ON c.customer_id=cc.customer_id JOIN loans l ON c.customer_id=l.customer_id WHERE l.principal_amount>1000000;"
+    },
+    {
+        "id": 131,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts",
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each account, compare its current balance with the total value of its transactions. Return only accounts whose balance is greater than their transaction total.",
+        "expectedOutput": [
+            {
+                "account_id": 17,
+                "balance": 69370.53,
+                "transaction_total": 24768.36
+            },
+            {
+                "account_id": 18,
+                "balance": 166139.73,
+                "transaction_total": 0
+            },
+            {
+                "account_id": 22,
+                "balance": 105698.97,
+                "transaction_total": 0
+            },
+            {
+                "account_id": 25,
+                "balance": 137355.51,
+                "transaction_total": 27117.13
+            },
+            {
+                "account_id": 67,
+                "balance": 59981.94,
+                "transaction_total": 0
+            }
+        ],
+        "hint": "LEFT JOIN transactions and compare balance to SUM(amount).",
+        "solution": "SELECT a.account_id,a.balance,COALESCE(SUM(t.amount),0) AS transaction_total FROM accounts a LEFT JOIN transactions t ON a.account_id=t.account_id GROUP BY a.account_id,a.balance HAVING a.balance>COALESCE(SUM(t.amount),0);"
+    },
+    {
+        "id": 132,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find accounts opened before 2023 that are still active. Return account ID, customer ID, and opening date.",
+        "expectedOutput": [
+            {
+                "account_id": 3,
+                "customer_id": 1176,
+                "opened_date": "2022-08-26"
+            },
+            {
+                "account_id": 5,
+                "customer_id": 293,
+                "opened_date": "2022-10-16"
+            },
+            {
+                "account_id": 6,
+                "customer_id": 852,
+                "opened_date": "2019-07-24"
+            },
+            {
+                "account_id": 7,
+                "customer_id": 558,
+                "opened_date": "2020-12-16"
+            },
+            {
+                "account_id": 10,
+                "customer_id": 1258,
+                "opened_date": "2019-01-30"
+            }
+        ],
+        "hint": "The current schema stores the opening date in opened_date.",
+        "solution": "SELECT account_id,customer_id,opened_date FROM accounts WHERE opened_date<'2023-01-01' AND account_status='Active';"
+    },
+    {
+        "id": 133,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find active loans whose interest rate is above the average interest rate among all active loans. Return loan ID, customer ID, and interest rate.",
+        "expectedOutput": [
+            {
+                "loan_id": 1,
+                "customer_id": 1449,
+                "interest_rate": 12.92
+            },
+            {
+                "loan_id": 4,
+                "customer_id": 638,
+                "interest_rate": 13.83
+            },
+            {
+                "loan_id": 6,
+                "customer_id": 1263,
+                "interest_rate": 12.85
+            },
+            {
+                "loan_id": 7,
+                "customer_id": 885,
+                "interest_rate": 13.65
+            },
+            {
+                "loan_id": 8,
+                "customer_id": 547,
+                "interest_rate": 11.11
+            }
+        ],
+        "hint": "Use the same Active filter in the outer query and the AVG subquery.",
+        "solution": "SELECT loan_id,customer_id,interest_rate FROM loans WHERE loan_status='Active' AND interest_rate>(SELECT AVG(interest_rate) FROM loans WHERE loan_status='Active');"
+    },
+    {
+        "id": 134,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have no active account. Include customers who may have closed accounts or no accounts at all.",
+        "expectedOutput": [
+            {
+                "customer_id": 2,
+                "customer_name": "Isha Mehta"
+            },
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni"
+            },
+            {
+                "customer_id": 7,
+                "customer_name": "Nikhil Shah"
+            },
+            {
+                "customer_id": 10,
+                "customer_name": "Sneha Kumar"
+            },
+            {
+                "customer_id": 20,
+                "customer_name": "Sanjay Shah"
+            }
+        ],
+        "hint": "Put the active-account condition in the JOIN so customers without an active match are preserved.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c LEFT JOIN accounts a ON c.customer_id=a.customer_id AND a.account_status='Active' WHERE a.account_id IS NULL;"
+    },
+    {
+        "id": 135,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "payments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Calculate the total payment amount grouped by payment method.",
+        "expectedOutput": [
+            {
+                "payment_method": "Auto Debit",
+                "total_payment_amount": 26637391.3
+            },
+            {
+                "payment_method": "Cash",
+                "total_payment_amount": 25850033.8
+            },
+            {
+                "payment_method": "Cheque",
+                "total_payment_amount": 25733803.36
+            },
+            {
+                "payment_method": "NEFT",
+                "total_payment_amount": 27363565.13
+            },
+            {
+                "payment_method": "UPI",
+                "total_payment_amount": 27640210.67
+            }
+        ],
+        "hint": "Payments use payment_amount, not amount.",
+        "solution": "SELECT payment_method,SUM(payment_amount) AS total_payment_amount FROM payments GROUP BY payment_method;"
+    },
+    {
+        "id": 136,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the customer with the largest combined principal amount across all of their loans. Return customer ID, full name, and total loan principal.",
+        "expectedOutput": [
+            {
+                "customer_id": 917,
+                "customer_name": "Pooja Verma",
+                "total_loan": 8913118.28
+            }
+        ],
+        "hint": "Aggregate loan principal by customer and select the highest total.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,SUM(l.principal_amount) AS total_loan FROM customers c JOIN loans l ON c.customer_id=l.customer_id GROUP BY c.customer_id,c.first_name,c.last_name ORDER BY total_loan DESC LIMIT 1;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 137,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "loans"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Calculate the percentage of all loans whose status is Active. Return the percentage rounded to two decimal places.",
+        "expectedOutput": [
+            {
+                "active_loan_percentage": 86.5
+            }
+        ],
+        "hint": "Use conditional aggregation with CASE inside SUM.",
+        "solution": "SELECT ROUND(100.0*SUM(CASE WHEN loan_status='Active' THEN 1 ELSE 0 END)/COUNT(*),2) AS active_loan_percentage FROM loans;"
+    },
+    {
+        "id": 138,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts",
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have transaction activity in at least two different calendar years. Return customer ID, full name, and number of active years.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "customer_name": "Arjun Mehta",
+                "years_active": 4
+            },
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "years_active": 5
+            },
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma",
+                "years_active": 4
+            },
+            {
+                "customer_id": 6,
+                "customer_name": "Neha Sharma",
+                "years_active": 4
+            },
+            {
+                "customer_id": 8,
+                "customer_name": "Vivaan Kumar",
+                "years_active": 4
+            }
+        ],
+        "hint": "Extract the year and count distinct years per customer.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COUNT(DISTINCT substr(t.transaction_date,1,4)) AS years_active FROM customers c JOIN accounts a ON c.customer_id=a.customer_id JOIN transactions t ON a.account_id=t.account_id GROUP BY c.customer_id,c.first_name,c.last_name HAVING COUNT(DISTINCT substr(t.transaction_date,1,4))>=2;"
+    },
+    {
+        "id": 139,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "employees"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each branch, calculate the average employee salary. Include branches with no employees and show a NULL average where no salary exists.",
+        "expectedOutput": [
+            {
+                "branch_id": 1,
+                "branch_name": "Mumbai Central Branch",
+                "average_salary": 78544.912
+            },
+            {
+                "branch_id": 2,
+                "branch_name": "Kolkata Market Branch",
+                "average_salary": 78237.08166666667
+            },
+            {
+                "branch_id": 3,
+                "branch_name": "Gurugram City Branch",
+                "average_salary": 74690.44857142857
+            },
+            {
+                "branch_id": 4,
+                "branch_name": "Kochi Central Branch",
+                "average_salary": 102327.39333333333
+            },
+            {
+                "branch_id": 5,
+                "branch_name": "Bengaluru Central Branch",
+                "average_salary": 86705.90400000001
+            }
+        ],
+        "hint": "LEFT JOIN branches to employees before AVG.",
+        "solution": "SELECT b.branch_id,b.branch_name,AVG(e.salary) AS average_salary FROM branches b LEFT JOIN employees e ON b.branch_id=e.branch_id GROUP BY b.branch_id,b.branch_name;"
+    },
+    {
+        "id": 140,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "employees"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find employees whose salary is above the average salary of all employees. Return employee ID, name, job title, and salary.",
+        "expectedOutput": [
+            {
+                "employee_id": 1,
+                "employee_name": "Aditi Jain",
+                "job_title": "Cashier",
+                "salary": 109687.04
+            },
+            {
+                "employee_id": 4,
+                "employee_name": "Sanjay Mehta",
+                "job_title": "Loan Officer",
+                "salary": 101359.04
+            },
+            {
+                "employee_id": 5,
+                "employee_name": "Aarav Desai",
+                "job_title": "Relationship Manager",
+                "salary": 92402.89
+            },
+            {
+                "employee_id": 7,
+                "employee_name": "Pooja Jain",
+                "job_title": "Analyst",
+                "salary": 134828.0
+            },
+            {
+                "employee_id": 8,
+                "employee_name": "Riya Kumar",
+                "job_title": "Analyst",
+                "salary": 95408.02
+            }
+        ],
+        "hint": "Compare each salary to a scalar AVG subquery.",
+        "solution": "SELECT employee_id,employee_name,job_title,salary FROM employees WHERE salary>(SELECT AVG(salary) FROM employees);"
+    },
+    {
+        "id": 141,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every customer, calculate the number of accounts and the combined balance of those accounts. Include customers with no accounts.",
+        "expectedOutput": [
+            {
+                "customer_id": 1,
+                "customer_name": "Arjun Mehta",
+                "account_count": 2,
+                "total_balance": 107171.2
+            },
+            {
+                "customer_id": 2,
+                "customer_name": "Isha Mehta",
+                "account_count": 0,
+                "total_balance": 0
+            },
+            {
+                "customer_id": 3,
+                "customer_name": "Kavya Shah",
+                "account_count": 2,
+                "total_balance": 137157.0
+            },
+            {
+                "customer_id": 4,
+                "customer_name": "Aditya Sharma",
+                "account_count": 2,
+                "total_balance": 89251.81
+            },
+            {
+                "customer_id": 5,
+                "customer_name": "Aarav Kulkarni",
+                "account_count": 2,
+                "total_balance": 132789.96
+            }
+        ],
+        "hint": "LEFT JOIN customers to accounts and use COUNT(account_id).",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,COUNT(a.account_id) AS account_count,COALESCE(SUM(a.balance),0) AS total_balance FROM customers c LEFT JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name;"
+    },
+    {
+        "id": 142,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "payments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each payment method, calculate both the number of payments and the average payment amount in one result set.",
+        "expectedOutput": [
+            {
+                "payment_method": "Auto Debit",
+                "payment_count": 439,
+                "average_payment": 60677.428929384965
+            },
+            {
+                "payment_method": "Cash",
+                "payment_count": 433,
+                "average_payment": 59699.847113163974
+            },
+            {
+                "payment_method": "Cheque",
+                "payment_count": 434,
+                "average_payment": 59294.477788018434
+            },
+            {
+                "payment_method": "NEFT",
+                "payment_count": 456,
+                "average_payment": 60007.81826754386
+            },
+            {
+                "payment_method": "UPI",
+                "payment_count": 438,
+                "average_payment": 63105.50381278539
+            }
+        ],
+        "hint": "Use COUNT and AVG together with GROUP BY payment_method.",
+        "solution": "SELECT payment_method,COUNT(*) AS payment_count,AVG(payment_amount) AS average_payment FROM payments GROUP BY payment_method;"
+    },
+    {
+        "id": 143,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "employees"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find branches that have at least five employees and return branch ID, branch name, and employee count.",
+        "expectedOutput": [
+            {
+                "branch_id": 1,
+                "branch_name": "Mumbai Central Branch",
+                "employee_count": 5
+            },
+            {
+                "branch_id": 2,
+                "branch_name": "Kolkata Market Branch",
+                "employee_count": 6
+            },
+            {
+                "branch_id": 3,
+                "branch_name": "Gurugram City Branch",
+                "employee_count": 7
+            },
+            {
+                "branch_id": 5,
+                "branch_name": "Bengaluru Central Branch",
+                "employee_count": 5
+            },
+            {
+                "branch_id": 6,
+                "branch_name": "Noida Central Branch",
+                "employee_count": 6
+            }
+        ],
+        "hint": "Aggregate employees by branch and use HAVING.",
+        "solution": "SELECT b.branch_id,b.branch_name,COUNT(e.employee_id) AS employee_count FROM branches b JOIN employees e ON b.branch_id=e.branch_id GROUP BY b.branch_id,b.branch_name HAVING COUNT(e.employee_id)>=5;"
+    },
+    {
+        "id": 144,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each account type, calculate the number of accounts and the average balance, then return the groups with an average balance above 75000.",
+        "expectedOutput": [
+            {
+                "account_type": "Business",
+                "account_count": 418,
+                "average_balance": 79283.12868421052
+            },
+            {
+                "account_type": "Current",
+                "account_count": 448,
+                "average_balance": 76501.71741071428
+            },
+            {
+                "account_type": "Salary",
+                "account_count": 452,
+                "average_balance": 83458.49555309735
+            },
+            {
+                "account_type": "Savings",
+                "account_count": 417,
+                "average_balance": 79201.34916067147
+            },
+            {
+                "account_type": "Student",
+                "account_count": 465,
+                "average_balance": 77438.51025806452
+            }
+        ],
+        "hint": "Group by account_type and filter with HAVING AVG(balance).",
+        "solution": "SELECT account_type,COUNT(*) AS account_count,AVG(balance) AS average_balance FROM accounts GROUP BY account_type HAVING AVG(balance)>75000;"
+    },
+    {
+        "id": 145,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers whose combined account balance exceeds 300000. Return customer ID, full name, and total balance.",
+        "expectedOutput": [
+            {
+                "customer_id": 17,
+                "customer_name": "Rohan Jain",
+                "total_balance": 476318.25
+            },
+            {
+                "customer_id": 34,
+                "customer_name": "Nikhil Sharma",
+                "total_balance": 439143.94
+            },
+            {
+                "customer_id": 40,
+                "customer_name": "Sanjay Iyer",
+                "total_balance": 339586.58999999997
+            },
+            {
+                "customer_id": 76,
+                "customer_name": "Vivaan Desai",
+                "total_balance": 394561.94
+            },
+            {
+                "customer_id": 79,
+                "customer_name": "Neha Reddy",
+                "total_balance": 339301.65
+            }
+        ],
+        "hint": "Sum balances per customer and apply HAVING.",
+        "solution": "SELECT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name,SUM(a.balance) AS total_balance FROM customers c JOIN accounts a ON c.customer_id=a.customer_id GROUP BY c.customer_id,c.first_name,c.last_name HAVING SUM(a.balance)>300000;"
+    },
+    {
+        "id": 146,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "transactions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each transaction account, calculate the total value of deposits and withdrawals as separate columns using conditional aggregation.",
+        "expectedOutput": [
+            {
+                "account_id": 1,
+                "total_deposits": 40389.15,
+                "total_withdrawals": 111911.1
+            },
+            {
+                "account_id": 2,
+                "total_deposits": 173189.52,
+                "total_withdrawals": 203520.56
+            },
+            {
+                "account_id": 3,
+                "total_deposits": 465993.47,
+                "total_withdrawals": 314282.56
+            },
+            {
+                "account_id": 4,
+                "total_deposits": 52127.51,
+                "total_withdrawals": 0
+            },
+            {
+                "account_id": 5,
+                "total_deposits": 0,
+                "total_withdrawals": 0
+            }
+        ],
+        "hint": "Use CASE expressions inside SUM for each transaction type.",
+        "solution": "SELECT account_id,SUM(CASE WHEN transaction_type='DEPOSIT' THEN amount ELSE 0 END) AS total_deposits,SUM(CASE WHEN transaction_type='WITHDRAWAL' THEN amount ELSE 0 END) AS total_withdrawals FROM transactions GROUP BY account_id;"
+    },
+    {
+        "id": 147,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "payments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the latest payment date for every loan that has at least one payment. Return loan ID and latest payment date.",
+        "expectedOutput": [
+            {
+                "loan_id": 2,
+                "latest_payment_date": "2025-07-08"
+            },
+            {
+                "loan_id": 4,
+                "latest_payment_date": "2025-10-20"
+            },
+            {
+                "loan_id": 5,
+                "latest_payment_date": "2025-04-10"
+            },
+            {
+                "loan_id": 6,
+                "latest_payment_date": "2026-03-06"
+            },
+            {
+                "loan_id": 7,
+                "latest_payment_date": "2024-11-19"
+            }
+        ],
+        "hint": "Group payments by loan_id and use MAX(payment_date).",
+        "solution": "SELECT loan_id,MAX(payment_date) AS latest_payment_date FROM payments GROUP BY loan_id;"
+    },
+    {
+        "id": 148,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "loans",
+            "payments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find loans that have never received a payment. Return loan ID, customer ID, and principal amount.",
+        "expectedOutput": [
+            {
+                "loan_id": 1,
+                "customer_id": 1449,
+                "principal_amount": 346922.09
+            },
+            {
+                "loan_id": 3,
+                "customer_id": 559,
+                "principal_amount": 134515.93
+            },
+            {
+                "loan_id": 66,
+                "customer_id": 5,
+                "principal_amount": 2443293.81
+            },
+            {
+                "loan_id": 106,
+                "customer_id": 884,
+                "principal_amount": 1004576.67
+            },
+            {
+                "loan_id": 115,
+                "customer_id": 1393,
+                "principal_amount": 1178682.06
+            }
+        ],
+        "hint": "LEFT JOIN loans to payments and test for NULL payment_id.",
+        "solution": "SELECT l.loan_id,l.customer_id,l.principal_amount FROM loans l LEFT JOIN payments p ON l.loan_id=p.loan_id WHERE p.payment_id IS NULL;"
+    },
+    {
+        "id": 149,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "branches",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each branch, calculate the number of active accounts and the average active-account balance.",
+        "expectedOutput": [
+            {
+                "branch_id": 1,
+                "branch_name": "Mumbai Central Branch",
+                "active_accounts": 32,
+                "average_active_balance": 74052.7796875
+            },
+            {
+                "branch_id": 2,
+                "branch_name": "Kolkata Market Branch",
+                "active_accounts": 52,
+                "average_active_balance": 71464.4551923077
+            },
+            {
+                "branch_id": 3,
+                "branch_name": "Gurugram City Branch",
+                "active_accounts": 48,
+                "average_active_balance": 74208.775625
+            },
+            {
+                "branch_id": 4,
+                "branch_name": "Kochi Central Branch",
+                "active_accounts": 43,
+                "average_active_balance": 89580.67418604651
+            },
+            {
+                "branch_id": 5,
+                "branch_name": "Bengaluru Central Branch",
+                "active_accounts": 41,
+                "average_active_balance": 70215.89487804878
+            }
+        ],
+        "hint": "Put the active-account condition in the LEFT JOIN.",
+        "solution": "SELECT b.branch_id,b.branch_name,COUNT(a.account_id) AS active_accounts,AVG(a.balance) AS average_active_balance FROM branches b LEFT JOIN accounts a ON b.branch_id=a.branch_id AND a.account_status='Active' GROUP BY b.branch_id,b.branch_name;"
+    },
+    {
+        "id": 150,
+        "difficulty": "Intermediate",
+        "database": "Banking",
+        "tables": [
+            "customers",
+            "accounts"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find customers who have both a savings account and a current account. Return each qualifying customer once with their full name.",
+        "expectedOutput": [
+            {
+                "customer_id": 1176,
+                "customer_name": "Amit Jain"
+            },
+            {
+                "customer_id": 1266,
+                "customer_name": "Rahul Shah"
+            },
+            {
+                "customer_id": 613,
+                "customer_name": "Rahul Gupta"
+            },
+            {
+                "customer_id": 61,
+                "customer_name": "Sneha Iyer"
+            },
+            {
+                "customer_id": 1166,
+                "customer_name": "Priya Patil"
+            }
+        ],
+        "hint": "Join accounts twice with different account-type conditions.",
+        "solution": "SELECT DISTINCT c.customer_id,c.first_name || ' ' || c.last_name AS customer_name FROM customers c JOIN accounts a1 ON c.customer_id=a1.customer_id AND a1.account_type='Savings' JOIN accounts a2 ON c.customer_id=a2.customer_id AND a2.account_type='Current';"
+    },
+    {
+        "id": 151,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "hospitals"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "A hospital directory needs each doctor paired with the hospital where the doctor works. Return doctor ID, doctor name, hospital name, and specialization.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "hospital_name": "Aster Kochi Hospital",
+                "specialization": "Neurology"
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "hospital_name": "Fortis Gurugram Hospital",
+                "specialization": "Oncology"
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "hospital_name": "Max Kolkata Hospital",
+                "specialization": "Oncology"
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "hospital_name": "Fortis Gurugram Hospital",
+                "specialization": "Radiology"
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "hospital_name": "Apollo Gurugram Hospital",
+                "specialization": "Cardiology"
+            }
+        ],
+        "hint": "Join doctors to hospitals using hospital_id.",
+        "solution": "SELECT d.doctor_id,d.doctor_name,h.hospital_name,d.specialization FROM doctors d JOIN hospitals h ON d.hospital_id=h.hospital_id;"
+    },
+    {
+        "id": 152,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "departments",
+            "hospitals"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every doctor, display the department name and hospital name associated with the doctor.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "department_name": "Neurology",
+                "hospital_name": "Aster Kochi Hospital"
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "department_name": "Oncology",
+                "hospital_name": "Fortis Gurugram Hospital"
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "department_name": "Oncology",
+                "hospital_name": "Max Kolkata Hospital"
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "department_name": "Radiology",
+                "hospital_name": "Fortis Gurugram Hospital"
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "department_name": "Cardiology",
+                "hospital_name": "Apollo Gurugram Hospital"
+            }
+        ],
+        "hint": "Join doctors to departments and hospitals.",
+        "solution": "SELECT d.doctor_id,d.doctor_name,dep.department_name,h.hospital_name FROM doctors d JOIN departments dep ON d.department_id=dep.department_id JOIN hospitals h ON d.hospital_id=h.hospital_id;"
+    },
+    {
+        "id": 153,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have at least one completed appointment. Return each patient once with patient ID and full name.",
+        "expectedOutput": [
+            {
+                "patient_id": 486,
+                "patient_name": "Neha Mehta"
+            },
+            {
+                "patient_id": 1113,
+                "patient_name": "Vivaan Jain"
+            },
+            {
+                "patient_id": 1217,
+                "patient_name": "Riya Gupta"
+            },
+            {
+                "patient_id": 1362,
+                "patient_name": "Sanjay Desai"
+            },
+            {
+                "patient_id": 901,
+                "patient_name": "Aditya Reddy"
+            }
+        ],
+        "hint": "Join patients to appointments and use DISTINCT.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN appointments a ON p.patient_id=a.patient_id WHERE a.appointment_status='Completed';"
+    },
+    {
+        "id": 154,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each doctor, calculate the number of appointments assigned to that doctor. Doctors with zero appointments must also appear.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "appointment_count": 18
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "appointment_count": 21
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "appointment_count": 25
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "appointment_count": 24
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "appointment_count": 17
+            }
+        ],
+        "hint": "Use LEFT JOIN and COUNT(appointment_id).",
+        "solution": "SELECT d.doctor_id,d.doctor_name,COUNT(a.appointment_id) AS appointment_count FROM doctors d LEFT JOIN appointments a ON d.doctor_id=a.doctor_id GROUP BY d.doctor_id,d.doctor_name;"
+    },
+    {
+        "id": 155,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have more than one appointment. Return patient ID, full name, and appointment count.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "appointment_count": 6
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "appointment_count": 5
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "appointment_count": 5
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "appointment_count": 7
+            },
+            {
+                "patient_id": 6,
+                "patient_name": "Arjun Kulkarni",
+                "appointment_count": 3
+            }
+        ],
+        "hint": "Group appointments by patient and use HAVING.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,COUNT(a.appointment_id) AS appointment_count FROM patients p JOIN appointments a ON p.patient_id=a.patient_id GROUP BY p.patient_id,p.first_name,p.last_name HAVING COUNT(a.appointment_id)>1;"
+    },
+    {
+        "id": 156,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find bills whose amount is greater than the average billing amount across all bills. Return billing ID, patient ID, and amount.",
+        "expectedOutput": [
+            {
+                "billing_id": 2,
+                "patient_id": 662,
+                "amount": 224383.89
+            },
+            {
+                "billing_id": 5,
+                "patient_id": 1149,
+                "amount": 174610.08
+            },
+            {
+                "billing_id": 8,
+                "patient_id": 140,
+                "amount": 201939.65
+            },
+            {
+                "billing_id": 10,
+                "patient_id": 1322,
+                "amount": 246900.32
+            },
+            {
+                "billing_id": 12,
+                "patient_id": 1455,
+                "amount": 186786.81
+            }
+        ],
+        "hint": "Compare each amount with AVG(amount).",
+        "solution": "SELECT billing_id,patient_id,amount FROM billing WHERE amount>(SELECT AVG(amount) FROM billing);"
+    },
+    {
+        "id": 157,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have at least one bill without an insurance record attached. Return patient ID and full name once.",
+        "expectedOutput": [
+            {
+                "patient_id": 662,
+                "patient_name": "Pooja Shah"
+            },
+            {
+                "patient_id": 295,
+                "patient_name": "Riya Shah"
+            },
+            {
+                "patient_id": 1461,
+                "patient_name": "Rahul Nair"
+            },
+            {
+                "patient_id": 1319,
+                "patient_name": "Sanjay Verma"
+            },
+            {
+                "patient_id": 850,
+                "patient_name": "Karan Kulkarni"
+            }
+        ],
+        "hint": "Filter billing rows where insurance_id is NULL.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN billing b ON p.patient_id=b.patient_id WHERE b.insurance_id IS NULL;"
+    },
+    {
+        "id": 158,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "lab_reports",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have both a lab report and an appointment. Return each patient once.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma"
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar"
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy"
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy"
+            },
+            {
+                "patient_id": 6,
+                "patient_name": "Arjun Kulkarni"
+            }
+        ],
+        "hint": "Join both child tables to patients and use DISTINCT.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN lab_reports lr ON p.patient_id=lr.patient_id JOIN appointments a ON p.patient_id=a.patient_id;"
+    },
+    {
+        "id": 159,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments",
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have a prescription but no completed appointment. Return each patient once.",
+        "expectedOutput": [
+            {
+                "patient_id": 383,
+                "patient_name": "Ananya Patil"
+            },
+            {
+                "patient_id": 22,
+                "patient_name": "Meera Kulkarni"
+            },
+            {
+                "patient_id": 112,
+                "patient_name": "Nikhil Gupta"
+            },
+            {
+                "patient_id": 127,
+                "patient_name": "Sneha Joshi"
+            },
+            {
+                "patient_id": 1379,
+                "patient_name": "Aarav Singh"
+            }
+        ],
+        "hint": "Use a LEFT JOIN to completed appointments and test for NULL.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN appointments a ON p.patient_id=a.patient_id JOIN prescriptions pr ON a.appointment_id=pr.appointment_id LEFT JOIN appointments ca ON p.patient_id=ca.patient_id AND ca.appointment_status='Completed' WHERE ca.appointment_id IS NULL;"
+    },
+    {
+        "id": 160,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "insurance",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each insurance provider, calculate total billed amount associated with its policies. Return provider name and total billed amount.",
+        "expectedOutput": [
+            {
+                "provider_name": "Aditya Birla Health",
+                "total_billed": 44729897.95
+            },
+            {
+                "provider_name": "Care Health",
+                "total_billed": 38730108.36
+            },
+            {
+                "provider_name": "HDFC ERGO",
+                "total_billed": 44816231.25
+            },
+            {
+                "provider_name": "ICICI Lombard",
+                "total_billed": 44106954.23
+            },
+            {
+                "provider_name": "Niva Bupa",
+                "total_billed": 47723162.86
+            }
+        ],
+        "hint": "Join insurance to billing using insurance_id.",
+        "solution": "SELECT i.provider_name,SUM(b.amount) AS total_billed FROM insurance i JOIN billing b ON i.insurance_id=b.insurance_id GROUP BY i.provider_name;"
+    },
+    {
+        "id": 161,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every doctor, count completed appointments and include doctors who have completed none.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "completed_count": 15
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "completed_count": 17
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "completed_count": 18
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "completed_count": 22
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "completed_count": 13
+            }
+        ],
+        "hint": "Put the Completed condition in the LEFT JOIN.",
+        "solution": "SELECT d.doctor_id,d.doctor_name,COUNT(a.appointment_id) AS completed_count FROM doctors d LEFT JOIN appointments a ON d.doctor_id=a.doctor_id AND a.appointment_status='Completed' GROUP BY d.doctor_id,d.doctor_name;"
+    },
+    {
+        "id": 162,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "lab_reports"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have at least two lab reports. Return patient ID, full name, and report count.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "report_count": 5
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "report_count": 6
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "report_count": 2
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "report_count": 7
+            },
+            {
+                "patient_id": 7,
+                "patient_name": "Aditi Kulkarni",
+                "report_count": 2
+            }
+        ],
+        "hint": "Count lab reports per patient and filter with HAVING.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,COUNT(lr.lab_report_id) AS report_count FROM patients p JOIN lab_reports lr ON p.patient_id=lr.patient_id GROUP BY p.patient_id,p.first_name,p.last_name HAVING COUNT(lr.lab_report_id)>=2;"
+    },
+    {
+        "id": 163,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the most frequently prescribed medications and return medication name with prescription count, keeping medications prescribed more than 100 times.",
+        "expectedOutput": [
+            {
+                "medication_name": "Pantoprazole",
+                "prescription_count": 259
+            },
+            {
+                "medication_name": "Amoxicillin",
+                "prescription_count": 249
+            },
+            {
+                "medication_name": "Azithromycin",
+                "prescription_count": 244
+            },
+            {
+                "medication_name": "Levothyroxine",
+                "prescription_count": 240
+            },
+            {
+                "medication_name": "Omeprazole",
+                "prescription_count": 238
+            }
+        ],
+        "hint": "Group prescriptions by medication_name and use HAVING.",
+        "solution": "SELECT medication_name,COUNT(*) AS prescription_count FROM prescriptions GROUP BY medication_name HAVING COUNT(*)>100 ORDER BY prescription_count DESC;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 164,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who received a prescription for Metformin. Return patient ID and full name once.",
+        "expectedOutput": [
+            {
+                "patient_id": 1339,
+                "patient_name": "Sneha Jain"
+            },
+            {
+                "patient_id": 817,
+                "patient_name": "Priya Jain"
+            },
+            {
+                "patient_id": 893,
+                "patient_name": "Karan Gupta"
+            },
+            {
+                "patient_id": 990,
+                "patient_name": "Isha Patil"
+            },
+            {
+                "patient_id": 386,
+                "patient_name": "Aditya Verma"
+            }
+        ],
+        "hint": "Filter prescriptions by medication_name and join to patients.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN prescriptions pr ON p.patient_id=pr.patient_id WHERE pr.medication_name='Metformin';"
+    },
+    {
+        "id": 165,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "lab_reports"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each patient, find the latest laboratory test date.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "latest_test_date": "2025-11-24"
+            },
+            {
+                "patient_id": 2,
+                "latest_test_date": "2025-04-29"
+            },
+            {
+                "patient_id": 3,
+                "latest_test_date": "2024-07-22"
+            },
+            {
+                "patient_id": 4,
+                "latest_test_date": "2025-09-01"
+            },
+            {
+                "patient_id": 6,
+                "latest_test_date": "2024-11-06"
+            }
+        ],
+        "hint": "Use MAX(test_date) grouped by patient.",
+        "solution": "SELECT patient_id,MAX(test_date) AS latest_test_date FROM lab_reports GROUP BY patient_id;"
+    },
+    {
+        "id": 166,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Classify every patient as Senior when age on 16 August 2026 is at least 60, Adult when age is at least 30 but below 60, and Young Adult otherwise. Return patient ID, full name, calculated age, and age group.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "age": 35,
+                "age_group": "Adult"
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "age": 38,
+                "age_group": "Adult"
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "age": 62,
+                "age_group": "Senior"
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "age": 37,
+                "age_group": "Adult"
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "age": 39,
+                "age_group": "Adult"
+            }
+        ],
+        "hint": "Calculate age from date_of_birth using julianday and then apply CASE.",
+        "solution": "SELECT patient_id,first_name || ' ' || last_name AS patient_name,CAST((julianday('2026-08-16')-julianday(date_of_birth))/365.25 AS INTEGER) AS age,CASE WHEN CAST((julianday('2026-08-16')-julianday(date_of_birth))/365.25 AS INTEGER)>=60 THEN 'Senior' WHEN CAST((julianday('2026-08-16')-julianday(date_of_birth))/365.25 AS INTEGER)>=30 THEN 'Adult' ELSE 'Young Adult' END AS age_group FROM patients;"
+    },
+    {
+        "id": 167,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find doctors with more than 15 years of experience who have at least one completed appointment. Return each doctor once.",
+        "expectedOutput": [
+            {
+                "doctor_id": 88,
+                "doctor_name": "Dr. Priya Joshi",
+                "experience_years": 17
+            },
+            {
+                "doctor_id": 126,
+                "doctor_name": "Dr. Arjun Sharma",
+                "experience_years": 27
+            },
+            {
+                "doctor_id": 42,
+                "doctor_name": "Dr. Aditi Sharma",
+                "experience_years": 17
+            },
+            {
+                "doctor_id": 43,
+                "doctor_name": "Dr. Amit Nair",
+                "experience_years": 25
+            },
+            {
+                "doctor_id": 56,
+                "doctor_name": "Dr. Ananya Patil",
+                "experience_years": 16
+            }
+        ],
+        "hint": "Filter doctor experience and appointment status after joining.",
+        "solution": "SELECT DISTINCT d.doctor_id,d.doctor_name,d.experience_years FROM doctors d JOIN appointments a ON d.doctor_id=a.doctor_id WHERE d.experience_years>15 AND a.appointment_status='Completed';"
+    },
+    {
+        "id": 168,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "insurance",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the insurance provider with the highest total billed amount. Return provider name and total billed amount.",
+        "expectedOutput": [
+            {
+                "provider_name": "Niva Bupa",
+                "total_billed": 47723162.86
+            }
+        ],
+        "hint": "Aggregate billing by provider and select the largest total.",
+        "solution": "SELECT i.provider_name,SUM(b.amount) AS total_billed FROM insurance i JOIN billing b ON i.insurance_id=b.insurance_id GROUP BY i.provider_name ORDER BY total_billed DESC LIMIT 1;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 169,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "lab_reports"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients whose latest lab report has a result status of Normal. Return patient ID and latest test date.",
+        "expectedOutput": [
+            {
+                "patient_id": 1250,
+                "latest_test_date": "2026-04-06"
+            },
+            {
+                "patient_id": 117,
+                "latest_test_date": "2024-01-10"
+            },
+            {
+                "patient_id": 425,
+                "latest_test_date": "2026-04-11"
+            },
+            {
+                "patient_id": 861,
+                "latest_test_date": "2025-08-30"
+            },
+            {
+                "patient_id": 1411,
+                "latest_test_date": "2024-05-29"
+            }
+        ],
+        "hint": "Build latest test date per patient, then join back to lab_reports.",
+        "solution": "WITH latest AS (SELECT patient_id,MAX(test_date) AS latest_test_date FROM lab_reports GROUP BY patient_id) SELECT lr.patient_id,latest.latest_test_date FROM latest JOIN lab_reports lr ON lr.patient_id=latest.patient_id AND lr.test_date=latest.latest_test_date WHERE lr.result_status='Normal';"
+    },
+    {
+        "id": 170,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments",
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have a completed appointment but no prescription linked to that appointment. Return each patient once.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma"
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar"
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy"
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy"
+            },
+            {
+                "patient_id": 6,
+                "patient_name": "Arjun Kulkarni"
+            }
+        ],
+        "hint": "LEFT JOIN prescriptions and check for NULL prescription_id.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN appointments a ON p.patient_id=a.patient_id LEFT JOIN prescriptions pr ON a.appointment_id=pr.appointment_id WHERE a.appointment_status='Completed' AND pr.prescription_id IS NULL;"
+    },
+    {
+        "id": 171,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the patient with the largest total billing amount. Return patient ID, full name, and total billed amount.",
+        "expectedOutput": [
+            {
+                "patient_id": 758,
+                "patient_name": "Aditya Joshi",
+                "total_billed": 1176441.78
+            }
+        ],
+        "hint": "Aggregate billing by patient and sort descending.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,SUM(b.amount) AS total_billed FROM patients p JOIN billing b ON p.patient_id=b.patient_id GROUP BY p.patient_id,p.first_name,p.last_name ORDER BY total_billed DESC LIMIT 1;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 172,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "lab_reports"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find lab test names that appear more than 100 times. Return the test name and report count.",
+        "expectedOutput": [
+            {
+                "test_name": "Creatinine",
+                "report_count": 375
+            },
+            {
+                "test_name": "Glucose",
+                "report_count": 383
+            },
+            {
+                "test_name": "HbA1c",
+                "report_count": 361
+            },
+            {
+                "test_name": "Hemoglobin",
+                "report_count": 361
+            },
+            {
+                "test_name": "Platelet Count",
+                "report_count": 397
+            }
+        ],
+        "hint": "Group lab reports by test_name and filter with HAVING.",
+        "solution": "SELECT test_name,COUNT(*) AS report_count FROM lab_reports GROUP BY test_name HAVING COUNT(*)>100;"
+    },
+    {
+        "id": 173,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing",
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have both a prescription and a bill whose amount is above the average bill amount. Return each patient once.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma"
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar"
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy"
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy"
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah"
+            }
+        ],
+        "hint": "Join both tables to patients and compare billing amount with the overall average.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN billing b ON p.patient_id=b.patient_id JOIN prescriptions pr ON p.patient_id=pr.patient_id WHERE b.amount>(SELECT AVG(amount) FROM billing);"
+    },
+    {
+        "id": 174,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "doctors"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each hospital, count the number of doctors working there. Include hospitals with no doctors.",
+        "expectedOutput": [
+            {
+                "hospital_id": 1,
+                "hospital_name": "Max Hyderabad Hospital",
+                "doctor_count": 0
+            },
+            {
+                "hospital_id": 2,
+                "hospital_name": "Narayana Gurugram Hospital",
+                "doctor_count": 8
+            },
+            {
+                "hospital_id": 3,
+                "hospital_name": "Manipal Mumbai Hospital",
+                "doctor_count": 5
+            },
+            {
+                "hospital_id": 4,
+                "hospital_name": "Max Kolkata Hospital",
+                "doctor_count": 8
+            },
+            {
+                "hospital_id": 5,
+                "hospital_name": "Aster Mumbai Hospital",
+                "doctor_count": 10
+            }
+        ],
+        "hint": "Use LEFT JOIN hospitals to doctors.",
+        "solution": "SELECT h.hospital_id,h.hospital_name,COUNT(d.doctor_id) AS doctor_count FROM hospitals h LEFT JOIN doctors d ON h.hospital_id=d.hospital_id GROUP BY h.hospital_id,h.hospital_name;"
+    },
+    {
+        "id": 175,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "departments",
+            "doctors"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each department, count doctors assigned to it and include departments with zero doctors.",
+        "expectedOutput": [
+            {
+                "department_id": 1,
+                "department_name": "Gynecology",
+                "doctor_count": 8
+            },
+            {
+                "department_id": 2,
+                "department_name": "Gastroenterology",
+                "doctor_count": 1
+            },
+            {
+                "department_id": 3,
+                "department_name": "Oncology",
+                "doctor_count": 0
+            },
+            {
+                "department_id": 4,
+                "department_name": "Cardiology",
+                "doctor_count": 1
+            },
+            {
+                "department_id": 5,
+                "department_name": "Emergency",
+                "doctor_count": 1
+            }
+        ],
+        "hint": "LEFT JOIN departments to doctors.",
+        "solution": "SELECT dep.department_id,dep.department_name,COUNT(d.doctor_id) AS doctor_count FROM departments dep LEFT JOIN doctors d ON dep.department_id=d.department_id GROUP BY dep.department_id,dep.department_name;"
+    },
+    {
+        "id": 176,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "doctors"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find hospitals whose average doctor experience exceeds 15 years. Return hospital name and average experience.",
+        "expectedOutput": [
+            {
+                "hospital_name": "Narayana Kolkata Hospital",
+                "average_experience": 20.875
+            },
+            {
+                "hospital_name": "Max Gurugram Hospital",
+                "average_experience": 19.666666666666668
+            },
+            {
+                "hospital_name": "Manipal Delhi Hospital",
+                "average_experience": 16.25
+            },
+            {
+                "hospital_name": "Aster Ahmedabad Hospital",
+                "average_experience": 21.75
+            },
+            {
+                "hospital_name": "Apollo Gurugram Hospital",
+                "average_experience": 20.25
+            }
+        ],
+        "hint": "Group doctors by hospital and filter average experience.",
+        "solution": "SELECT h.hospital_name,AVG(d.experience_years) AS average_experience FROM hospitals h JOIN doctors d ON h.hospital_id=d.hospital_id GROUP BY h.hospital_id,h.hospital_name HAVING AVG(d.experience_years)>15;"
+    },
+    {
+        "id": 177,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each appointment status, calculate both the number of appointments and the average number of characters in the appointment reason.",
+        "expectedOutput": [
+            {
+                "appointment_status": "Cancelled",
+                "appointment_count": 266,
+                "average_reason_length": 12.203007518796992
+            },
+            {
+                "appointment_status": "Completed",
+                "appointment_count": 3711,
+                "average_reason_length": 12.37725680409593
+            },
+            {
+                "appointment_status": "No Show",
+                "appointment_count": 258,
+                "average_reason_length": 12.313953488372093
+            },
+            {
+                "appointment_status": "Scheduled",
+                "appointment_count": 265,
+                "average_reason_length": 12.8
+            }
+        ],
+        "hint": "Use COUNT and AVG(LENGTH(...)) grouped by appointment_status.",
+        "solution": "SELECT appointment_status,COUNT(*) AS appointment_count,AVG(LENGTH(COALESCE(reason,''))) AS average_reason_length FROM appointments GROUP BY appointment_status;"
+    },
+    {
+        "id": 178,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients whose total billed amount exceeds 100000. Return patient ID, full name, and total billed amount.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "total_billed": 239297.49
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "total_billed": 240660.78
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "total_billed": 152557.01
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "total_billed": 241680.17
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "total_billed": 350886.53
+            }
+        ],
+        "hint": "Aggregate billing per patient and use HAVING.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,SUM(b.amount) AS total_billed FROM patients p JOIN billing b ON p.patient_id=b.patient_id GROUP BY p.patient_id,p.first_name,p.last_name HAVING SUM(b.amount)>100000;"
+    },
+    {
+        "id": 179,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Calculate the percentage of appointments that are completed, rounded to two decimal places.",
+        "expectedOutput": [
+            {
+                "completed_percentage": 82.47
+            }
+        ],
+        "hint": "Use conditional aggregation with CASE.",
+        "solution": "SELECT ROUND(100.0*SUM(CASE WHEN appointment_status='Completed' THEN 1 ELSE 0 END)/COUNT(*),2) AS completed_percentage FROM appointments;"
+    },
+    {
+        "id": 180,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "doctors",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every hospital, calculate the number of completed appointments and the number of distinct doctors who handled those appointments.",
+        "expectedOutput": [
+            {
+                "hospital_id": 1,
+                "hospital_name": "Max Hyderabad Hospital",
+                "completed_appointments": 0,
+                "active_doctors": 0
+            },
+            {
+                "hospital_id": 2,
+                "hospital_name": "Narayana Gurugram Hospital",
+                "completed_appointments": 152,
+                "active_doctors": 8
+            },
+            {
+                "hospital_id": 3,
+                "hospital_name": "Manipal Mumbai Hospital",
+                "completed_appointments": 117,
+                "active_doctors": 5
+            },
+            {
+                "hospital_id": 4,
+                "hospital_name": "Max Kolkata Hospital",
+                "completed_appointments": 166,
+                "active_doctors": 8
+            },
+            {
+                "hospital_id": 5,
+                "hospital_name": "Aster Mumbai Hospital",
+                "completed_appointments": 187,
+                "active_doctors": 10
+            }
+        ],
+        "hint": "Use LEFT JOINs so hospitals with no completed appointments remain.",
+        "solution": "SELECT h.hospital_id,h.hospital_name,COUNT(a.appointment_id) AS completed_appointments,COUNT(DISTINCT d.doctor_id) AS active_doctors FROM hospitals h LEFT JOIN doctors d ON h.hospital_id=d.hospital_id LEFT JOIN appointments a ON d.doctor_id=a.doctor_id AND a.appointment_status='Completed' GROUP BY h.hospital_id,h.hospital_name;"
+    },
+    {
+        "id": 181,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "insurance",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have an insurance policy but no billing record connected to that policy. Return patient ID and full name.",
+        "expectedOutput": [
+            {
+                "patient_id": 10,
+                "patient_name": "Nikhil Kumar"
+            },
+            {
+                "patient_id": 17,
+                "patient_name": "Aditi Joshi"
+            },
+            {
+                "patient_id": 30,
+                "patient_name": "Nikhil Reddy"
+            },
+            {
+                "patient_id": 67,
+                "patient_name": "Rohan Joshi"
+            },
+            {
+                "patient_id": 91,
+                "patient_name": "Arjun Jain"
+            }
+        ],
+        "hint": "LEFT JOIN billing to insurance and test for NULL billing_id.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN insurance i ON p.patient_id=i.patient_id LEFT JOIN billing b ON i.insurance_id=b.insurance_id WHERE b.billing_id IS NULL;"
+    },
+    {
+        "id": 182,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each doctor, calculate the average billing amount generated by appointments handled by that doctor. Return doctors even when they have no matching billing records.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "average_billing": 146757.324
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "average_billing": 103584.84294117648
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "average_billing": 151419.37461538462
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "average_billing": 123512.99857142857
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "average_billing": 129912.30941176473
+            }
+        ],
+        "hint": "Chain LEFT JOINs from doctors to appointments to billing.",
+        "solution": "SELECT d.doctor_id,d.doctor_name,AVG(b.amount) AS average_billing FROM doctors d LEFT JOIN appointments a ON d.doctor_id=a.doctor_id LEFT JOIN billing b ON a.appointment_id=b.appointment_id GROUP BY d.doctor_id,d.doctor_name;"
+    },
+    {
+        "id": 183,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients with at least three prescriptions. Return patient ID, full name, and prescription count.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "prescription_count": 5
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "prescription_count": 7
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "prescription_count": 5
+            },
+            {
+                "patient_id": 7,
+                "patient_name": "Aditi Kulkarni",
+                "prescription_count": 3
+            },
+            {
+                "patient_id": 10,
+                "patient_name": "Nikhil Kumar",
+                "prescription_count": 5
+            }
+        ],
+        "hint": "Group prescriptions by patient and filter with HAVING.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,COUNT(pr.prescription_id) AS prescription_count FROM patients p JOIN prescriptions pr ON p.patient_id=pr.patient_id GROUP BY p.patient_id,p.first_name,p.last_name HAVING COUNT(pr.prescription_id)>=3;"
+    },
+    {
+        "id": 184,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find hospitals with more than 250 appointments. Return hospital ID, hospital name, and appointment count.",
+        "expectedOutput": [
+            {
+                "hospital_id": 15,
+                "hospital_name": "Max Kolkata Hospital",
+                "appointment_count": 269
+            },
+            {
+                "hospital_id": 17,
+                "hospital_name": "Apollo Indore Hospital",
+                "appointment_count": 282
+            },
+            {
+                "hospital_id": 19,
+                "hospital_name": "Max Jaipur Hospital",
+                "appointment_count": 257
+            },
+            {
+                "hospital_id": 26,
+                "hospital_name": "Manipal Noida Hospital",
+                "appointment_count": 395
+            },
+            {
+                "hospital_id": 27,
+                "hospital_name": "Max Mumbai Hospital",
+                "appointment_count": 368
+            }
+        ],
+        "hint": "Group appointments by hospital and use HAVING COUNT(*) > 250.",
+        "solution": "SELECT h.hospital_id,h.hospital_name,COUNT(a.appointment_id) AS appointment_count FROM hospitals h LEFT JOIN appointments a ON h.hospital_id=a.hospital_id GROUP BY h.hospital_id,h.hospital_name HAVING COUNT(a.appointment_id)>250;"
+    },
+    {
+        "id": 185,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "insurance"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each insurance provider, calculate the number of policies and average coverage amount.",
+        "expectedOutput": [
+            {
+                "provider_name": "Aditya Birla Health",
+                "policy_count": 171,
+                "average_coverage": 2656792.1705847955
+            },
+            {
+                "provider_name": "Care Health",
+                "policy_count": 149,
+                "average_coverage": 2677047.562281879
+            },
+            {
+                "provider_name": "HDFC ERGO",
+                "policy_count": 186,
+                "average_coverage": 2697792.0569354836
+            },
+            {
+                "provider_name": "ICICI Lombard",
+                "policy_count": 165,
+                "average_coverage": 2607201.92169697
+            },
+            {
+                "provider_name": "Niva Bupa",
+                "policy_count": 173,
+                "average_coverage": 2781682.4584393064
+            }
+        ],
+        "hint": "Group insurance policies by provider_name.",
+        "solution": "SELECT provider_name,COUNT(*) AS policy_count,AVG(coverage_amount) AS average_coverage FROM insurance GROUP BY provider_name;"
+    },
+    {
+        "id": 186,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find doctors who have handled appointments in at least two different appointment years. Return doctor ID, doctor name, and number of active years.",
+        "expectedOutput": [
+            {
+                "doctor_id": 1,
+                "doctor_name": "Dr. Priya Reddy",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 2,
+                "doctor_name": "Dr. Neha Gupta",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 3,
+                "doctor_name": "Dr. Ananya Gupta",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 4,
+                "doctor_name": "Dr. Sanjay Singh",
+                "years_active": 5
+            },
+            {
+                "doctor_id": 5,
+                "doctor_name": "Dr. Isha Jain",
+                "years_active": 4
+            }
+        ],
+        "hint": "Extract the appointment year and count distinct years per doctor.",
+        "solution": "SELECT d.doctor_id,d.doctor_name,COUNT(DISTINCT substr(a.appointment_date,1,4)) AS years_active FROM doctors d JOIN appointments a ON d.doctor_id=a.doctor_id GROUP BY d.doctor_id,d.doctor_name HAVING COUNT(DISTINCT substr(a.appointment_date,1,4))>=2;"
+    },
+    {
+        "id": 187,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the most recent appointment date for every patient who has at least one appointment.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "latest_appointment_date": "2026-07-16"
+            },
+            {
+                "patient_id": 2,
+                "latest_appointment_date": "2026-01-10"
+            },
+            {
+                "patient_id": 3,
+                "latest_appointment_date": "2026-04-27"
+            },
+            {
+                "patient_id": 4,
+                "latest_appointment_date": "2025-03-21"
+            },
+            {
+                "patient_id": 5,
+                "latest_appointment_date": "2024-01-01"
+            }
+        ],
+        "hint": "Use MAX(appointment_date) grouped by patient.",
+        "solution": "SELECT patient_id,MAX(appointment_date) AS latest_appointment_date FROM appointments GROUP BY patient_id;"
+    },
+    {
+        "id": 188,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "doctors",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every hospital, calculate completed appointments per doctor. Keep hospitals with doctors but no completed appointments and return the ratio rounded to two decimals.",
+        "expectedOutput": [
+            {
+                "hospital_id": 1,
+                "hospital_name": "Max Hyderabad Hospital",
+                "doctor_count": 0,
+                "completed_count": 0,
+                "completed_per_doctor": null
+            },
+            {
+                "hospital_id": 2,
+                "hospital_name": "Narayana Gurugram Hospital",
+                "doctor_count": 8,
+                "completed_count": 152,
+                "completed_per_doctor": 19.0
+            },
+            {
+                "hospital_id": 3,
+                "hospital_name": "Manipal Mumbai Hospital",
+                "doctor_count": 5,
+                "completed_count": 117,
+                "completed_per_doctor": 23.4
+            },
+            {
+                "hospital_id": 4,
+                "hospital_name": "Max Kolkata Hospital",
+                "doctor_count": 8,
+                "completed_count": 166,
+                "completed_per_doctor": 20.75
+            },
+            {
+                "hospital_id": 5,
+                "hospital_name": "Aster Mumbai Hospital",
+                "doctor_count": 10,
+                "completed_count": 187,
+                "completed_per_doctor": 18.7
+            }
+        ],
+        "hint": "Aggregate doctors and completed appointments per hospital, then divide safely.",
+        "solution": "WITH x AS (SELECT h.hospital_id,h.hospital_name,COUNT(DISTINCT d.doctor_id) AS doctor_count,COUNT(a.appointment_id) AS completed_count FROM hospitals h LEFT JOIN doctors d ON h.hospital_id=d.hospital_id LEFT JOIN appointments a ON d.doctor_id=a.doctor_id AND a.appointment_status='Completed' GROUP BY h.hospital_id,h.hospital_name) SELECT hospital_id,hospital_name,doctor_count,completed_count,ROUND(1.0*completed_count/NULLIF(doctor_count,0),2) AS completed_per_doctor FROM x;"
+    },
+    {
+        "id": 189,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients who have a pending bill and at least one completed appointment. Return patient ID and full name once.",
+        "expectedOutput": [
+            {
+                "patient_id": 1213,
+                "patient_name": "Arjun Patil"
+            },
+            {
+                "patient_id": 34,
+                "patient_name": "Isha Mehta"
+            },
+            {
+                "patient_id": 856,
+                "patient_name": "Kavya Patil"
+            },
+            {
+                "patient_id": 658,
+                "patient_name": "Isha Reddy"
+            },
+            {
+                "patient_id": 760,
+                "patient_name": "Arjun Reddy"
+            }
+        ],
+        "hint": "Join billing and appointments to patients and apply both status filters.",
+        "solution": "SELECT DISTINCT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name FROM patients p JOIN billing b ON p.patient_id=b.patient_id JOIN appointments a ON p.patient_id=a.patient_id WHERE b.payment_status='Pending' AND a.appointment_status='Completed';"
+    },
+    {
+        "id": 190,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "departments",
+            "doctors"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each department, calculate the average experience of its doctors and keep departments whose average exceeds 15 years.",
+        "expectedOutput": [
+            {
+                "department_id": 1,
+                "department_name": "Gynecology",
+                "average_experience": 20.875
+            },
+            {
+                "department_id": 6,
+                "department_name": "Orthopedics",
+                "average_experience": 16.0
+            },
+            {
+                "department_id": 7,
+                "department_name": "Radiology",
+                "average_experience": 17.0
+            },
+            {
+                "department_id": 9,
+                "department_name": "ENT",
+                "average_experience": 24.75
+            },
+            {
+                "department_id": 12,
+                "department_name": "Oncology",
+                "average_experience": 16.5
+            }
+        ],
+        "hint": "Group doctors by department and use HAVING AVG.",
+        "solution": "SELECT dep.department_id,dep.department_name,AVG(d.experience_years) AS average_experience FROM departments dep JOIN doctors d ON dep.department_id=d.department_id GROUP BY dep.department_id,dep.department_name HAVING AVG(d.experience_years)>15;"
+    },
+    {
+        "id": 191,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find the top five patients by total billing amount and return patient ID, full name, and total billed amount in descending order.",
+        "expectedOutput": [
+            {
+                "patient_id": 758,
+                "patient_name": "Aditya Joshi",
+                "total_billed": 1176441.78
+            },
+            {
+                "patient_id": 415,
+                "patient_name": "Amit Sharma",
+                "total_billed": 1096610.66
+            },
+            {
+                "patient_id": 764,
+                "patient_name": "Arjun Joshi",
+                "total_billed": 1090964.85
+            },
+            {
+                "patient_id": 348,
+                "patient_name": "Kavya Verma",
+                "total_billed": 992418.55
+            },
+            {
+                "patient_id": 893,
+                "patient_name": "Karan Gupta",
+                "total_billed": 984786.22
+            }
+        ],
+        "hint": "Aggregate billing per patient and sort descending.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,SUM(b.amount) AS total_billed FROM patients p JOIN billing b ON p.patient_id=b.patient_id GROUP BY p.patient_id,p.first_name,p.last_name ORDER BY total_billed DESC LIMIT 5;",
+        "validationType": "ORDERED_RESULT"
+    },
+    {
+        "id": 192,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "lab_reports"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For each lab result status, calculate the number of reports and the average length of the result value text.",
+        "expectedOutput": [
+            {
+                "result_status": "Critical",
+                "report_count": 184,
+                "average_result_length": 14.0
+            },
+            {
+                "result_status": "High",
+                "report_count": 146,
+                "average_result_length": 21.0
+            },
+            {
+                "result_status": "Low",
+                "report_count": 151,
+                "average_result_length": 21.0
+            },
+            {
+                "result_status": "Normal",
+                "report_count": 2519,
+                "average_result_length": 21.0
+            }
+        ],
+        "hint": "Group lab reports by result_status.",
+        "solution": "SELECT result_status,COUNT(*) AS report_count,AVG(LENGTH(result_value)) AS average_result_length FROM lab_reports GROUP BY result_status;"
+    },
+    {
+        "id": 193,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients whose total pending billing exceeds 50000. Return patient ID, full name, and pending amount.",
+        "expectedOutput": [
+            {
+                "patient_id": 49,
+                "patient_name": "Kavya Desai",
+                "pending_amount": 143330.46
+            },
+            {
+                "patient_id": 76,
+                "patient_name": "Karan Nair",
+                "pending_amount": 232919.08
+            },
+            {
+                "patient_id": 78,
+                "patient_name": "Aditya Joshi",
+                "pending_amount": 151660.72
+            },
+            {
+                "patient_id": 79,
+                "patient_name": "Karan Verma",
+                "pending_amount": 120315.69
+            },
+            {
+                "patient_id": 81,
+                "patient_name": "Aarav Kulkarni",
+                "pending_amount": 96194.41
+            }
+        ],
+        "hint": "Filter billing to Pending before grouping by patient.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,SUM(b.amount) AS pending_amount FROM patients p JOIN billing b ON p.patient_id=b.patient_id WHERE b.payment_status='Pending' GROUP BY p.patient_id,p.first_name,p.last_name HAVING SUM(b.amount)>50000;"
+    },
+    {
+        "id": 194,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find appointments that have more than one prescription. Return appointment ID, patient ID, and prescription count.",
+        "expectedOutput": [
+            {
+                "appointment_id": 6,
+                "patient_id": 1134,
+                "prescription_count": 2
+            },
+            {
+                "appointment_id": 9,
+                "patient_id": 435,
+                "prescription_count": 2
+            },
+            {
+                "appointment_id": 30,
+                "patient_id": 856,
+                "prescription_count": 2
+            },
+            {
+                "appointment_id": 31,
+                "patient_id": 502,
+                "prescription_count": 2
+            },
+            {
+                "appointment_id": 36,
+                "patient_id": 223,
+                "prescription_count": 3
+            }
+        ],
+        "hint": "Group prescriptions by appointment_id.",
+        "solution": "SELECT appointment_id,patient_id,COUNT(*) AS prescription_count FROM prescriptions GROUP BY appointment_id,patient_id HAVING COUNT(*)>1;"
+    },
+    {
+        "id": 195,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "appointments",
+            "lab_reports",
+            "prescriptions"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find appointments that have at least one lab report and at least one prescription. Return appointment ID and patient ID once.",
+        "expectedOutput": [
+            {
+                "appointment_id": 1246,
+                "patient_id": 1
+            },
+            {
+                "appointment_id": 3152,
+                "patient_id": 1
+            },
+            {
+                "appointment_id": 4195,
+                "patient_id": 1
+            },
+            {
+                "appointment_id": 3723,
+                "patient_id": 3
+            },
+            {
+                "appointment_id": 4042,
+                "patient_id": 3
+            }
+        ],
+        "hint": "Join both child tables to appointments and use DISTINCT.",
+        "solution": "SELECT DISTINCT a.appointment_id,a.patient_id FROM appointments a JOIN lab_reports lr ON a.appointment_id=lr.appointment_id JOIN prescriptions pr ON a.appointment_id=pr.appointment_id;"
+    },
+    {
+        "id": 196,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "appointments",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every hospital, calculate total billing generated by its appointments. Include hospitals with no linked billing.",
+        "expectedOutput": [
+            {
+                "hospital_id": 1,
+                "hospital_name": "Max Hyderabad Hospital",
+                "total_billing": 0
+            },
+            {
+                "hospital_id": 2,
+                "hospital_name": "Narayana Gurugram Hospital",
+                "total_billing": 14963224.29
+            },
+            {
+                "hospital_id": 3,
+                "hospital_name": "Manipal Mumbai Hospital",
+                "total_billing": 10416258.07
+            },
+            {
+                "hospital_id": 4,
+                "hospital_name": "Max Kolkata Hospital",
+                "total_billing": 15482793.07
+            },
+            {
+                "hospital_id": 5,
+                "hospital_name": "Aster Mumbai Hospital",
+                "total_billing": 19859783.34
+            }
+        ],
+        "hint": "Start from hospitals and use LEFT JOINs through appointments to billing.",
+        "solution": "SELECT h.hospital_id,h.hospital_name,COALESCE(SUM(b.amount),0) AS total_billing FROM hospitals h LEFT JOIN appointments a ON h.hospital_id=a.hospital_id LEFT JOIN billing b ON a.appointment_id=b.appointment_id GROUP BY h.hospital_id,h.hospital_name;"
+    },
+    {
+        "id": 197,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "doctors",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find doctors whose appointment count is above the average appointment count per doctor. Include doctors with zero appointments when calculating the average.",
+        "expectedOutput": [
+            {
+                "doctor_id": 6,
+                "doctor_name": "Dr. Kavya Singh",
+                "appointment_count": 33
+            },
+            {
+                "doctor_id": 12,
+                "doctor_name": "Dr. Karan Nair",
+                "appointment_count": 34
+            },
+            {
+                "doctor_id": 13,
+                "doctor_name": "Dr. Priya Kumar",
+                "appointment_count": 28
+            },
+            {
+                "doctor_id": 16,
+                "doctor_name": "Dr. Rahul Jain",
+                "appointment_count": 26
+            },
+            {
+                "doctor_id": 17,
+                "doctor_name": "Dr. Priya Mehta",
+                "appointment_count": 28
+            }
+        ],
+        "hint": "Build doctor counts with LEFT JOIN, then compare to the CTE average.",
+        "solution": "WITH x AS (SELECT d.doctor_id,d.doctor_name,COUNT(a.appointment_id) AS appointment_count FROM doctors d LEFT JOIN appointments a ON d.doctor_id=a.doctor_id GROUP BY d.doctor_id,d.doctor_name) SELECT * FROM x WHERE appointment_count>(SELECT AVG(appointment_count) FROM x);"
+    },
+    {
+        "id": 198,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "billing"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find patients whose latest bill amount is greater than their average bill amount. Return patient ID, full name, latest bill amount, and average bill amount.",
+        "expectedOutput": [
+            {
+                "patient_id": 9,
+                "patient_name": "Riya Gupta",
+                "latest_bill_amount": 131638.75,
+                "average_bill": 69971.52
+            },
+            {
+                "patient_id": 12,
+                "patient_name": "Vivaan Kumar",
+                "latest_bill_amount": 172080.46,
+                "average_bill": 109951.38
+            },
+            {
+                "patient_id": 15,
+                "patient_name": "Riya Sharma",
+                "latest_bill_amount": 192845.05,
+                "average_bill": 168352.16999999998
+            },
+            {
+                "patient_id": 17,
+                "patient_name": "Aditi Joshi",
+                "latest_bill_amount": 207620.4,
+                "average_bill": 193027.6433333333
+            },
+            {
+                "patient_id": 28,
+                "patient_name": "Neha Jain",
+                "latest_bill_amount": 198784.26,
+                "average_bill": 162582.42
+            }
+        ],
+        "hint": "Use window functions to calculate patient averages and identify the latest bill.",
+        "solution": "WITH x AS (SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,b.amount,b.billing_date,AVG(b.amount) OVER(PARTITION BY p.patient_id) AS average_bill,ROW_NUMBER() OVER(PARTITION BY p.patient_id ORDER BY b.billing_date DESC,b.billing_id DESC) AS rn FROM patients p JOIN billing b ON p.patient_id=b.patient_id) SELECT patient_id,patient_name,amount AS latest_bill_amount,average_bill FROM x WHERE rn=1 AND amount>average_bill;"
+    },
+    {
+        "id": 199,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "hospitals",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "Find hospitals where the completed-appointment count is greater than 200. Return hospital ID, hospital name, and completed appointment count.",
+        "expectedOutput": [
+            {
+                "hospital_id": 15,
+                "hospital_name": "Max Kolkata Hospital",
+                "completed_count": 212
+            },
+            {
+                "hospital_id": 17,
+                "hospital_name": "Apollo Indore Hospital",
+                "completed_count": 236
+            },
+            {
+                "hospital_id": 18,
+                "hospital_name": "Fortis Indore Hospital",
+                "completed_count": 203
+            },
+            {
+                "hospital_id": 19,
+                "hospital_name": "Max Jaipur Hospital",
+                "completed_count": 207
+            },
+            {
+                "hospital_id": 26,
+                "hospital_name": "Manipal Noida Hospital",
+                "completed_count": 336
+            }
+        ],
+        "hint": "Put the Completed condition in the JOIN and use HAVING on the count.",
+        "solution": "SELECT h.hospital_id,h.hospital_name,COUNT(a.appointment_id) AS completed_count FROM hospitals h LEFT JOIN appointments a ON h.hospital_id=a.hospital_id AND a.appointment_status='Completed' GROUP BY h.hospital_id,h.hospital_name HAVING COUNT(a.appointment_id)>200;"
+    },
+    {
+        "id": 200,
+        "difficulty": "Intermediate",
+        "database": "Healthcare",
+        "tables": [
+            "patients",
+            "appointments"
+        ],
+        "points": 20,
+        "status": "incomplete",
+        "question": "For every patient with an appointment, calculate first appointment date, latest appointment date, and total appointment count in one row.",
+        "expectedOutput": [
+            {
+                "patient_id": 1,
+                "patient_name": "Aditi Sharma",
+                "first_appointment": "2022-05-01",
+                "latest_appointment": "2026-07-16",
+                "appointment_count": 6
+            },
+            {
+                "patient_id": 2,
+                "patient_name": "Amit Kumar",
+                "first_appointment": "2022-04-24",
+                "latest_appointment": "2026-01-10",
+                "appointment_count": 5
+            },
+            {
+                "patient_id": 3,
+                "patient_name": "Aarav Reddy",
+                "first_appointment": "2023-06-01",
+                "latest_appointment": "2026-04-27",
+                "appointment_count": 5
+            },
+            {
+                "patient_id": 4,
+                "patient_name": "Amit Reddy",
+                "first_appointment": "2023-03-14",
+                "latest_appointment": "2025-03-21",
+                "appointment_count": 7
+            },
+            {
+                "patient_id": 5,
+                "patient_name": "Vivaan Shah",
+                "first_appointment": "2024-01-01",
+                "latest_appointment": "2024-01-01",
+                "appointment_count": 1
+            }
+        ],
+        "hint": "Aggregate appointment dates and count by patient.",
+        "solution": "SELECT p.patient_id,p.first_name || ' ' || p.last_name AS patient_name,MIN(a.appointment_date) AS first_appointment,MAX(a.appointment_date) AS latest_appointment,COUNT(a.appointment_id) AS appointment_count FROM patients p JOIN appointments a ON p.patient_id=a.patient_id GROUP BY p.patient_id,p.first_name,p.last_name;"
+    }
+]
