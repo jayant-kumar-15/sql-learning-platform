@@ -1003,11 +1003,19 @@ const browserSqlEngine = {
                 "banking"
             ) {
 
+                /*
+                 * ========================================================
+                 * PLAYGROUND BANKING DATA SOURCE
+                 * ========================================================
+                 *
+                 * Dedicated Playground schema and seed files keep the
+                 * large learning dataset independent from other pages.
+                 */
                 schemaFile =
-                    "../assets/banking-schema.sql";
+                    "../playground/data/banking-playground-schema.sql";
 
                 seedFile =
-                    "../assets/banking-seed.sql";
+                    "../playground/data/banking-playground-seed.sql";
 
             }
 
@@ -1016,11 +1024,19 @@ const browserSqlEngine = {
                 "healthcare"
             ) {
 
+                /*
+                 * ========================================================
+                 * PLAYGROUND HEALTHCARE DATA SOURCE
+                 * ========================================================
+                 *
+                 * Dedicated Playground schema and seed files keep the
+                 * large learning dataset independent from other pages.
+                 */
                 schemaFile =
-                    "../assets/healthcare-schema.sql";
+                    "../playground/data/healthcare-playground-schema.sql";
 
                 seedFile =
-                    "../assets/healthcare-seed.sql";
+                    "../playground/data/healthcare-playground-seed.sql";
 
             }
 
