@@ -18,6 +18,8 @@
  */
 
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
 const router = express.Router();
 
@@ -33,6 +35,204 @@ const db = require("../config/db");
  *
  * /api/schema/Banking/customers,accounts
  */
+
+/* ============================================================
+ * GET AVAILABLE PLAYGROUND DATABASES
+ * ============================================================
+ *
+ * Playground currently supports two predefined learning
+ * databases:
+ *
+ *     1. Banking
+ *     2. Healthcare
+ *
+ * These databases are represented by their own schema/seed
+ * files in the frontend assets:
+ *
+ *     frontend/assets/banking-schema.sql
+ *     frontend/assets/healthcare-schema.sql
+ *
+ * This endpoint is used by:
+ *
+ *     frontend/playground/playground.js
+ *
+ *     GET /api/schema/databases
+ *
+ * The response contains the database name and the table names
+ * extracted from the corresponding schema file.
+ *
+ * IMPORTANT
+ * ----------
+ * This is a read-only learning database list.
+ *
+ * Users cannot create/drop these Playground databases.
+ * ============================================================ */
+
+router.get("/databases", function (req, res) {
+
+    try {
+
+        const databaseDefinitions = [
+            {
+                name: "Banking",
+                schemaFile: path.join(
+                    __dirname,
+                    "../../frontend/assets/banking-schema.sql"
+                )
+            },
+
+            {
+                name: "Healthcare",
+                schemaFile: path.join(
+                    __dirname,
+                    "../../frontend/assets/healthcare-schema.sql"
+                )
+            }
+        ];
+
+
+        const databases =
+            databaseDefinitions.map(
+                function (database) {
+
+                    /*
+                     * Verify the schema file exists.
+                     */
+                    if (
+                        !fs.existsSync(
+                            database.schemaFile
+                        )
+                    ) {
+
+                        console.warn(
+                            "⚠️ Schema file not found:",
+                            database.schemaFile
+                        );
+
+                        return {
+                            name:
+                                database.name,
+
+                            tables:
+                                []
+                        };
+
+                    }
+
+
+                    /*
+                     * Read the SQL schema file.
+                     */
+                    const schemaSql =
+                        fs.readFileSync(
+                            database.schemaFile,
+                            "utf8"
+                        );
+
+
+                    /*
+                     * Extract CREATE TABLE names.
+                     *
+                     * Supports forms such as:
+                     *
+                     * CREATE TABLE customers
+                     * CREATE TABLE IF NOT EXISTS customers
+                     */
+                    const tableNames = [];
+
+
+                    const createTablePattern =
+                        /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["'`]?([A-Za-z_][A-Za-z0-9_]*)["'`]?/gi;
+
+
+                    let match;
+
+
+                    while (
+                        (
+                            match =
+                                createTablePattern.exec(
+                                    schemaSql
+                                )
+                        ) !== null
+                    ) {
+
+                        const tableName =
+                            match[1];
+
+
+                        if (
+                            tableName &&
+                            !tableNames.includes(
+                                tableName
+                            )
+                        ) {
+
+                            tableNames.push(
+                                tableName
+                            );
+
+                        }
+
+                    }
+
+
+                    tableNames.sort(
+                        function (a, b) {
+
+                            return a.localeCompare(
+                                b
+                            );
+
+                        }
+                    );
+
+
+                    return {
+
+                        name:
+                            database.name,
+
+                        tables:
+                            tableNames
+
+                    };
+
+                }
+            );
+
+
+        res.json({
+
+            success: true,
+
+            databases:
+                databases
+
+        });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "❌ Failed to load Playground databases:",
+            error
+        );
+
+
+        res.status(500).json({
+
+            success: false,
+
+            message:
+                "Unable to load Playground databases."
+
+        });
+
+    }
+
+});
 
 router.get("/:database/:tables", function (req, res) {
 
