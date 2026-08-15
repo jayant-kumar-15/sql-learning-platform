@@ -9,7 +9,7 @@
 
          FILE
          ----
-         frontend/pages/playground.html
+         frontend/playground/playground.html
 
          PURPOSE
          -------
@@ -132,86 +132,61 @@
 <body>
 
 
-<!-- ============================================================
-     PLATFORM HEADER
-     ============================================================
+    <!-- ============================================================
+         PLATFORM HEADER
+         ============================================================
 
-     FILE LOCATION
-     -------------
-     frontend/playground/playground.html
+         Same navigation pattern used throughout the platform.
+         ============================================================ -->
 
-     Because Playground is now inside:
-         frontend/playground/
+    <header class="platform-header">
 
-     pages are reached through:
-         ../pages/
+        <div class="platform-brand">
 
-     Sandbox is reached through:
-         ../sandbox/
-     ============================================================ -->
+            <h1>
+                SQL Learning Platform
+            </h1>
 
-<header class="platform-header">
-
-    <div class="platform-brand">
-
-        <h1>
-            SQL Learning Platform
-        </h1>
-
-    </div>
+        </div>
 
 
-    <nav
-        class="platform-nav"
-        aria-label="Main navigation"
-    >
-
-        <a
-            href="../pages/home.html"
+        <nav
+            class="platform-nav"
+            aria-label="Main navigation"
         >
-            Home
-        </a>
 
+            <a href="../pages/home.html">
+                Home
+            </a>
 
-        <a
-            href="../pages/tutorial.html"
-        >
-            Tutorials
-        </a>
+            <a href="../pages/tutorial.html">
+                Tutorials
+            </a>
 
+            <a
+                href="playground.html"
+                class="active"
+                aria-current="page"
+            >
+                Playground
+            </a>
 
-        <a
-            href="playground.html"
-            class="active"
-            aria-current="page"
-        >
-            Playground
-        </a>
+            <a href="../pages/challenge.html">
+                Challenges
+            </a>
 
+            <a href="../pages/explorer.html">
+                Explorer
+            </a>
 
-        <a
-            href="../pages/challenge.html"
-        >
-            Challenges
-        </a>
+            <a href="../sandbox/sandbox.html">
+                Sandbox
+            </a>
 
+        </nav>
 
-        <a
-            href="../pages/explorer.html"
-        >
-            Explorer
-        </a>
+    </header>
 
-
-        <a
-            href="../sandbox/sandbox.html"
-        >
-            Sandbox
-        </a>
-
-    </nav>
-
-</header>
 
     <!-- ============================================================
          MOBILE SIDEBAR BUTTON
@@ -237,9 +212,9 @@
          ============================================================ -->
 
     <main
-    class="playground-main"
-    id="playground-layout"
->
+        class="playground-main"
+        id="playground-layout"
+    >
 
 
         <!-- ========================================================
@@ -431,50 +406,18 @@
 
 
             <!-- ====================================================
-                 ACTIVE DATABASE
+                 ACTIVE DATABASE DISPLAY
                  ====================================================
 
-                 This is intentionally visible above the worksheet.
+                 The active database is maintained internally by
+                 playground.js and can be changed with:
 
-                 Example:
+                     USE database_name;
 
-                 Active database: Healthcare
-                 To change database, execute USE database_name;
-
-                 The JavaScript updates the database name whenever
-                 the user:
-                 - selects a database
-                 - executes USE database_name
-                 - restores the previous database
+                 The dedicated status banner was intentionally removed
+                 so the SQL worksheet receives the maximum available
+                 vertical space.
                  ==================================================== -->
-
-            <div
-                id="active-database-hint"
-                class="active-database-hint"
-                role="status"
-                aria-live="polite"
-            >
-
-                <span class="active-database-label">
-                    Active database:
-                </span>
-
-                <strong
-                    id="active-database-name"
-                    class="active-database-name"
-                >
-                    None
-                </strong>
-
-                <span class="active-database-help">
-                    To change database, execute
-                    <code>
-                        USE database_name;
-                    </code>
-                </span>
-
-            </div>
-
 
             <!-- ====================================================
                  QUERY TAB BAR
@@ -1139,7 +1082,7 @@ FROM Patients;"
 
 <!-- Playground page controller -->
 <script
-    src="playground.js?v=3"
+    src="playground.js?v=2"
 ></script>
 
 
