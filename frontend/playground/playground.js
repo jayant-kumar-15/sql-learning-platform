@@ -910,32 +910,26 @@ function renderDatabaseTree() {
                 "table-list";
 
 /*
- * DATABASE EXPANSION
- * ------------------
- *
- * Databases are collapsed by default.
- *
- * Search results automatically expand when a matching table
- * is found so the user can locate the table easily.
- *
- * The active database is NOT automatically forced open.
- * This allows the user to manually collapse/expand it.
- */
-if (
-    searchTerm &&
-    matchingTables.length > 0
-) {
+             * Automatically expand the active database.
+             */
+            if (
+                isActive ||
+                (
+                    searchTerm &&
+                    matchingTables.length > 0
+                )
+            ) {
 
-    tableList.style.display =
-        "block";
+                tableList.style.display =
+                    "block";
 
 
-    header.querySelector(
-        ".database-arrow"
-    ).textContent =
-        "▼";
+                header.querySelector(
+                    ".database-arrow"
+                ).textContent =
+                    "▼";
 
-}
+            }
 
 
             database.tables.forEach(
@@ -1042,56 +1036,34 @@ if (
 
 
             header.addEventListener(
-    "click",
-    () => {
+                "click",
+                () => {
 
-        /*
-         * Determine the current state BEFORE changing
-         * the active database.
-         */
-        const isOpen =
-            tableList.style.display ===
-            "block";
+                    setActiveDatabase(
+                        database.name
+                    );
 
 
-        /*
-         * Toggle the database visually.
-         */
-        tableList.style.display =
-            isOpen
-                ? "none"
-                : "block";
+                    const isOpen =
+                        tableList.style.display ===
+                        "block";
 
 
-        header.querySelector(
-            ".database-arrow"
-        ).textContent =
-            isOpen
-                ? "▶"
-                : "▼";
+                    tableList.style.display =
+                        isOpen
+                            ? "none"
+                            : "block";
 
 
-        /*
-         * Selecting a database should still make it the
-         * active database.
-         *
-         * This is intentionally done AFTER the visual
-         * toggle so the user's expand/collapse action is
-         * preserved.
-         */
-        if (
-            activeDatabase !==
-            database.name
-        ) {
+                    header.querySelector(
+                        ".database-arrow"
+                    ).textContent =
+                        isOpen
+                            ? "▶"
+                            : "▼";
 
-            setActiveDatabase(
-                database.name
+                }
             );
-
-        }
-
-    }
-);
 
 
             databaseItem.appendChild(
@@ -1888,7 +1860,7 @@ async function executeSingleStatement(
      */
     const useMatch =
         sql.match(
-            /^USE\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?\s*$/i
+            /^USE\s+(?:["'`\[])?([A-Za-z0-9_]+)(?:["'`\]])?\s*$/i
         );
 
 
@@ -2085,18 +2057,49 @@ async function executeNormalSQL(
 ) {
 
     /*
-     * Prefer the shared API helper when available.
+     * ============================================================
+     * PLAYGROUND SQL EXECUTION
+     * ============================================================
+     *
+     * Playground databases are fixed Healthcare / Banking
+     * learning databases. They are already implemented by the
+     * browserSqlEngine, which loads the correct schema + seed data
+     * for the selected database.
+     *
+     * IMPORTANT:
+     *
+     * Do NOT send Playground SQL through the generic queryApi first.
+     * That helper does not carry the Playground active-database
+     * context, which means USE database_name could change the UI
+     * state without changing the database used for the next query.
+     *
+     * Passing activeDatabase directly to browserSqlEngine keeps:
+     *
+     *     USE Banking;
+     *     SELECT ...;
+     *
+     * and:
+     *
+     *     USE Healthcare;
+     *     SELECT ...;
+     *
+     * consistent with the selected learning database.
+     * ============================================================
      */
+
     if (
-        typeof window.executeSqlQuery ===
-        "function"
+        window.browserSqlEngine &&
+        typeof window.browserSqlEngine.execute ===
+            "function"
     ) {
 
         const result =
-            await window.executeSqlQuery(
+            await window.browserSqlEngine.execute(
                 statement,
-                null,
-                activeDatabase
+                {
+                    database:
+                        activeDatabase
+                }
             );
 
 
@@ -2107,78 +2110,9 @@ async function executeNormalSQL(
     }
 
 
-    /*
-     * Fallback direct API request.
-     */
-    const response =
-        await fetch(
-            PLAYGROUND_API_BASE_URL +
-            "/api/query",
-            {
-
-                method:
-                    "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json"
-
-                },
-
-                body:
-                    JSON.stringify({
-
-                        query:
-                            statement,
-
-                        database:
-                            activeDatabase,
-
-                        expectedOutput:
-                            null
-
-                    })
-
-            }
-        );
-
-
-    let data = null;
-
-
-    try {
-
-        data =
-            await response.json();
-
-    }
-
-    catch {
-
-        throw new Error(
-            "Invalid SQL API response."
-        );
-
-    }
-
-
-    if (
-        !response.ok
-    ) {
-
-        throw new Error(
-            data?.message ||
-            "SQL query execution failed."
-        );
-
-    }
-
-
-    return normalizeQueryResult(
-        data
+    throw new Error(
+        "Browser SQL engine is unavailable. Please refresh the Playground."
     );
-
 }
 
 
@@ -2362,53 +2296,122 @@ async function fetchTableMetadata(
     tableName
 ) {
 
-    const response =
-        await fetch(
-            PLAYGROUND_API_BASE_URL +
-            "/api/schema/table/" +
-            encodeURIComponent(
-                databaseName
-            ) +
-            "/" +
-            encodeURIComponent(
-                tableName
-            )
-        );
-
-
-    let data = null;
-
-
-    try {
-
-        data =
-            await response.json();
-
-    }
-
-    catch {
-
-        throw new Error(
-            "Unable to read table metadata."
-        );
-
-    }
-
+    /*
+     * ============================================================
+     * LOCAL TABLE METADATA
+     * ============================================================
+     *
+     * Playground databases are loaded into browserSqlEngine from
+     * the same fixed schema/seed assets used by the SQL worksheet.
+     *
+     * Reading metadata from that same SQLite instance guarantees
+     * that Describe / Schema always inspect the database currently
+     * selected by USE database_name or the Database Explorer.
+     *
+     * This also avoids the old backend route mismatch where the
+     * frontend requested:
+     *
+     *     /api/schema/table/:database/:table
+     *
+     * while the backend exposed a different schema route.
+     * ============================================================
+     */
 
     if (
-        !response.ok
+        !window.browserSqlEngine ||
+        typeof window.browserSqlEngine.initialize !==
+            "function"
     ) {
 
         throw new Error(
-            data?.message ||
-            "Unable to load table metadata."
+            "Browser SQL engine is unavailable."
         );
 
     }
 
 
-    return data;
+    const database =
+        await window.browserSqlEngine.initialize(
+            databaseName
+        );
 
+
+    if (!database) {
+
+        throw new Error(
+            `Unable to open database '${databaseName}'.`
+        );
+
+    }
+
+
+    /*
+     * Quote the SQLite identifier safely.
+     */
+    const safeTableName =
+        String(tableName)
+            .replace(/"/g, '""');
+
+
+    const columns =
+        database.exec({
+
+            sql:
+                `PRAGMA table_info("${safeTableName}")`,
+
+            rowMode:
+                "object",
+
+            returnValue:
+                "resultRows"
+
+        }) || [];
+
+
+    if (
+        columns.length === 0
+    ) {
+
+        throw new Error(
+            `Table '${tableName}' is not present in database '${databaseName}'.`
+        );
+
+    }
+
+
+    const foreignKeys =
+        database.exec({
+
+            sql:
+                `PRAGMA foreign_key_list("${safeTableName}")`,
+
+            rowMode:
+                "object",
+
+            returnValue:
+                "resultRows"
+
+        }) || [];
+
+
+    return {
+
+        success:
+            true,
+
+        database:
+            databaseName,
+
+        table:
+            tableName,
+
+        columns:
+            columns,
+
+        foreignKeys:
+            foreignKeys
+
+    };
 }
 
 
@@ -2725,6 +2728,9 @@ function showResults() {
     );
 
 
+    resultsSection.style.height =
+        `${resultsHeight}px`;
+
     resultsSection.style.flexBasis =
         `${resultsHeight}px`;
 
@@ -2780,6 +2786,9 @@ function minimizeResults() {
         )
     ) {
 
+        resultsSection.style.height =
+            `${resultsHeight}px`;
+
         resultsSection.style.flexBasis =
             `${resultsHeight}px`;
 
@@ -2817,12 +2826,18 @@ function maximizeResults() {
         )
     ) {
 
+        resultsSection.style.height =
+            "85vh";
+
         resultsSection.style.flexBasis =
             "85vh";
 
     }
 
     else {
+
+        resultsSection.style.height =
+            `${resultsHeight}px`;
 
         resultsSection.style.flexBasis =
             `${resultsHeight}px`;
@@ -2860,6 +2875,46 @@ function initializeResultsResize() {
         0;
 
 
+    const getMaximumHeight =
+        () =>
+            Math.max(
+                MIN_RESULTS_HEIGHT,
+                Math.floor(
+                    window.innerHeight *
+                    MAX_RESULTS_HEIGHT_RATIO
+                )
+            );
+
+
+    const stopDragging =
+        () => {
+
+            if (!dragging) {
+
+                return;
+
+            }
+
+            dragging =
+                false;
+
+
+            resultsSection.classList.remove(
+                "is-resizing"
+            );
+
+
+            document.body.classList.remove(
+                "results-resizing"
+            );
+
+
+            document.body.style.userSelect =
+                "";
+
+        };
+
+
     resizeHandle.addEventListener(
         "pointerdown",
         event => {
@@ -2888,20 +2943,46 @@ function initializeResultsResize() {
                     .height;
 
 
-            resizeHandle.setPointerCapture(
-                event.pointerId
+            resultsSection.classList.add(
+                "is-resizing"
+            );
+
+
+            document.body.classList.add(
+                "results-resizing"
             );
 
 
             document.body.style.userSelect =
                 "none";
 
+
+            try {
+
+                resizeHandle.setPointerCapture(
+                    event.pointerId
+                );
+
+            }
+
+            catch {
+
+                /*
+                 * Some browsers do not expose pointer capture
+                 * consistently. Document-level listeners below
+                 * keep resizing functional in that case.
+                 */
+
+            }
+
+
+            event.preventDefault();
+
         }
     );
 
 
-    resizeHandle.addEventListener(
-        "pointermove",
+    const handlePointerMove =
         event => {
 
             if (!dragging) {
@@ -2911,14 +2992,13 @@ function initializeResultsResize() {
             }
 
 
+            /*
+             * Moving the pointer upward increases result height.
+             * Moving downward decreases it.
+             */
             const difference =
                 startY -
                 event.clientY;
-
-
-            const maximum =
-                window.innerHeight *
-                MAX_RESULTS_HEIGHT_RATIO;
 
 
             const newHeight =
@@ -2928,7 +3008,7 @@ function initializeResultsResize() {
                         difference,
                         MIN_RESULTS_HEIGHT
                     ),
-                    maximum
+                    getMaximumHeight()
                 );
 
 
@@ -2936,37 +3016,41 @@ function initializeResultsResize() {
                 newHeight;
 
 
+            resultsSection.style.height =
+                `${newHeight}px`;
+
+
             resultsSection.style.flexBasis =
                 `${newHeight}px`;
 
-        }
-    );
 
-
-    const stopDragging =
-        () => {
-
-            dragging =
-                false;
-
-
-            document.body.style.userSelect =
-                "";
+            event.preventDefault();
 
         };
 
 
-    resizeHandle.addEventListener(
+    document.addEventListener(
+        "pointermove",
+        handlePointerMove
+    );
+
+
+    document.addEventListener(
         "pointerup",
         stopDragging
     );
 
 
-    resizeHandle.addEventListener(
+    document.addEventListener(
         "pointercancel",
         stopDragging
     );
 
+
+    window.addEventListener(
+        "blur",
+        stopDragging
+    );
 }
 
 
@@ -3707,19 +3791,28 @@ function openTableSelector(
 
 
             row.className =
-                "table-selector-row";
+                "table-selector-item";
 
 
             row.innerHTML = `
 
-                <strong>
-                    ${escapeHTML(
-                        table.name
-                    )}
-                </strong>
+                <div class="table-selector-table-name">
+
+                    <span class="table-selector-table-icon">
+                        ▦
+                    </span>
+
+                    <strong>
+                        ${escapeHTML(
+                            table.name
+                        )}
+                    </strong>
+
+                </div>
 
                 <button
                     type="button"
+                    class="table-selector-describe-button"
                 >
                     ${escapeHTML(
                         action
