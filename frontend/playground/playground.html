@@ -132,61 +132,86 @@
 <body>
 
 
-    <!-- ============================================================
-         PLATFORM HEADER
-         ============================================================
+<!-- ============================================================
+     PLATFORM HEADER
+     ============================================================
 
-         Same navigation pattern used throughout the platform.
-         ============================================================ -->
+     FILE LOCATION
+     -------------
+     frontend/playground/playground.html
 
-    <header class="platform-header">
+     Because Playground is now inside:
+         frontend/playground/
 
-        <div class="platform-brand">
+     pages are reached through:
+         ../pages/
 
-            <h1>
-                SQL Learning Platform
-            </h1>
+     Sandbox is reached through:
+         ../sandbox/
+     ============================================================ -->
 
-        </div>
+<header class="platform-header">
+
+    <div class="platform-brand">
+
+        <h1>
+            SQL Learning Platform
+        </h1>
+
+    </div>
 
 
-        <nav
-            class="platform-nav"
-            aria-label="Main navigation"
+    <nav
+        class="platform-nav"
+        aria-label="Main navigation"
+    >
+
+        <a
+            href="../pages/home.html"
         >
+            Home
+        </a>
 
-            <a href="home.html">
-                Home
-            </a>
 
-            <a href="tutorial.html">
-                Tutorials
-            </a>
+        <a
+            href="../pages/tutorial.html"
+        >
+            Tutorials
+        </a>
 
-            <a
-                href="playground.html"
-                class="active"
-                aria-current="page"
-            >
-                Playground
-            </a>
 
-            <a href="challenge.html">
-                Challenges
-            </a>
+        <a
+            href="playground.html"
+            class="active"
+            aria-current="page"
+        >
+            Playground
+        </a>
 
-            <a href="explorer.html">
-                Explorer
-            </a>
 
-            <a href="../sandbox/sandbox.html">
-                Sandbox
-            </a>
+        <a
+            href="../pages/challenge.html"
+        >
+            Challenges
+        </a>
 
-        </nav>
 
-    </header>
+        <a
+            href="../pages/explorer.html"
+        >
+            Explorer
+        </a>
 
+
+        <a
+            href="../sandbox/sandbox.html"
+        >
+            Sandbox
+        </a>
+
+    </nav>
+
+</header>
 
     <!-- ============================================================
          MOBILE SIDEBAR BUTTON
