@@ -2394,6 +2394,125 @@ body.results-resizing {
 
 
 /* ============================================================
+   DESCRIBE / SCHEMA SELECTOR - UI FIX
+   ------------------------------------------------------------
+   The selector is shared by both Describe and Schema.  Keep the
+   presentation identical and prevent native browser button
+   styling from leaking into the dark Playground UI.
+   ============================================================ */
+
+.table-selector-list {
+    background: #0b1120;
+}
+
+.table-selector-item,
+.table-selector-row {
+    width: 100%;
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+    padding: 9px 11px;
+    margin-bottom: 6px;
+
+    border: 1px solid #263247;
+    border-radius: 6px;
+
+    background: #0f172a;
+    color: #cbd5e1;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        transform .15s ease;
+}
+
+.table-selector-item:hover,
+.table-selector-row:hover {
+    background: #111c31;
+    border-color: #3b82f6;
+}
+
+.table-selector-table-name {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.table-selector-table-name > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table-selector-table-icon {
+    flex: 0 0 auto;
+    color: #60a5fa;
+    font-size: 13px;
+}
+
+.table-selector-describe-button,
+.table-selector-row button {
+    flex: 0 0 auto;
+    min-width: 76px;
+    height: 30px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 12px;
+
+    border: 1px solid #3b82f6;
+    border-radius: 5px;
+
+    background: #172554;
+    color: #93c5fd;
+
+    box-shadow: none;
+    outline: none;
+
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .02em;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease,
+        transform .1s ease;
+}
+
+.table-selector-describe-button:hover,
+.table-selector-row button:hover {
+    background: #1d4ed8;
+    border-color: #60a5fa;
+    color: #ffffff;
+}
+
+.table-selector-describe-button:active,
+.table-selector-row button:active {
+    transform: translateY(1px);
+}
+
+.table-selector-describe-button:focus-visible,
+.table-selector-row button:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+}
+
+
+/* ============================================================
    47. TABLE DETAILS
    ============================================================ */
 

@@ -3659,20 +3659,35 @@ function openTableSelector(
                 );
 
 
+            /*
+             * IMPORTANT UI FIX:
+             * The stylesheet already provides the polished table-selector
+             * layout, but the previous markup used generic row/button classes.
+             * That caused the browser's default white button styling to appear
+             * when Describe / Schema was opened.
+             *
+             * Keep the existing functionality exactly the same; only apply the
+             * intended presentation classes here.
+             */
             row.className =
-                "table-selector-row";
+                "table-selector-item";
 
 
             row.innerHTML = `
 
-                <strong>
-                    ${escapeHTML(
-                        table.name
-                    )}
-                </strong>
+                <span class="table-selector-table-name">
+                    <span class="table-selector-table-icon">▦</span>
+                    <span>
+                        ${escapeHTML(
+                            table.name
+                        )}
+                    </span>
+                </span>
 
                 <button
+                    class="table-selector-describe-button"
                     type="button"
+                    aria-label="${escapeHTML(action)} ${escapeHTML(table.name)}"
                 >
                     ${escapeHTML(
                         action
