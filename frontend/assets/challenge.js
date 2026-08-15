@@ -249,38 +249,40 @@ const expertFill =
 
 
 /* ============================================================
- * CHALLENGE V1 PROGRESSION DOM
- * ============================================================ */
+ * ACTIVE LEVEL + MILESTONE CELEBRATION DOM
+ * ------------------------------------------------------------
+ * Only the highest currently active level is shown in the header.
+ * Milestone messages are shown separately in an animated popup.
+ * ============================================================
+ */
 
-const intermediateCompletedCount =
-    document.getElementById("intermediate-completed-count");
+const activeLevelStatus =
+    document.getElementById("active-level-status");
 
-const intermediateStars =
-    document.getElementById("intermediate-stars");
+const milestoneCelebrationOverlay =
+    document.getElementById(
+        "milestone-celebration-overlay"
+    );
 
-const intermediateRankTitle =
-    document.getElementById("intermediate-rank-title");
+const milestoneCelebrationIcon =
+    document.getElementById(
+        "milestone-celebration-icon"
+    );
 
-const intermediateProgressionFill =
-    document.getElementById("intermediate-progression-fill");
+const milestoneCelebrationTitle =
+    document.getElementById(
+        "milestone-celebration-title"
+    );
 
-const intermediateRankMessage =
-    document.getElementById("intermediate-rank-message");
+const milestoneCelebrationMessage =
+    document.getElementById(
+        "milestone-celebration-message"
+    );
 
-const expertCompletedCount =
-    document.getElementById("expert-completed-count");
-
-const expertRankTitle =
-    document.getElementById("expert-rank-title");
-
-const expertRankBadge =
-    document.getElementById("expert-rank-badge");
-
-const expertProgressionFill =
-    document.getElementById("expert-progression-fill");
-
-const expertRankMessage =
-    document.getElementById("expert-rank-message");
+const milestoneCelebrationClose =
+    document.getElementById(
+        "milestone-celebration-close"
+    );
 
 
 /* ============================================================
@@ -1396,7 +1398,8 @@ function saveDifficultyProgress(
 
 window.updateScoreBoard =
     function updateScoreBoard(
-        data = allChallenges
+        data = allChallenges,
+        options = {}
     ) {
 
         if (!Array.isArray(data)) {
@@ -1633,7 +1636,10 @@ window.updateScoreBoard =
         }
 
 
-        updateChallengeProgression();
+        updateActiveLevelStatus(
+            options.celebrate === true,
+            options.completedDifficulty || null
+        );
     };
 
 
@@ -1746,13 +1752,17 @@ await sqlEngine.execute(
                     "query-result-status success";    
 
 
-                window.updateScoreBoard(    
-                    allChallenges    
-                );    
+                window.updateScoreBoard(
+                    allChallenges,
+                    {
+                        celebrate: true,
+                        completedDifficulty:
+                            currentQuestion.difficulty
+                    }
+                );
 
-
-                loadQuestions(    
-                    currentQuestionList    
+                loadQuestions(
+                    currentQuestionList
                 );    
 
 
@@ -1812,15 +1822,21 @@ await sqlEngine.execute(
 
 
 /* ============================================================
- * CHALLENGE V1 PROGRESSION ENGINE
+ * ACTIVE LEVEL + MILESTONE ENGINE
  * ============================================================
  *
- * Intermediate: 20 / 40 / 60 / 80 / 100 completed -> stars
- * Expert: 10 / 20 / 30 / 40 / 50 completed -> Boss / Killer /
- * Gangster / Monster / Don
+ * Active-level rule:
+ * 1. Expert is active once at least one Expert question is completed.
+ * 2. Otherwise Intermediate is active once at least one Intermediate
+ *    question is completed.
+ * 3. Otherwise Beginner/Easy remains active.
  *
- * Only COMPLETED questions count toward these milestones.
- * ============================================================ */
+ * Only the highest active level is displayed in "Your Level".
+ *
+ * Milestone messages are intentionally NOT displayed inside the
+ * active-level card. They appear as one-time animated celebrations.
+ * ============================================================
+ */
 
 function getCompletedCountForDifficulty(difficulty) {
 
@@ -1828,16 +1844,19 @@ function getCompletedCountForDifficulty(difficulty) {
         return 0;
     }
 
-    return allChallenges.filter(function (question) {
+    return allChallenges.filter(
+        function (question) {
 
-        return (
-            question.difficulty === difficulty &&
-            question.status === "completed"
-        );
+            return (
+                question.difficulty === difficulty &&
+                question.status === "completed"
+            );
 
-    }).length;
+        }
+    ).length;
 
 }
+
 
 function getMilestoneState(storageKey) {
 
@@ -1848,7 +1867,9 @@ function getMilestoneState(storageKey) {
                 localStorage.getItem(storageKey)
             );
 
-        return Array.isArray(saved) ? saved : [];
+        return Array.isArray(saved)
+            ? saved
+            : [];
 
     } catch (error) {
 
@@ -1858,7 +1879,11 @@ function getMilestoneState(storageKey) {
 
 }
 
-function saveMilestoneState(storageKey, state) {
+
+function saveMilestoneState(
+    storageKey,
+    state
+) {
 
     localStorage.setItem(
         storageKey,
@@ -1867,258 +1892,314 @@ function saveMilestoneState(storageKey, state) {
 
 }
 
-function showProgressionMilestone(element, message) {
 
-    if (!element) {
+/*
+ * Display a milestone message in the animated popup.
+ */
+function showMilestoneCelebration(
+    milestone,
+    difficulty
+) {
+
+    if (
+        !milestoneCelebrationOverlay ||
+        !milestoneCelebrationIcon ||
+        !milestoneCelebrationTitle ||
+        !milestoneCelebrationMessage
+    ) {
         return;
     }
 
-    element.textContent = message;
+    milestoneCelebrationIcon.textContent =
+        milestone.badge || "🎉";
 
-    element.classList.remove(
-        "progression-milestone"
+    milestoneCelebrationTitle.textContent =
+        difficulty === "Expert"
+            ? "Expert Rank Unlocked!"
+            : "Intermediate Star Unlocked!";
+
+    milestoneCelebrationMessage.textContent =
+        milestone.message || "";
+
+    milestoneCelebrationOverlay.style.display =
+        "flex";
+
+    milestoneCelebrationOverlay.classList.remove(
+        "level-celebration-pop"
     );
 
-    void element.offsetWidth;
+    void milestoneCelebrationOverlay.offsetWidth;
 
-    element.classList.add(
-        "progression-milestone"
+    milestoneCelebrationOverlay.classList.add(
+        "level-celebration-pop"
     );
 
 }
 
-function updateIntermediateProgression(completed) {
 
-    const target =
-        CHALLENGE_V1_TARGETS.Intermediate;
+function closeMilestoneCelebration() {
 
-    const percentage =
-        Math.min(
-            100,
-            Math.round(
-                (completed / target) * 100
-            )
-        );
-
-    if (intermediateCompletedCount) {
-        intermediateCompletedCount.textContent =
-            completed + " / " + target;
+    if (!milestoneCelebrationOverlay) {
+        return;
     }
 
-    if (intermediateProgressionFill) {
-        intermediateProgressionFill.style.width =
-            percentage + "%";
-    }
+    milestoneCelebrationOverlay.classList.remove(
+        "level-celebration-pop"
+    );
+
+    milestoneCelebrationOverlay.style.display =
+        "none";
+
+}
+
+
+if (milestoneCelebrationClose) {
+
+    milestoneCelebrationClose.addEventListener(
+        "click",
+        closeMilestoneCelebration
+    );
+
+}
+
+
+if (milestoneCelebrationOverlay) {
+
+    milestoneCelebrationOverlay.addEventListener(
+        "click",
+        function (event) {
+
+            if (
+                event.target ===
+                milestoneCelebrationOverlay
+            ) {
+
+                closeMilestoneCelebration();
+
+            }
+
+        }
+    );
+
+}
+
+
+function getCurrentIntermediateMilestone(
+    completed
+) {
 
     let current = null;
 
     INTERMEDIATE_STAR_MILESTONES.forEach(
         function (milestone) {
-            if (completed >= milestone.completed) {
-                current = milestone;
-            }
-        }
-    );
-
-    const stars = current ? current.stars : 0;
-
-    if (intermediateStars) {
-        intermediateStars.textContent =
-            "★".repeat(stars) +
-            "☆".repeat(5 - stars);
-    }
-
-    if (intermediateRankTitle) {
-        intermediateRankTitle.textContent =
-            current
-                ? current.title
-                : "⭐ SQL Explorer";
-    }
-
-    if (intermediateRankMessage) {
-
-        if (current) {
-
-            intermediateRankMessage.textContent =
-                current.message;
-
-        } else {
-
-            const next =
-                INTERMEDIATE_STAR_MILESTONES.find(
-                    function (milestone) {
-                        return completed < milestone.completed;
-                    }
-                );
-
-            if (next) {
-                intermediateRankMessage.textContent =
-                    "Complete " +
-                    next.completed +
-                    " Intermediate questions to earn your next star.";
-            }
-
-        }
-
-    }
-
-    const reached =
-        getMilestoneState(
-            INTERMEDIATE_MILESTONE_STORAGE_KEY
-        );
-
-    INTERMEDIATE_STAR_MILESTONES.forEach(
-        function (milestone) {
 
             if (
-                completed >= milestone.completed &&
-                !reached.includes(milestone.completed)
+                completed >= milestone.completed
             ) {
 
-                reached.push(
-                    milestone.completed
-                );
-
-                saveMilestoneState(
-                    INTERMEDIATE_MILESTONE_STORAGE_KEY,
-                    reached
-                );
-
-                showProgressionMilestone(
-                    intermediateRankMessage,
-                    milestone.message
-                );
+                current = milestone;
 
             }
 
         }
     );
+
+    return current;
 
 }
 
-function updateExpertProgression(completed) {
 
-    const target =
-        CHALLENGE_V1_TARGETS.Expert;
-
-    const percentage =
-        Math.min(
-            100,
-            Math.round(
-                (completed / target) * 100
-            )
-        );
-
-    if (expertCompletedCount) {
-        expertCompletedCount.textContent =
-            completed + " / " + target;
-    }
-
-    if (expertProgressionFill) {
-        expertProgressionFill.style.width =
-            percentage + "%";
-    }
+function getCurrentExpertMilestone(
+    completed
+) {
 
     let current = null;
 
     EXPERT_RANK_MILESTONES.forEach(
         function (milestone) {
-            if (completed >= milestone.completed) {
-                current = milestone;
-            }
-        }
-    );
-
-    if (expertRankTitle) {
-        expertRankTitle.textContent =
-            current
-                ? current.rank
-                : "🔒 Expert Awaits";
-    }
-
-    if (expertRankBadge) {
-        expertRankBadge.textContent =
-            current
-                ? current.badge
-                : "🔒";
-    }
-
-    if (expertRankMessage) {
-
-        if (current) {
-
-            expertRankMessage.textContent =
-                current.message;
-
-        } else {
-
-            const next =
-                EXPERT_RANK_MILESTONES.find(
-                    function (milestone) {
-                        return completed < milestone.completed;
-                    }
-                );
-
-            if (next) {
-                expertRankMessage.textContent =
-                    "Solve " +
-                    next.completed +
-                    " Expert challenges to earn the " +
-                    next.rank +
-                    " rank.";
-            }
-
-        }
-
-    }
-
-    const reached =
-        getMilestoneState(
-            EXPERT_MILESTONE_STORAGE_KEY
-        );
-
-    EXPERT_RANK_MILESTONES.forEach(
-        function (milestone) {
 
             if (
-                completed >= milestone.completed &&
-                !reached.includes(milestone.completed)
+                completed >= milestone.completed
             ) {
 
-                reached.push(
-                    milestone.completed
-                );
-
-                saveMilestoneState(
-                    EXPERT_MILESTONE_STORAGE_KEY,
-                    reached
-                );
-
-                showProgressionMilestone(
-                    expertRankMessage,
-                    milestone.message
-                );
+                current = milestone;
 
             }
 
         }
     );
+
+    return current;
 
 }
 
-function updateChallengeProgression() {
 
-    updateIntermediateProgression(
+/*
+ * Update only the single active-level indicator.
+ *
+ * Examples:
+ *   Easy - 10/50
+ *   Intermediate - ⭐⭐⭐
+ *   Expert - 💀 BOSS
+ */
+function updateActiveLevelStatus(
+    allowCelebration = false,
+    completedDifficulty = null
+) {
+
+    if (!activeLevelStatus) {
+        return;
+    }
+
+    const beginnerCompleted =
+        getCompletedCountForDifficulty(
+            "Beginner"
+        );
+
+    const intermediateCompleted =
         getCompletedCountForDifficulty(
             "Intermediate"
-        )
-    );
+        );
 
-    updateExpertProgression(
+    const expertCompleted =
         getCompletedCountForDifficulty(
             "Expert"
+        );
+
+    let statusText = "";
+
+    if (expertCompleted > 0) {
+
+        const currentExpert =
+            getCurrentExpertMilestone(
+                expertCompleted
+            );
+
+        statusText =
+            currentExpert
+                ? (
+                    "Expert - " +
+                    currentExpert.badge +
+                    " " +
+                    currentExpert.rank
+                )
+                : "Expert - 🔒";
+
+    }
+
+    else if (intermediateCompleted > 0) {
+
+        const currentIntermediate =
+            getCurrentIntermediateMilestone(
+                intermediateCompleted
+            );
+
+        const stars =
+            currentIntermediate
+                ? currentIntermediate.stars
+                : 0;
+
+        statusText =
+            "Intermediate - " +
+            (
+                stars > 0
+                    ? "⭐".repeat(stars)
+                    : "0⭐"
+            );
+
+    }
+
+    else {
+
+        statusText =
+            "Easy - " +
+            beginnerCompleted +
+            "/" +
+            CHALLENGE_V1_TARGETS.Beginner;
+
+    }
+
+    activeLevelStatus.textContent =
+        statusText;
+
+
+    /*
+     * Celebrate only the milestone created by the successful
+     * query that just completed. Initial page load does not
+     * trigger celebrations.
+     */
+    if (
+        allowCelebration &&
+        (
+            completedDifficulty === "Intermediate" ||
+            completedDifficulty === "Expert"
         )
-    );
+    ) {
+
+        const completed =
+            getCompletedCountForDifficulty(
+                completedDifficulty
+            );
+
+        const milestones =
+            completedDifficulty === "Intermediate"
+                ? INTERMEDIATE_STAR_MILESTONES
+                : EXPERT_RANK_MILESTONES;
+
+        const storageKey =
+            completedDifficulty === "Intermediate"
+                ? INTERMEDIATE_MILESTONE_STORAGE_KEY
+                : EXPERT_MILESTONE_STORAGE_KEY;
+
+        const reached =
+            getMilestoneState(
+                storageKey
+            );
+
+        const newlyReached =
+            milestones.find(
+                function (milestone) {
+
+                    return (
+                        completed === milestone.completed &&
+                        !reached.includes(
+                            milestone.completed
+                        )
+                    );
+
+                }
+            );
+
+        if (newlyReached) {
+
+            reached.push(
+                newlyReached.completed
+            );
+
+            saveMilestoneState(
+                storageKey,
+                reached
+            );
+
+            showMilestoneCelebration(
+                newlyReached,
+                completedDifficulty
+            );
+
+        }
+
+    }
+
+}
+
+
+/*
+ * Compatibility wrapper retained so existing calls from the
+ * Challenge page remain safe during this UI revision.
+ */
+function updateChallengeProgression() {
+
+    updateActiveLevelStatus();
 
 }
 
@@ -2183,6 +2264,7 @@ if (resetButton) {
                 EXPERT_MILESTONE_STORAGE_KEY
             );
 
+            closeMilestoneCelebration();
 
             window.updateScoreBoard(
                 allChallenges
@@ -2266,8 +2348,8 @@ if (searchBox) {
 /* ============================================================
  * INITIAL QUESTION
  *
- * When challenges.js finishes loading all
- * 9 questions, automatically show Beginner #1.
+ * When challenges.js finishes loading all 200 questions,
+ * automatically show Beginner #1.
  * ============================================================
  */
 

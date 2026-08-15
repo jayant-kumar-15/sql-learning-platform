@@ -1,22 +1,3 @@
-/*
- * ============================================================
- * FILE PATH: frontend/assets/challenges.js
- * ============================================================
- * PURPOSE
- * -------
- * SQL Learning Platform module.
- *
- * DOCUMENTATION
- * -------------
- * Keep this path header during future revisions. Add section
- * comments before every new major feature, state object,
- * event group, API call, or validation rule.
- *
- * Existing functionality is preserved in this documentation
- * revision.
- * ============================================================
- */
-
 let challenges = [];
 let allChallenges = [];
 function loadAllDifficultyQuestions() {
@@ -177,19 +158,34 @@ async function loadAllProgress() {
         )
     ) || [];
 
-        data.forEach(function (question) {
+        /* ========================================================
+         * RESTORE SAVED STATUS FOR EACH QUESTION
+         * --------------------------------------------------------
+         * Progress is keyed by question ID, not by array position.
+         * This keeps saved progress stable when the question files
+         * grow from the original V1 dataset to the full 200 questions.
+         * ======================================================== */
+        const savedStatusById = new Map();
 
-            const saved = savedChallenges.find(
-                function (q) {
+        savedChallenges.forEach(function (savedQuestion) {
 
-                    return q.id === question.id;
-
-                }
+            savedStatusById.set(
+                String(savedQuestion.id),
+                savedQuestion.status
             );
 
-            if (saved) {
+        });
 
-                question.status = saved.status;
+        data.forEach(function (question) {
+
+            const savedStatus =
+                savedStatusById.get(
+                    String(question.id)
+                );
+
+            if (savedStatus) {
+
+                question.status = savedStatus;
 
             }
 
@@ -197,18 +193,44 @@ async function loadAllProgress() {
 
         allChallenges.push(...data);
 
-        window.dispatchEvent(
-    new Event("allQuestionsLoaded")
-);
-
     }
 
-    updateScoreBoard(allChallenges);
+    /*
+     * Notify the Challenge page only after all three datasets have
+     * been restored. This prevents a temporary 0-progress display
+     * while Beginner/Intermediate/Expert are still loading.
+     */
+    window.dispatchEvent(
+        new Event("allQuestionsLoaded")
+    );
+
+    if (typeof updateScoreBoard === "function") {
+
+        updateScoreBoard(allChallenges);
+
+    }
 
 }
 
 window.addEventListener("load", async function () {
 
     await loadAllProgress();
+
+});
+
+/* ============================================================
+ * PROGRESS RESTORE HANDSHAKE
+ * ------------------------------------------------------------
+ * Re-render the Challenge header immediately after all saved
+ * question statuses have been restored.
+ * ============================================================
+ */
+window.addEventListener("allQuestionsLoaded", function () {
+
+    if (typeof updateScoreBoard === "function") {
+
+        updateScoreBoard(allChallenges);
+
+    }
 
 });
