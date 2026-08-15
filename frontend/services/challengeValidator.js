@@ -53,6 +53,48 @@
  */
 
 
+/* ============================================================
+ * VALIDATION TYPE INFERENCE
+ * ============================================================
+ * RESULT ignores row order by default. Only explicit ordering language
+ * makes row sequence part of the answer. Words such as "top" or
+ * "highest" alone describe which rows to return, not their display order.
+ * ============================================================
+ */
+function inferChallengeValidationType(challenge) {
+
+    const explicitType =
+        String(
+            challenge && challenge.validationType
+                ? challenge.validationType
+                : ""
+        )
+        .trim()
+        .toUpperCase();
+
+    if (explicitType) {
+        return explicitType;
+    }
+
+    const questionText =
+        String(
+            challenge && challenge.question
+                ? challenge.question
+                : ""
+        )
+        .trim()
+        .toLowerCase();
+
+    const orderedLanguage =
+        /\b(ordered|sorted|ascending|descending|highest first|lowest first|in ascending order|in descending order)\b/i;
+
+    return orderedLanguage.test(questionText)
+        ? "ORDERED_RESULT"
+        : "RESULT";
+
+}
+
+
 const challengeValidator = {
 
 
@@ -104,12 +146,9 @@ const challengeValidator = {
          */
 
         const validationType =
-            String(
-                challenge.validationType ||
-                "RESULT"
-            )
-            .trim()
-            .toUpperCase();
+            inferChallengeValidationType(
+                challenge
+            );
 
 
         console.log(
@@ -322,6 +361,20 @@ const challengeValidator = {
          * --------------------------------------------------------
          */
 
+        /* Dynamic reference is authoritative for expanded datasets. */
+        if (
+            Array.isArray(
+                actualResult.validationExpectedRows
+            )
+        ) {
+
+            return compareQueryResults(
+                actualResult.rows || [],
+                actualResult.validationExpectedRows
+            );
+
+        }
+
         if (
             typeof actualResult.isCorrect ===
             "boolean"
@@ -393,6 +446,9 @@ const challengeValidator = {
 
         if (
             !Array.isArray(
+                actualResult.validationExpectedRows
+            ) &&
+            !Array.isArray(
                 challenge.expectedOutput
             )
         ) {
@@ -414,20 +470,6 @@ const challengeValidator = {
                 : [];
 
 
-        /*
-         * ============================================================
-         * DYNAMIC REFERENCE RESULT
-         * ============================================================
-         *
-         * When the browser SQL engine has executed the trusted solution
-         * against the current dataset, use that live result as the expected
-         * result. This prevents ORDERED_RESULT questions from depending on
-         * stale JSON output after seed data is expanded.
-         *
-         * Older questions continue to use challenge.expectedOutput when a
-         * dynamic reference result is not available.
-         * ============================================================
-         */
         const expectedRows =
             Array.isArray(
                 actualResult.validationExpectedRows

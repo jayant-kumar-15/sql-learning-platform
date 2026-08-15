@@ -1130,6 +1130,68 @@ const browserSqlEngine = {
             );
 
 
+            /* =================================================
+             * BANKING PAYMENTS COLUMN COMPATIBILITY
+             * =================================================
+             * Older Banking data used `payment_amount`, while the
+             * finalized Challenge schema/question set uses `amount`.
+             * This browser-only compatibility step prevents an older
+             * cached schema from breaking a valid Challenge query.
+             */
+            if (
+                databaseName.toLowerCase() ===
+                "banking"
+            ) {
+
+                try {
+
+                    const paymentInfo =
+                        this.db.exec(
+                            "PRAGMA table_info(payments);"
+                        );
+
+                    const paymentColumns =
+                        paymentInfo &&
+                        paymentInfo[0] &&
+                        Array.isArray(paymentInfo[0].values)
+                            ? paymentInfo[0].values.map(
+                                function (row) {
+                                    return row[1];
+                                }
+                            )
+                            : [];
+
+                    if (
+                        !paymentColumns.includes("amount") &&
+                        paymentColumns.includes("payment_amount")
+                    ) {
+
+                        this.db.exec(
+                            "ALTER TABLE payments ADD COLUMN amount REAL;"
+                        );
+
+                        this.db.exec(
+                            "UPDATE payments SET amount = payment_amount;"
+                        );
+
+                        console.log(
+                            "✅ Banking payments compatibility column `amount` created."
+                        );
+
+                    }
+
+                } catch (compatibilityError) {
+
+                    console.warn(
+                        "⚠️ Banking payments compatibility check failed:",
+                        compatibilityError
+                    );
+
+                }
+
+            }
+
+
             /*
              * Re-enable foreign keys.
              */
@@ -1319,43 +1381,32 @@ const browserSqlEngine = {
             }
 
 
-            /*
-             * ============================================================
-             * DYNAMIC CHALLENGE VALIDATION BASELINE
-             * ============================================================
+            /* =================================================
+             * DYNAMIC CHALLENGE REFERENCE RESULT
+             * =================================================
+             * The trusted question solution is executed against the
+             * SAME current SQLite database as the user's query. This
+             * prevents stale static expectedOutput data from breaking
+             * challenges after the datasets are expanded.
              *
-             * Challenge JSON files originally stored a small static
-             * expectedOutput. That becomes stale when the Banking/
-             * Healthcare seed data is expanded.
-             *
-             * For challenge validation, the trusted solution query is now
-             * executed against the SAME current in-memory SQLite database.
-             * The user's result is therefore compared with the result that
-             * the platform's solution produces on the current dataset.
-             *
-             * This means:
-             *   - different valid SQL approaches are accepted;
-             *   - row order is ignored for normal RESULT challenges;
-             *   - ORDERED_RESULT challenges can still enforce ordering;
-             *   - expanded seed data automatically changes the expected
-             *     result without manually editing every question.
-             *
-             * Static expectedOutput remains as a backward-compatible
-             * fallback if a question has no executable solution query.
-             * ============================================================
+             * Normal RESULT questions intentionally ignore row order.
              */
             let isCorrect = null;
-
             let validationExpectedRows = null;
 
             const challenge =
-                options.challenge;
+                options.challenge || null;
 
             const solutionQuery =
                 challenge &&
                 typeof challenge.solution === "string"
                     ? challenge.solution.trim()
-                    : "";
+                    : (
+                        challenge &&
+                        typeof challenge.solution_sql === "string"
+                            ? challenge.solution_sql.trim()
+                            : ""
+                    );
 
             const normalizedSolution =
                 solutionQuery.toLowerCase();
@@ -1366,16 +1417,14 @@ const browserSqlEngine = {
                 normalizedSolution.startsWith("with ");
 
             if (
+                challenge &&
                 solutionQuery &&
                 isSelectableSolution
             ) {
 
                 try {
 
-                    /*
-                     * Execute the trusted reference solution against the
-                     * same database used for the user's query.
-                     */
+                    /* Execute the trusted reference solution. */
                     const solutionResult =
                         db.exec({
                             sql: solutionQuery,
@@ -1386,14 +1435,6 @@ const browserSqlEngine = {
                     validationExpectedRows =
                         solutionResult || [];
 
-                    /*
-                     * Normal RESULT challenges compare logical result sets
-                     * without requiring the user's query to use the same
-                     * SQL structure or row order.
-                     *
-                     * ORDERED_RESULT is deliberately left for the central
-                     * challengeValidator because it must compare row order.
-                     */
                     const validationType =
                         String(
                             challenge.validationType ||
@@ -1402,9 +1443,12 @@ const browserSqlEngine = {
                         .trim()
                         .toUpperCase();
 
+                    /*
+                     * ORDERED_RESULT is handled by challengeValidator.
+                     * RESULT is compared here without row-order dependence.
+                     */
                     if (
-                        validationType ===
-                        "RESULT"
+                        validationType === "RESULT"
                     ) {
 
                         isCorrect =
@@ -1415,17 +1459,15 @@ const browserSqlEngine = {
 
                     }
 
-                }
-                catch (solutionError) {
+                    console.log(
+                        "🧠 Dynamic reference rows:",
+                        validationExpectedRows.length
+                    );
 
-                    /*
-                     * If the reference solution cannot execute, preserve the
-                     * existing static expectedOutput behavior instead of
-                     * making the entire challenge engine unusable.
-                     */
+                } catch (solutionError) {
+
                     console.warn(
-                        "⚠️ Dynamic solution validation failed. " +
-                        "Falling back to static expectedOutput.",
+                        "⚠️ Dynamic solution validation failed. Falling back to static expectedOutput.",
                         solutionError
                     );
 
@@ -1437,12 +1479,7 @@ const browserSqlEngine = {
             }
 
 
-            /*
-             * Backward-compatible fallback.
-             *
-             * Older questions may not contain a solution query or may use
-             * a validation type that is handled by challengeValidator.
-             */
+            /* Backward-compatible fallback for older V1 questions. */
             if (
                 validationExpectedRows === null &&
                 Array.isArray(
@@ -1505,11 +1542,7 @@ const browserSqlEngine = {
                 isCorrect:
                     isCorrect,
 
-                /*
-                 * Dynamic reference result used by challengeValidator.
-                 * This is intentionally kept out of the visible result
-                 * renderer; it is validation metadata only.
-                 */
+                /* Dynamic reference result for central validation. */
                 validationExpectedRows:
                     validationExpectedRows
 
@@ -1531,6 +1564,55 @@ const browserSqlEngine = {
             );
 
         }
+
+    },
+
+
+    /* ========================================================
+     * GET TRUSTED CHALLENGE REFERENCE RESULT
+     * ========================================================
+     * Used only by the Challenge page to refresh the visible
+     * Expected Output using the current database contents.
+     */
+    async getReferenceResult(
+        databaseName,
+        solutionQuery
+    ) {
+
+        if (
+            !solutionQuery ||
+            typeof solutionQuery !== "string"
+        ) {
+            return [];
+        }
+
+        const normalizedQuery =
+            solutionQuery.trim().toLowerCase();
+
+        if (
+            !(
+                normalizedQuery.startsWith("select ") ||
+                normalizedQuery.startsWith("select\n") ||
+                normalizedQuery.startsWith("with ")
+            )
+        ) {
+            return [];
+        }
+
+        const db =
+            await this.initialize(
+                databaseName ||
+                "Banking"
+            );
+
+        const result =
+            db.exec({
+                sql: solutionQuery,
+                rowMode: "object",
+                returnValue: "resultRows"
+            });
+
+        return result || [];
 
     }
 
