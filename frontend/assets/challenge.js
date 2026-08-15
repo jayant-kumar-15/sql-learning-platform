@@ -33,6 +33,39 @@ const EXPERT_FILE =
 
 
 /* ============================================================
+ * CHALLENGE V1 PROGRESSION CONFIGURATION
+ * ============================================================ */
+
+const CHALLENGE_V1_TARGETS = {
+    Beginner: 50,
+    Intermediate: 100,
+    Expert: 50
+};
+
+const INTERMEDIATE_STAR_MILESTONES = [
+    { completed: 20, stars: 1, title: "⭐ SQL Explorer", message: "🎉 First star unlocked! Keep going — the SQL gets tougher from here." },
+    { completed: 40, stars: 2, title: "⭐⭐ Query Builder", message: "🔥 Two stars! JOINs and business logic are starting to feel natural." },
+    { completed: 60, stars: 3, title: "⭐⭐⭐ SQL Analyst", message: "🚀 Three stars! Your SQL reasoning is getting serious." },
+    { completed: 80, stars: 4, title: "⭐⭐⭐⭐ SQL Master", message: "💪 Four stars! You're one step away from Intermediate Mastery." },
+    { completed: 100, stars: 5, title: "⭐⭐⭐⭐⭐ Intermediate Master", message: "🏆 Five stars! Intermediate SQL mastered. Expert territory awaits." }
+];
+
+const EXPERT_RANK_MILESTONES = [
+    { completed: 10, rank: "BOSS", badge: "💀", message: "💀 Hey Boss! You've entered the SQL danger zone." },
+    { completed: 20, rank: "KILLER", badge: "🔪", message: "🔪 Hey SQL Killer! Queries don't survive you anymore." },
+    { completed: 30, rank: "GANGSTER", badge: "😎", message: "😎 Hey Gangster! You're making databases nervous." },
+    { completed: 40, rank: "MONSTER", badge: "👹", message: "👹 Hey Monster! Even complex queries are afraid of you." },
+    { completed: 50, rank: "DON", badge: "🙏", message: "🙏 Namaste DON! 👑 SQL now runs in YOUR territory." }
+];
+
+const INTERMEDIATE_MILESTONE_STORAGE_KEY =
+    "sqlChallenge_Intermediate_Milestones";
+
+const EXPERT_MILESTONE_STORAGE_KEY =
+    "sqlChallenge_Expert_Rank_Milestones";
+
+
+/* ============================================================
  * IMPORTANT
  *
  * allChallenges and challenges are created by challenges.js.
@@ -213,6 +246,41 @@ const intermediateFill =
 
 const expertFill =
     document.getElementById("expert-fill");
+
+
+/* ============================================================
+ * CHALLENGE V1 PROGRESSION DOM
+ * ============================================================ */
+
+const intermediateCompletedCount =
+    document.getElementById("intermediate-completed-count");
+
+const intermediateStars =
+    document.getElementById("intermediate-stars");
+
+const intermediateRankTitle =
+    document.getElementById("intermediate-rank-title");
+
+const intermediateProgressionFill =
+    document.getElementById("intermediate-progression-fill");
+
+const intermediateRankMessage =
+    document.getElementById("intermediate-rank-message");
+
+const expertCompletedCount =
+    document.getElementById("expert-completed-count");
+
+const expertRankTitle =
+    document.getElementById("expert-rank-title");
+
+const expertRankBadge =
+    document.getElementById("expert-rank-badge");
+
+const expertProgressionFill =
+    document.getElementById("expert-progression-fill");
+
+const expertRankMessage =
+    document.getElementById("expert-rank-message");
 
 
 /* ============================================================
@@ -1488,6 +1556,8 @@ window.updateScoreBoard =
 
         }
 
+
+        updateChallengeProgression();
     };
 
 
@@ -1666,6 +1736,318 @@ await sqlEngine.execute(
 
 
 /* ============================================================
+ * CHALLENGE V1 PROGRESSION ENGINE
+ * ============================================================
+ *
+ * Intermediate: 20 / 40 / 60 / 80 / 100 completed -> stars
+ * Expert: 10 / 20 / 30 / 40 / 50 completed -> Boss / Killer /
+ * Gangster / Monster / Don
+ *
+ * Only COMPLETED questions count toward these milestones.
+ * ============================================================ */
+
+function getCompletedCountForDifficulty(difficulty) {
+
+    if (!Array.isArray(allChallenges)) {
+        return 0;
+    }
+
+    return allChallenges.filter(function (question) {
+
+        return (
+            question.difficulty === difficulty &&
+            question.status === "completed"
+        );
+
+    }).length;
+
+}
+
+function getMilestoneState(storageKey) {
+
+    try {
+
+        const saved =
+            JSON.parse(
+                localStorage.getItem(storageKey)
+            );
+
+        return Array.isArray(saved) ? saved : [];
+
+    } catch (error) {
+
+        return [];
+
+    }
+
+}
+
+function saveMilestoneState(storageKey, state) {
+
+    localStorage.setItem(
+        storageKey,
+        JSON.stringify(state)
+    );
+
+}
+
+function showProgressionMilestone(element, message) {
+
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+
+    element.classList.remove(
+        "progression-milestone"
+    );
+
+    void element.offsetWidth;
+
+    element.classList.add(
+        "progression-milestone"
+    );
+
+}
+
+function updateIntermediateProgression(completed) {
+
+    const target =
+        CHALLENGE_V1_TARGETS.Intermediate;
+
+    const percentage =
+        Math.min(
+            100,
+            Math.round(
+                (completed / target) * 100
+            )
+        );
+
+    if (intermediateCompletedCount) {
+        intermediateCompletedCount.textContent =
+            completed + " / " + target;
+    }
+
+    if (intermediateProgressionFill) {
+        intermediateProgressionFill.style.width =
+            percentage + "%";
+    }
+
+    let current = null;
+
+    INTERMEDIATE_STAR_MILESTONES.forEach(
+        function (milestone) {
+            if (completed >= milestone.completed) {
+                current = milestone;
+            }
+        }
+    );
+
+    const stars = current ? current.stars : 0;
+
+    if (intermediateStars) {
+        intermediateStars.textContent =
+            "★".repeat(stars) +
+            "☆".repeat(5 - stars);
+    }
+
+    if (intermediateRankTitle) {
+        intermediateRankTitle.textContent =
+            current
+                ? current.title
+                : "⭐ SQL Explorer";
+    }
+
+    if (intermediateRankMessage) {
+
+        if (current) {
+
+            intermediateRankMessage.textContent =
+                current.message;
+
+        } else {
+
+            const next =
+                INTERMEDIATE_STAR_MILESTONES.find(
+                    function (milestone) {
+                        return completed < milestone.completed;
+                    }
+                );
+
+            if (next) {
+                intermediateRankMessage.textContent =
+                    "Complete " +
+                    next.completed +
+                    " Intermediate questions to earn your next star.";
+            }
+
+        }
+
+    }
+
+    const reached =
+        getMilestoneState(
+            INTERMEDIATE_MILESTONE_STORAGE_KEY
+        );
+
+    INTERMEDIATE_STAR_MILESTONES.forEach(
+        function (milestone) {
+
+            if (
+                completed >= milestone.completed &&
+                !reached.includes(milestone.completed)
+            ) {
+
+                reached.push(
+                    milestone.completed
+                );
+
+                saveMilestoneState(
+                    INTERMEDIATE_MILESTONE_STORAGE_KEY,
+                    reached
+                );
+
+                showProgressionMilestone(
+                    intermediateRankMessage,
+                    milestone.message
+                );
+
+            }
+
+        }
+    );
+
+}
+
+function updateExpertProgression(completed) {
+
+    const target =
+        CHALLENGE_V1_TARGETS.Expert;
+
+    const percentage =
+        Math.min(
+            100,
+            Math.round(
+                (completed / target) * 100
+            )
+        );
+
+    if (expertCompletedCount) {
+        expertCompletedCount.textContent =
+            completed + " / " + target;
+    }
+
+    if (expertProgressionFill) {
+        expertProgressionFill.style.width =
+            percentage + "%";
+    }
+
+    let current = null;
+
+    EXPERT_RANK_MILESTONES.forEach(
+        function (milestone) {
+            if (completed >= milestone.completed) {
+                current = milestone;
+            }
+        }
+    );
+
+    if (expertRankTitle) {
+        expertRankTitle.textContent =
+            current
+                ? current.rank
+                : "🔒 Expert Awaits";
+    }
+
+    if (expertRankBadge) {
+        expertRankBadge.textContent =
+            current
+                ? current.badge
+                : "🔒";
+    }
+
+    if (expertRankMessage) {
+
+        if (current) {
+
+            expertRankMessage.textContent =
+                current.message;
+
+        } else {
+
+            const next =
+                EXPERT_RANK_MILESTONES.find(
+                    function (milestone) {
+                        return completed < milestone.completed;
+                    }
+                );
+
+            if (next) {
+                expertRankMessage.textContent =
+                    "Solve " +
+                    next.completed +
+                    " Expert challenges to earn the " +
+                    next.rank +
+                    " rank.";
+            }
+
+        }
+
+    }
+
+    const reached =
+        getMilestoneState(
+            EXPERT_MILESTONE_STORAGE_KEY
+        );
+
+    EXPERT_RANK_MILESTONES.forEach(
+        function (milestone) {
+
+            if (
+                completed >= milestone.completed &&
+                !reached.includes(milestone.completed)
+            ) {
+
+                reached.push(
+                    milestone.completed
+                );
+
+                saveMilestoneState(
+                    EXPERT_MILESTONE_STORAGE_KEY,
+                    reached
+                );
+
+                showProgressionMilestone(
+                    expertRankMessage,
+                    milestone.message
+                );
+
+            }
+
+        }
+    );
+
+}
+
+function updateChallengeProgression() {
+
+    updateIntermediateProgression(
+        getCompletedCountForDifficulty(
+            "Intermediate"
+        )
+    );
+
+    updateExpertProgression(
+        getCompletedCountForDifficulty(
+            "Expert"
+        )
+    );
+
+}
+
+
+/* ============================================================
  * RESET PROGRESS
  * ============================================================
  */
@@ -1715,6 +2097,14 @@ if (resetButton) {
 
             localStorage.removeItem(
                 "sqlChallenges_Expert"
+            );
+
+            localStorage.removeItem(
+                INTERMEDIATE_MILESTONE_STORAGE_KEY
+            );
+
+            localStorage.removeItem(
+                EXPERT_MILESTONE_STORAGE_KEY
             );
 
 
