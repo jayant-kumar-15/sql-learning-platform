@@ -910,26 +910,32 @@ function renderDatabaseTree() {
                 "table-list";
 
 /*
-             * Automatically expand the active database.
-             */
-            if (
-                isActive ||
-                (
-                    searchTerm &&
-                    matchingTables.length > 0
-                )
-            ) {
+ * DATABASE EXPANSION
+ * ------------------
+ *
+ * Databases are collapsed by default.
+ *
+ * Search results automatically expand when a matching table
+ * is found so the user can locate the table easily.
+ *
+ * The active database is NOT automatically forced open.
+ * This allows the user to manually collapse/expand it.
+ */
+if (
+    searchTerm &&
+    matchingTables.length > 0
+) {
 
-                tableList.style.display =
-                    "block";
+    tableList.style.display =
+        "block";
 
 
-                header.querySelector(
-                    ".database-arrow"
-                ).textContent =
-                    "▼";
+    header.querySelector(
+        ".database-arrow"
+    ).textContent =
+        "▼";
 
-            }
+}
 
 
             database.tables.forEach(
@@ -1036,34 +1042,56 @@ function renderDatabaseTree() {
 
 
             header.addEventListener(
-                "click",
-                () => {
+    "click",
+    () => {
 
-                    setActiveDatabase(
-                        database.name
-                    );
-
-
-                    const isOpen =
-                        tableList.style.display ===
-                        "block";
-
-
-                    tableList.style.display =
-                        isOpen
-                            ? "none"
-                            : "block";
+        /*
+         * Determine the current state BEFORE changing
+         * the active database.
+         */
+        const isOpen =
+            tableList.style.display ===
+            "block";
 
 
-                    header.querySelector(
-                        ".database-arrow"
-                    ).textContent =
-                        isOpen
-                            ? "▶"
-                            : "▼";
+        /*
+         * Toggle the database visually.
+         */
+        tableList.style.display =
+            isOpen
+                ? "none"
+                : "block";
 
-                }
+
+        header.querySelector(
+            ".database-arrow"
+        ).textContent =
+            isOpen
+                ? "▶"
+                : "▼";
+
+
+        /*
+         * Selecting a database should still make it the
+         * active database.
+         *
+         * This is intentionally done AFTER the visual
+         * toggle so the user's expand/collapse action is
+         * preserved.
+         */
+        if (
+            activeDatabase !==
+            database.name
+        ) {
+
+            setActiveDatabase(
+                database.name
             );
+
+        }
+
+    }
+);
 
 
             databaseItem.appendChild(
