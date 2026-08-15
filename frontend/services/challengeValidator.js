@@ -1,24 +1,5 @@
 /*
  * ============================================================
- * FILE PATH: frontend/services/challengeValidator.js
- * ============================================================
- * PURPOSE
- * -------
- * SQL Learning Platform module.
- *
- * DOCUMENTATION
- * -------------
- * Keep this path header during future revisions. Add section
- * comments before every new major feature, state object,
- * event group, API call, or validation rule.
- *
- * Existing functionality is preserved in this documentation
- * revision.
- * ============================================================
- */
-
-/*
- * ============================================================
  * CHALLENGE VALIDATOR
  * ============================================================
  *
@@ -433,8 +414,26 @@ const challengeValidator = {
                 : [];
 
 
+        /*
+         * ============================================================
+         * DYNAMIC REFERENCE RESULT
+         * ============================================================
+         *
+         * When the browser SQL engine has executed the trusted solution
+         * against the current dataset, use that live result as the expected
+         * result. This prevents ORDERED_RESULT questions from depending on
+         * stale JSON output after seed data is expanded.
+         *
+         * Older questions continue to use challenge.expectedOutput when a
+         * dynamic reference result is not available.
+         * ============================================================
+         */
         const expectedRows =
-            challenge.expectedOutput;
+            Array.isArray(
+                actualResult.validationExpectedRows
+            )
+                ? actualResult.validationExpectedRows
+                : challenge.expectedOutput;
 
 
         /*

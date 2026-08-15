@@ -1125,72 +1125,6 @@ const browserSqlEngine = {
             );
 
 
-            /* =================================================
-             * BANKING PAYMENTS COLUMN COMPATIBILITY
-             * =================================================
-             * Some older Banking schema/seed combinations used
-             * `payment_amount`, while the finalized Challenge
-             * questions use `amount`.
-             *
-             * Do NOT change the source schema or question files.
-             * If the loaded database has the legacy column only,
-             * expose the finalized `amount` column in this in-memory
-             * Challenge database so existing questions continue to
-             * execute correctly.
-             */
-            if (
-                databaseName.toLowerCase() === "banking"
-            ) {
-
-                try {
-
-                    const paymentTableInfo =
-                        this.db.exec(
-                            "PRAGMA table_info(payments);"
-                        );
-
-                    const paymentColumns =
-                        paymentTableInfo?.[0]?.values?.map(
-                            row => row[1]
-                        ) || [];
-
-                    if (
-                        !paymentColumns.includes("amount") &&
-                        paymentColumns.includes("payment_amount")
-                    ) {
-
-                        console.warn(
-                            "⚠️ Legacy Banking payments column detected. "+
-                            "Creating Challenge-compatible amount column."
-                        );
-
-                        this.db.exec(
-                            "ALTER TABLE payments ADD COLUMN amount REAL;"
-                        );
-
-                        this.db.exec(
-                            "UPDATE payments SET amount = payment_amount;"
-                        );
-
-                        console.log(
-                            "✅ Banking payments.amount compatibility column created."
-                        );
-                    }
-
-                }
-
-                catch (compatibilityError) {
-
-                    console.error(
-                        "❌ Banking payments compatibility check failed:",
-                        compatibilityError
-                    );
-
-                    throw compatibilityError;
-                }
-            }
-
-
             console.log(
                 "✅ Seed data loaded successfully."
             );
@@ -1386,13 +1320,131 @@ const browserSqlEngine = {
 
 
             /*
-             * Compare with expected output
-             * when supplied.
+             * ============================================================
+             * DYNAMIC CHALLENGE VALIDATION BASELINE
+             * ============================================================
+             *
+             * Challenge JSON files originally stored a small static
+             * expectedOutput. That becomes stale when the Banking/
+             * Healthcare seed data is expanded.
+             *
+             * For challenge validation, the trusted solution query is now
+             * executed against the SAME current in-memory SQLite database.
+             * The user's result is therefore compared with the result that
+             * the platform's solution produces on the current dataset.
+             *
+             * This means:
+             *   - different valid SQL approaches are accepted;
+             *   - row order is ignored for normal RESULT challenges;
+             *   - ORDERED_RESULT challenges can still enforce ordering;
+             *   - expanded seed data automatically changes the expected
+             *     result without manually editing every question.
+             *
+             * Static expectedOutput remains as a backward-compatible
+             * fallback if a question has no executable solution query.
+             * ============================================================
              */
             let isCorrect = null;
 
+            let validationExpectedRows = null;
+
+            const challenge =
+                options.challenge;
+
+            const solutionQuery =
+                challenge &&
+                typeof challenge.solution === "string"
+                    ? challenge.solution.trim()
+                    : "";
+
+            const normalizedSolution =
+                solutionQuery.toLowerCase();
+
+            const isSelectableSolution =
+                normalizedSolution.startsWith("select ") ||
+                normalizedSolution.startsWith("select\n") ||
+                normalizedSolution.startsWith("with ");
 
             if (
+                solutionQuery &&
+                isSelectableSolution
+            ) {
+
+                try {
+
+                    /*
+                     * Execute the trusted reference solution against the
+                     * same database used for the user's query.
+                     */
+                    const solutionResult =
+                        db.exec({
+                            sql: solutionQuery,
+                            rowMode: "object",
+                            returnValue: "resultRows"
+                        });
+
+                    validationExpectedRows =
+                        solutionResult || [];
+
+                    /*
+                     * Normal RESULT challenges compare logical result sets
+                     * without requiring the user's query to use the same
+                     * SQL structure or row order.
+                     *
+                     * ORDERED_RESULT is deliberately left for the central
+                     * challengeValidator because it must compare row order.
+                     */
+                    const validationType =
+                        String(
+                            challenge.validationType ||
+                            "RESULT"
+                        )
+                        .trim()
+                        .toUpperCase();
+
+                    if (
+                        validationType ===
+                        "RESULT"
+                    ) {
+
+                        isCorrect =
+                            compareQueryResults(
+                                rows,
+                                validationExpectedRows
+                            );
+
+                    }
+
+                }
+                catch (solutionError) {
+
+                    /*
+                     * If the reference solution cannot execute, preserve the
+                     * existing static expectedOutput behavior instead of
+                     * making the entire challenge engine unusable.
+                     */
+                    console.warn(
+                        "⚠️ Dynamic solution validation failed. " +
+                        "Falling back to static expectedOutput.",
+                        solutionError
+                    );
+
+                    validationExpectedRows =
+                        null;
+
+                }
+
+            }
+
+
+            /*
+             * Backward-compatible fallback.
+             *
+             * Older questions may not contain a solution query or may use
+             * a validation type that is handled by challengeValidator.
+             */
+            if (
+                validationExpectedRows === null &&
                 Array.isArray(
                     options.expectedOutput
                 )
@@ -1451,7 +1503,15 @@ const browserSqlEngine = {
                     false,
 
                 isCorrect:
-                    isCorrect
+                    isCorrect,
+
+                /*
+                 * Dynamic reference result used by challengeValidator.
+                 * This is intentionally kept out of the visible result
+                 * renderer; it is validation metadata only.
+                 */
+                validationExpectedRows:
+                    validationExpectedRows
 
             };
 
