@@ -1,5176 +1,1630 @@
 /*
  * ============================================================
- * FILE PATH
- * ============================================================
- * frontend/playground/playground.js
- *
+ * FILE PATH: frontend/playground/playground.js
  * ============================================================
  * PURPOSE
- * ============================================================
- * Read-only SQL Playground for the SQL Learning Platform.
+ * -------
+ * Controller for the read-only SQL Playground.
  *
- * The Playground is intended for practicing SQL against
- * platform-provided learning databases.
+ * This page uses the same browser SQLite engine already used by
+ * the platform's learning/challenge functionality. Banking and
+ * Healthcare are fixed learning databases; users cannot modify
+ * their permanent structure or seed data from this page.
  *
- * Unlike Sandbox:
- * - Users cannot create databases.
- * - Users cannot modify database structure.
- * - Users cannot INSERT / UPDATE / DELETE learning data.
- * - Users can execute practice/read queries.
+ * FEATURES
+ * --------
+ * - Banking / Healthcare database explorer
+ * - Fold / unfold databases
+ * - Explorer scrollbar
+ * - Active database persistence
+ * - USE database_name
+ * - Multiple persistent query tabs
+ * - Rename / close query tabs
+ * - Selected-statement / cursor-statement / full-script execution
+ * - Styled Describe dialog
+ * - Separate Schema dialog
+ * - Visual relationship/data-model dialog
+ * - Results hidden until execution
+ * - Compact results panel
+ * - Drag results vertically
+ * - Minimize / maximize / close results
+ * - CSV download
  *
- * ============================================================
- * MAIN FEATURES
- * ============================================================
- *
- * 1. Load learning databases from backend.
- * 2. Display databases and tables in Database Explorer.
- * 3. Select database from the explorer.
- * 4. Persist last active database in browser storage.
- * 5. Support:
- *
- *        USE database_name;
- *
- *    as a client-side command.
- *
- * 6. Support:
- *
- *        SHOW DATABASES;
- *        SHOW TABLES;
- *        DESCRIBE table_name;
- *        DESC table_name;
- *
- *    through Playground compatibility handling.
- *
- * 7. Execute multiple SQL statements separated by semicolon.
- * 8. Execute statement under cursor.
- * 9. Execute selected statement when text is selected.
- * 10. Execute entire script with Ctrl/Cmd + Shift + Enter.
- * 11. Correctly process statements sequentially.
- * 12. Display SELECT/query results.
- * 13. Display successful DDL/read-only messages.
- * 14. Display SQL errors.
- * 15. Query tabs.
- * 16. Rename query tabs.
- * 17. Persist query names and SQL text.
- * 18. Close query tabs.
- * 19. Keep at least one query tab open.
- * 20. Describe table popup.
- * 21. Schema/table metadata popup.
- * 22. Relationships/data-model popup.
- * 23. Results panel resize by dragging.
- * 24. Results minimize.
- * 25. Results maximize.
- * 26. Results close.
- * 27. CSV download.
- * 28. Search database/table explorer.
- * 29. Mobile sidebar support.
- *
- * ============================================================
- * IMPORTANT ARCHITECTURE
- * ============================================================
- *
- * SQLite does not natively support:
- *
- *      USE database_name;
- *      SHOW DATABASES;
- *      SHOW TABLES;
- *      DESCRIBE table_name;
- *
- * Therefore those commands are interpreted by this Playground
- * before normal SQL is sent to the backend.
- *
- * Normal SQL is sent to:
- *
- *      /api/query
- *
- * Database metadata is loaded through:
- *
- *      /api/schema/databases
- *      /api/schema/table/:database/:table
- *      /api/schema/relationships/:database
- *
+ * IMPORTANT
+ * ---------
+ * This file intentionally does NOT modify Sandbox code.
+ * It only controls elements inside frontend/playground/.
  * ============================================================
  */
 
+"use strict";
 
 /* ============================================================
  * CONFIGURATION
  * ============================================================ */
 
-const PLAYGROUND_API_BASE_URL =
-    "https://sql-learning-platform-5fu8.onrender.com";
-
-
-const PLAYGROUND_ACTIVE_DATABASE_KEY =
-    "sqlPlaygroundActiveDatabase";
-
-
-const PLAYGROUND_QUERY_STATE_KEY =
-    "sqlPlaygroundQueryState";
-
-
-const DEFAULT_RESULTS_HEIGHT =
-    260;
-
-
-const MIN_RESULTS_HEIGHT =
-    110;
-
-
-const MAX_RESULTS_HEIGHT_RATIO =
-    0.85;
-
+const PLAYGROUND_STORAGE_KEY = "sqlLearningPlaygroundQueries_v3";
+const PLAYGROUND_ACTIVE_DB_KEY = "sqlPlaygroundActiveDatabase";
+const DEFAULT_RESULTS_HEIGHT = 150;
+const MIN_RESULTS_HEIGHT = 88;
+const MAX_RESULTS_HEIGHT_RATIO = 0.88;
+const LEARNING_DATABASES = ["Banking", "Healthcare"];
 
 /* ============================================================
- * DOM ELEMENTS
+ * DOM REFERENCES
  * ============================================================ */
 
-const sqlEditor =
-    document.getElementById(
-        "sql-editor"
-    );
-
-
-const runQueryButton =
-    document.getElementById(
-        "run-query-button"
-    );
-
-
-const statusElement =
-    document.getElementById(
-        "playground-status"
-    ) ||
-    document.getElementById(
-        "sandbox-status"
-    );
-
-
-const databaseTree =
-    document.getElementById(
-        "database-tree"
-    );
-
-
-const searchInput =
-    document.getElementById(
-        "database-search-input"
-    );
-
-
-const activeDbElement =
-    document.getElementById(
-        "active-database-name"
-    );
-
-
-const queryTabs =
-    document.getElementById(
-        "query-tabs"
-    );
-
-
-const newQueryButton =
-    document.getElementById(
-        "new-query-button"
-    );
-
-
-/* ============================================================
- * RESULTS ELEMENTS
- * ============================================================ */
-
-const resultsSection =
-    document.getElementById(
-        "results-section"
-    );
-
-
-const resultsContainer =
-    document.getElementById(
-        "results-container"
-    );
-
-
-const resultsSummary =
-    document.getElementById(
-        "results-summary"
-    );
-
-
-const downloadButton =
-    document.getElementById(
-        "download-results-button"
-    );
-
-
-const minimizeButton =
-    document.getElementById(
-        "minimize-results-button"
-    );
-
-
-const maximizeButton =
-    document.getElementById(
-        "maximize-results-button"
-    );
-
-
-const closeResultsButton =
-    document.getElementById(
-        "close-results-button"
-    );
-
-
-const resizeHandle =
-    document.getElementById(
-        "results-resize-handle"
-    );
-
-
-/* ============================================================
- * TABLE SELECTOR / DETAILS ELEMENTS
- * ============================================================ */
-
-const selectorModal =
-    document.getElementById(
-        "table-selector-modal"
-    );
-
-
-const selectorTitle =
-    document.getElementById(
-        "table-selector-title"
-    );
-
-
-const selectorList =
-    document.getElementById(
-        "table-selector-list"
-    );
-
-
-const closeSelector =
-    document.getElementById(
-        "close-table-selector"
-    );
-
-
-const detailsModal =
-    document.getElementById(
-        "table-details-modal"
-    );
-
-
-const detailsTitle =
-    document.getElementById(
-        "table-details-title"
-    );
-
-
-const detailsContainer =
-    document.getElementById(
-        "table-details-container"
-    );
-
-
-const closeDetails =
-    document.getElementById(
-        "close-table-details"
-    );
-
-
-const relationshipsModal =
-    document.getElementById(
-        "relationships-modal"
-    );
-
-
-const relationshipsContainer =
-    document.getElementById(
-        "relationships-container"
-    );
-
-
-const closeRelationships =
-    document.getElementById(
-        "close-relationships"
-    );
-
-
-/* ============================================================
- * OTHER CONTROLS
- * ============================================================ */
-
-const describeTableButton =
-    document.getElementById(
-        "describe-table-button"
-    );
-
-
-const viewSchemaButton =
-    document.getElementById(
-        "view-schema-button"
-    );
-
-
-const viewRelationshipsButton =
-    document.getElementById(
-        "view-relationships-button"
-    );
-
-
-const closeSidebar =
-    document.getElementById(
-        "close-sidebar-button"
-    );
-
+const sqlEditor = document.getElementById("sql-editor");
+const runQueryButton = document.getElementById("run-query-button");
+const statusElement = document.getElementById("playground-status");
+const databaseTree = document.getElementById("database-tree");
+const searchInput = document.getElementById("database-search-input");
+const activeDbElement = document.getElementById("active-database-name");
+const queryTabs = document.getElementById("query-tabs");
+const newQueryButton = document.getElementById("new-query-button");
+
+const resultsSection = document.getElementById("results-section");
+const resultsContainer = document.getElementById("results-container");
+const resultsSummary = document.getElementById("results-summary");
+const downloadButton = document.getElementById("download-results-button");
+const minimizeButton = document.getElementById("minimize-results-button");
+const maximizeButton = document.getElementById("maximize-results-button");
+const closeResultsButton = document.getElementById("close-results-button");
+const resizeHandle = document.getElementById("results-resize-handle");
+
+const selectorOverlay = document.getElementById("table-selector-overlay");
+const selectorModal = document.getElementById("table-selector-modal");
+const selectorTitle = document.getElementById("table-selector-title");
+const selectorList = document.getElementById("table-selector-list");
+const closeSelector = document.getElementById("close-table-selector");
+
+const detailsOverlay = document.getElementById("table-details-overlay");
+const detailsModal = document.getElementById("table-details-modal");
+const detailsTitle = document.getElementById("table-details-title");
+const detailsContainer = document.getElementById("table-details-container");
+const closeDetails = document.getElementById("close-table-details");
+
+const relationshipsOverlay = document.getElementById("relationships-overlay");
+const relationshipsModal = document.getElementById("relationships-modal");
+const relationshipsContainer = document.getElementById("relationships-container");
+const closeRelationships = document.getElementById("close-relationships");
+
+const closeSidebar = document.getElementById("close-sidebar-button");
+const mobileSidebarButton = document.getElementById("mobile-sidebar-button");
+const mobileSidebarOverlay = document.getElementById("mobile-sidebar-overlay");
 
 /* ============================================================
  * APPLICATION STATE
  * ============================================================ */
 
 let databases = [];
+let activeDatabase = localStorage.getItem(PLAYGROUND_ACTIVE_DB_KEY) || null;
+let activeTable = null;
+let latestResults = null;
+let resultsHeight = DEFAULT_RESULTS_HEIGHT;
+let resultsDragging = false;
+let dragStartY = 0;
+let dragStartHeight = 0;
 
+let queryCounter = 1;
+let activeQueryId = 1;
+const queryState = new Map();
+queryState.set(1, { name: "Query 1", sql: "" });
 
-let activeDatabase =
-    localStorage.getItem(
-        PLAYGROUND_ACTIVE_DATABASE_KEY
-    ) || null;
-
-
-let activeTable =
-    null;
-
-
-let latestResults =
-    null;
-
-
-let resultsHeight =
-    DEFAULT_RESULTS_HEIGHT;
-
-
-let queryCounter =
-    1;
-
-
-let activeQueryId =
-    1;
-
-
-/*
- * Query state:
- *
- * {
- *   1: {
- *      name: "Query 1",
- *      sql: ""
- *   }
- * }
- */
-const queryState =
-    new Map();
-
-
-queryState.set(
-    1,
-    {
-        name: "Query 1",
-        sql: ""
-    }
-);
-
+/* Databases are collapsed by default. The active database is opened. */
+const expandedDatabases = new Set();
 
 /* ============================================================
  * STARTUP
  * ============================================================ */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    initializePlayground
-);
-
-
-/* ============================================================
- * INITIALIZE PLAYGROUND
- * ============================================================ */
+document.addEventListener("DOMContentLoaded", initializePlayground);
 
 async function initializePlayground() {
-
     try {
-
-        showStatus(
-            "Loading Playground databases...",
-            "info"
-        );
-
+        showStatus("Loading Playground databases...", "info");
 
         loadPersistedQueries();
-
-
-        await loadDatabases();
-
-
+        await loadLearningDatabases();
         restoreActiveDatabase();
-
+        expandedDatabases.clear();
+        if (activeDatabase) {
+            expandedDatabases.add(activeDatabase);
+        }
 
         renderDatabaseTree();
-
-
         renderQueryTabs();
-
-
+        updateActiveDatabaseUI();
+        hideResults();
         initializeEvents();
 
-
-        hideResults();
-
-
-        updateActiveDatabase();
-
-
-        showStatus(
-            "SQL Playground ready.",
-            "success"
-        );
-
+        showStatus("SQL Playground ready.", "success");
+    } catch (error) {
+        console.error("Playground initialization failed:", error);
+        showStatus("Unable to load Playground: " + error.message, "error");
     }
-
-    catch (error) {
-
-        console.error(
-            "Playground initialization failed:",
-            error
-        );
-
-
-        showStatus(
-            "Unable to initialize Playground: " +
-            error.message,
-            "error"
-        );
-
-    }
-
 }
 
-
 /* ============================================================
- * LOAD DATABASES
+ * LOAD BANKING / HEALTHCARE FROM BROWSER SQLITE
+ * ============================================================
+ *
+ * We deliberately do not depend on /api/schema/databases here.
+ * The Playground already has the authoritative learning databases
+ * in browserSqlEngine. This prevents backend route differences from
+ * breaking the Explorer, Describe, Schema or Relationships buttons.
  * ============================================================ */
 
-async function loadDatabases() {
-
-    const response =
-        await fetch(
-            PLAYGROUND_API_BASE_URL +
-            "/api/schema/databases"
-        );
-
-
-    let data = null;
-
-
-    try {
-
-        data =
-            await response.json();
-
+async function loadLearningDatabases() {
+    if (!window.browserSqlEngine || typeof window.browserSqlEngine.initialize !== "function") {
+        throw new Error("Browser SQL engine is unavailable. Refresh the Playground.");
     }
 
-    catch {
+    const loaded = [];
 
-        throw new Error(
-            "Invalid response received from database API."
-        );
-
+    for (const databaseName of LEARNING_DATABASES) {
+        const db = await window.browserSqlEngine.initialize(databaseName);
+        const tables = readDatabaseTables(db);
+        loaded.push({
+            name: databaseName,
+            tables
+        });
     }
 
+    databases = loaded;
 
-    if (!response.ok) {
-
-        throw new Error(
-            data?.message ||
-            "Database list request failed."
-        );
-
+    /* Re-open the selected database after inspecting both databases. */
+    if (activeDatabase && databases.some(db => db.name === activeDatabase)) {
+        await window.browserSqlEngine.initialize(activeDatabase);
     }
-
-
-    const rawDatabases =
-        Array.isArray(data)
-            ? data
-            : (
-                Array.isArray(data?.databases)
-                    ? data.databases
-                    : []
-            );
-
-
-    databases =
-        rawDatabases
-            .map(
-                normalizeDatabase
-            )
-            .filter(
-                database =>
-                    database.name
-            );
-
 }
 
+function readDatabaseTables(db) {
+    const tableRows = db.exec({
+        sql: `
+            SELECT name
+            FROM sqlite_master
+            WHERE type = 'table'
+              AND name NOT LIKE 'sqlite_%'
+            ORDER BY name
+        `,
+        rowMode: "object",
+        returnValue: "resultRows"
+    }) || [];
 
-/* ============================================================
- * NORMALIZE DATABASE
- * ============================================================ */
-
-function normalizeDatabase(
-    database
-) {
-
-    const name =
-        String(
-            database?.name ||
-            database?.database ||
-            database?.databaseName ||
-            ""
-        ).trim();
-
-
-    const rawTables =
-        database?.tables ||
-        database?.tableNames ||
-        [];
-
-
-    const tables =
-        Array.isArray(rawTables)
-            ? rawTables
-                .map(
-                    normalizeTable
-                )
-                .filter(
-                    table =>
-                        table.name
-                )
-            : [];
-
-
-    return {
-        name,
-        tables
-    };
-
-}
-
-
-/* ============================================================
- * NORMALIZE TABLE
- * ============================================================ */
-
-function normalizeTable(
-    table
-) {
-
-    if (
-        typeof table ===
-        "string"
-    ) {
-
+    return tableRows.map(row => {
+        const name = String(row.name || "");
         return {
-            name: table,
-            columns: []
+            name,
+            columns: readTableColumns(db, name),
+            foreignKeys: readForeignKeys(db, name),
+            schemaSql: readSchemaSql(db, name),
+            indexes: readIndexes(db, name)
         };
-
-    }
-
-
-    return {
-
-        name:
-            String(
-                table?.name ||
-                table?.tableName ||
-                table?.table_name ||
-                ""
-            ).trim(),
-
-        columns:
-            Array.isArray(
-                table?.columns
-            )
-                ? table.columns
-                : []
-
-    };
-
+    });
 }
 
+function readTableColumns(db, tableName) {
+    const safe = quoteIdentifier(tableName);
+
+    return db.exec({
+        sql: `PRAGMA table_info(${safe})`,
+        rowMode: "object",
+        returnValue: "resultRows"
+    }) || [];
+}
+
+function readForeignKeys(db, tableName) {
+    const safe = quoteIdentifier(tableName);
+
+    return db.exec({
+        sql: `PRAGMA foreign_key_list(${safe})`,
+        rowMode: "object",
+        returnValue: "resultRows"
+    }) || [];
+}
+
+function readSchemaSql(db, tableName) {
+    const safe = quoteIdentifier(tableName);
+
+    const rows = db.exec({
+        sql: `
+            SELECT sql
+            FROM sqlite_master
+            WHERE type = 'table'
+              AND name = ${quoteString(tableName)}
+        `,
+        rowMode: "object",
+        returnValue: "resultRows"
+    }) || [];
+
+    return rows[0]?.sql || `CREATE TABLE ${safe} (...);`;
+}
+
+function readIndexes(db, tableName) {
+    const safe = quoteString(tableName);
+
+    return db.exec({
+        sql: `
+            SELECT name, sql
+            FROM sqlite_master
+            WHERE type = 'index'
+              AND tbl_name = ${safe}
+            ORDER BY name
+        `,
+        rowMode: "object",
+        returnValue: "resultRows"
+    }) || [];
+}
 
 /* ============================================================
- * RESTORE ACTIVE DATABASE
+ * DATABASE STATE
  * ============================================================ */
 
 function restoreActiveDatabase() {
-
-    if (
-        activeDatabase &&
-        databases.some(
-            database =>
-                database.name ===
-                activeDatabase
-        )
-    ) {
-
-        return;
-
+    if (!activeDatabase || !databases.some(db => db.name === activeDatabase)) {
+        activeDatabase = databases[0]?.name || null;
     }
 
-
-    activeDatabase =
-        databases.length > 0
-            ? databases[0].name
-            : null;
-
-
-    persistActiveDatabase();
-
+    if (activeDatabase) {
+        localStorage.setItem(PLAYGROUND_ACTIVE_DB_KEY, activeDatabase);
+    }
 }
 
-
-/* ============================================================
- * SET ACTIVE DATABASE
- * ============================================================ */
-
-function setActiveDatabase(
-    databaseName
-) {
-
-    const database =
-        findDatabase(
-            databaseName
-        );
-
+async function setActiveDatabase(name, options = {}) {
+    const database = databases.find(db => db.name.toLowerCase() === String(name).toLowerCase());
 
     if (!database) {
-
-        showStatus(
-            `Database '${databaseName}' is not available in Playground.`,
-            "error"
-        );
-
-
-        return false;
-
+        throw new Error(`Database '${name}' is not available in Playground.`);
     }
 
+    activeDatabase = database.name;
+    activeTable = null;
+    localStorage.setItem(PLAYGROUND_ACTIVE_DB_KEY, activeDatabase);
 
-    activeDatabase =
-        database.name;
+    expandedDatabases.add(activeDatabase);
+    updateActiveDatabaseUI();
 
-
-    activeTable =
-        null;
-
-
-    persistActiveDatabase();
-
-
-    updateActiveDatabase();
-
+    /* Ensure the browser engine is on the same database. */
+    if (window.browserSqlEngine && typeof window.browserSqlEngine.initialize === "function") {
+        await window.browserSqlEngine.initialize(activeDatabase);
+    }
 
     renderDatabaseTree();
 
+    if (!options.silent) {
+        showStatus(`Active database changed to ${activeDatabase}.`, "success");
+    }
 
     return true;
-
 }
 
+function updateActiveDatabaseUI() {
+    const name = activeDatabase || "None";
 
-/* ============================================================
- * PERSIST ACTIVE DATABASE
- * ============================================================ */
+    if (activeDbElement) {
+        activeDbElement.textContent = name;
+    }
 
-function persistActiveDatabase() {
 
-    if (activeDatabase) {
-
-        localStorage.setItem(
-            PLAYGROUND_ACTIVE_DATABASE_KEY,
-            activeDatabase
+    if (sqlEditor) {
+        sqlEditor.setAttribute(
+            "placeholder",
+            `-- Active database: ${name}\n-- To change database: USE database_name;\n\n-- Write your SQL query here.\n\n-- Example:\nSELECT *\nFROM Patients;`
         );
-
     }
-
-    else {
-
-        localStorage.removeItem(
-            PLAYGROUND_ACTIVE_DATABASE_KEY
-        );
-
-    }
-
 }
-
-
-/* ============================================================
- * UPDATE ACTIVE DATABASE DISPLAY
- * ============================================================ */
-
-function updateActiveDatabase() {
-
-    if (!activeDbElement) {
-
-        return;
-
-    }
-
-
-    activeDbElement.textContent =
-        activeDatabase ||
-        "None";
-
-}
-
-
-/* ============================================================
- * FIND DATABASE
- * ============================================================ */
-
-function findDatabase(
-    databaseName
-) {
-
-    return databases.find(
-        database =>
-            database.name.toLowerCase() ===
-            String(
-                databaseName
-            ).toLowerCase()
-    );
-
-}
-
-
-/* ============================================================
- * FIND TABLE
- * ============================================================ */
-
-function findTable(
-    databaseName,
-    tableName
-) {
-
-    const database =
-        findDatabase(
-            databaseName
-        );
-
-
-    if (!database) {
-
-        return null;
-
-    }
-
-
-    return database.tables.find(
-        table =>
-            table.name.toLowerCase() ===
-            String(
-                tableName
-            ).toLowerCase()
-    );
-
-}
-
 
 /* ============================================================
  * DATABASE EXPLORER
  * ============================================================ */
 
 function renderDatabaseTree() {
+    if (!databaseTree) return;
 
-    if (!databaseTree) {
+    const query = (searchInput?.value || "").trim().toLowerCase();
+    databaseTree.replaceChildren();
 
-        return;
+    databases.forEach(database => {
+        const databaseMatches = database.name.toLowerCase().includes(query);
+        const matchingTables = database.tables.filter(table =>
+            table.name.toLowerCase().includes(query)
+        );
 
-    }
+        if (query && !databaseMatches && matchingTables.length === 0) {
+            return;
+        }
 
+        const item = document.createElement("div");
+        item.className = "database-item";
+        item.dataset.database = database.name;
+        item.setAttribute("role", "treeitem");
 
-    databaseTree.innerHTML = "";
+        const header = document.createElement("button");
+        header.type = "button";
+        header.className = "database-header";
+        header.setAttribute("aria-expanded", String(expandedDatabases.has(database.name)));
+        header.innerHTML = `
+            <span class="database-arrow" role="button" tabindex="0" aria-label="Toggle ${escapeHTML(database.name)} database">
+                ${expandedDatabases.has(database.name) ? "▼" : "▶"}
+            </span>
+            <span class="database-icon">🗄️</span>
+            <span class="database-name">${escapeHTML(database.name)}</span>
+            ${database.name === activeDatabase ? '<span class="database-active-badge">ACTIVE</span>' : ""}
+        `;
 
+        const tableList = document.createElement("div");
+        tableList.className = "table-list";
 
-    const searchTerm =
-        (
-            searchInput?.value ||
-            ""
-        )
-            .trim()
-            .toLowerCase();
+        const shouldShowTables = expandedDatabases.has(database.name) ||
+            (query && matchingTables.length > 0);
+        tableList.style.display = shouldShowTables ? "block" : "none";
 
-
-    databases.forEach(
-        database => {
-
-            const databaseMatches =
-                database.name
-                    .toLowerCase()
-                    .includes(
-                        searchTerm
-                    );
-
-
-            const matchingTables =
-                database.tables.filter(
-                    table =>
-                        table.name
-                            .toLowerCase()
-                            .includes(
-                                searchTerm
-                            )
-                );
-
-
-            if (
-                searchTerm &&
-                !databaseMatches &&
-                matchingTables.length === 0
-            ) {
-
+        database.tables.forEach(table => {
+            if (query && !databaseMatches && !table.name.toLowerCase().includes(query)) {
                 return;
-
             }
 
-
-            const databaseItem =
-                document.createElement(
-                    "div"
-                );
-
-
-            databaseItem.className =
-                "database-item";
-
-
-            const header =
-                document.createElement(
-                    "div"
-                );
-
-
-            header.className =
-                "database-header";
-
-
-            const isActive =
-                activeDatabase ===
-                database.name;
-
-
-            header.innerHTML = `
-
-                <span class="database-arrow">
-                    ▶
-                </span>
-
-                <span>
-                    🗄️
-                </span>
-
-                <span>
-                    ${escapeHTML(
-                        database.name
-                    )}
-                </span>
-
-                ${
-                    isActive
-                        ? `
-                            <span
-                                class="active-database-badge"
-                            >
-                                ACTIVE
-                            </span>
-                          `
-                        : ""
-                }
-
+            const tableElement = document.createElement("button");
+            tableElement.type = "button";
+            tableElement.className = "table-item";
+            tableElement.innerHTML = `
+                <span class="table-item-icon">▦</span>
+                <span class="table-item-name">${escapeHTML(table.name)}</span>
             `;
 
-
-            const tableList =
-                document.createElement(
-                    "div"
-                );
-
-
-            tableList.className =
-                "table-list";
-
-/*
-             * Automatically expand the active database.
+            /*
+             * Keep table rows visually neutral. Selecting a table must NOT
+             * create the white highlighted-table effect that was previously
+             * appearing in the explorer.
              */
-            if (
-                isActive ||
-                (
-                    searchTerm &&
-                    matchingTables.length > 0
-                )
-            ) {
+            tableElement.classList.remove("selected");
 
-                tableList.style.display =
-                    "block";
+            tableElement.addEventListener("click", async event => {
+                event.preventDefault();
+                event.stopPropagation();
 
+                try {
+                    await setActiveDatabase(database.name, { silent: true });
+                    activeTable = { database: database.name, table: table.name };
+                    expandedDatabases.add(database.name);
+                    renderDatabaseTree();
+                    showStatus(`Selected table: ${database.name}.${table.name}`, "info");
+                } catch (error) {
+                    showStatus(error.message, "error");
+                }
+            });
 
-                header.querySelector(
-                    ".database-arrow"
-                ).textContent =
-                    "▼";
+            tableList.appendChild(tableElement);
+        });
 
+        const databaseArrow = header.querySelector(".database-arrow");
+
+        /*
+         * The arrow is an explicit fold/unfold control.
+         *
+         * We deliberately do NOT call setActiveDatabase() here. Clicking the
+         * arrow is only a UI action; it must not change the active database.
+         * The expanded state lives in expandedDatabases, so it survives the
+         * re-render that occurs after other explorer actions.
+         */
+        const toggleDatabase = event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (expandedDatabases.has(database.name)) {
+                expandedDatabases.delete(database.name);
+            } else {
+                expandedDatabases.add(database.name);
             }
 
+            renderDatabaseTree();
+        };
 
-            database.tables.forEach(
-                table => {
+        databaseArrow?.addEventListener("click", toggleDatabase);
+        databaseArrow?.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+                toggleDatabase(event);
+            }
+        });
 
-                    if (
-                        searchTerm &&
-                        !databaseMatches &&
-                        !table.name
-                            .toLowerCase()
-                            .includes(
-                                searchTerm
-                            )
-                    ) {
+        /*
+         * Clicking the database name/header keeps the existing behavior:
+         * open the database and make it active. The arrow itself is handled
+         * separately above so it can reliably fold/unfold.
+         */
+        header.addEventListener("click", async event => {
+            if (event.target.closest(".database-arrow")) {
+                return;
+            }
 
-                        return;
+            try {
+                await setActiveDatabase(database.name, { silent: true });
+                expandedDatabases.add(database.name);
+                renderDatabaseTree();
+            } catch (error) {
+                showStatus(error.message, "error");
+            }
+        });
 
-                    }
+        item.appendChild(header);
+        item.appendChild(tableList);
+        databaseTree.appendChild(item);
+    });
 
-
-                    const tableElement =
-                        document.createElement(
-                            "div"
-                        );
-
-
-                    tableElement.className =
-                        "table-item";
-
-
-                    tableElement.innerHTML = `
-
-                        <span>
-                            ▦
-                        </span>
-
-                        <span>
-                            ${escapeHTML(
-                                table.name
-                            )}
-                        </span>
-
-                    `;
-
-
-                    tableElement.addEventListener(
-                        "click",
-                        event => {
-
-                            event.stopPropagation();
-
-
-                            setActiveDatabase(
-                                database.name
-                            );
-
-
-                            activeTable = {
-
-                                database:
-                                    database.name,
-
-                                table:
-                                    table.name
-
-                            };
-
-
-                            renderDatabaseTree();
-
-
-                            showStatus(
-                                `Selected table '${table.name}' in database '${database.name}'.`,
-                                "info"
-                            );
-
-                        }
-                    );
-
-
-                    tableList.appendChild(
-                        tableElement
-                    );
-
-                }
-            );
-
-
-            header.addEventListener(
-                "click",
-                () => {
-
-                    setActiveDatabase(
-                        database.name
-                    );
-
-
-                    const isOpen =
-                        tableList.style.display ===
-                        "block";
-
-
-                    tableList.style.display =
-                        isOpen
-                            ? "none"
-                            : "block";
-
-
-                    header.querySelector(
-                        ".database-arrow"
-                    ).textContent =
-                        isOpen
-                            ? "▶"
-                            : "▼";
-
-                }
-            );
-
-
-            databaseItem.appendChild(
-                header
-            );
-
-
-            databaseItem.appendChild(
-                tableList
-            );
-
-
-            databaseTree.appendChild(
-                databaseItem
-            );
-
-        }
-    );
-
+    if (!databaseTree.children.length) {
+        databaseTree.innerHTML = `
+            <div class="database-empty-state">
+                No matching database or table found.
+            </div>
+        `;
+    }
 }
 
-
 /* ============================================================
- * SQL STATEMENT SPLITTER
- * ============================================================
- *
- * Splits SQL on semicolons while respecting:
- *
- * - single quotes
- * - double quotes
- * - backticks
- * - line comments
- * - block comments
- *
- * This prevents:
- *
- * SELECT 'A;B';
- *
- * from being split incorrectly.
+ * SQL STATEMENT PARSING
  * ============================================================ */
 
-function splitSqlStatements(
-    sql
-) {
-
+function splitSqlStatements(sql) {
     const statements = [];
-
-
     let current = "";
-
-
     let quote = null;
+    let lineComment = false;
+    let blockComment = false;
 
+    for (let i = 0; i < sql.length; i += 1) {
+        const char = sql[i];
+        const next = sql[i + 1];
 
-    let inLineComment = false;
-
-
-    let inBlockComment = false;
-
-
-    for (
-        let index = 0;
-        index < sql.length;
-        index++
-    ) {
-
-        const character =
-            sql[index];
-
-
-        const next =
-            sql[index + 1];
-
-
-        if (inLineComment) {
-
-            current += character;
-
-
-            if (
-                character === "\n"
-            ) {
-
-                inLineComment =
-                    false;
-
-            }
-
-
+        if (lineComment) {
+            current += char;
+            if (char === "\n") lineComment = false;
             continue;
-
         }
 
-
-        if (inBlockComment) {
-
-            current += character;
-
-
-            if (
-                character === "*" &&
-                next === "/"
-            ) {
-
+        if (blockComment) {
+            current += char;
+            if (char === "*" && next === "/") {
                 current += next;
-
-
-                index++;
-
-
-                inBlockComment =
-                    false;
-
+                i += 1;
+                blockComment = false;
             }
-
-
             continue;
-
         }
 
-
-        if (
-            !quote &&
-            character === "-" &&
-            next === "-"
-        ) {
-
-            current +=
-                character +
-                next;
-
-
-            index++;
-
-
-            inLineComment =
-                true;
-
-
+        if (!quote && char === "-" && next === "-") {
+            current += char + next;
+            i += 1;
+            lineComment = true;
             continue;
-
         }
 
-
-        if (
-            !quote &&
-            character === "/" &&
-            next === "*"
-        ) {
-
-            current +=
-                character +
-                next;
-
-
-            index++;
-
-
-            inBlockComment =
-                true;
-
-
+        if (!quote && char === "/" && next === "*") {
+            current += char + next;
+            i += 1;
+            blockComment = true;
             continue;
-
         }
-
 
         if (quote) {
-
-            current +=
-                character;
-
-
-            if (
-                character === quote
-            ) {
-
-                /*
-                 * SQL escaped quote:
-                 *
-                 * ''
-                 * ""
-                 * ``
-                 */
-                if (
-                    next === quote
-                ) {
-
-                    current +=
-                        next;
-
-
-                    index++;
-
+            current += char;
+            if (char === quote) {
+                if (next === quote) {
+                    current += next;
+                    i += 1;
+                } else {
+                    quote = null;
                 }
-
-                else {
-
-                    quote =
-                        null;
-
-                }
-
             }
-
-
             continue;
-
         }
 
-
-        if (
-            character === "'" ||
-            character === '"' ||
-            character === "`"
-        ) {
-
-            quote =
-                character;
-
-
-            current +=
-                character;
-
-
+        if (char === "'" || char === '"' || char === "`") {
+            quote = char;
+            current += char;
             continue;
-
         }
 
-
-        if (
-            character === ";"
-        ) {
-
-            if (
-                current.trim()
-            ) {
-
-                statements.push(
-                    current.trim()
-                );
-
-            }
-
-
-            current =
-                "";
-
-
+        if (char === ";") {
+            if (current.trim()) statements.push(current.trim());
+            current = "";
             continue;
-
         }
 
-
-        current +=
-            character;
-
+        current += char;
     }
 
+    if (current.trim()) statements.push(current.trim());
+    return statements;
+}
 
-    if (
-        current.trim()
-    ) {
+function splitStatementsWithPositions(sql) {
+    const statements = [];
+    let start = 0;
+    let quote = null;
+    let lineComment = false;
+    let blockComment = false;
 
-        statements.push(
-            current.trim()
-        );
+    for (let i = 0; i < sql.length; i += 1) {
+        const char = sql[i];
+        const next = sql[i + 1];
 
+        if (lineComment) {
+            if (char === "\n") lineComment = false;
+            continue;
+        }
+
+        if (blockComment) {
+            if (char === "*" && next === "/") {
+                i += 1;
+                blockComment = false;
+            }
+            continue;
+        }
+
+        if (!quote && char === "-" && next === "-") {
+            i += 1;
+            lineComment = true;
+            continue;
+        }
+
+        if (!quote && char === "/" && next === "*") {
+            i += 1;
+            blockComment = true;
+            continue;
+        }
+
+        if (quote) {
+            if (char === quote) {
+                if (next === quote) i += 1;
+                else quote = null;
+            }
+            continue;
+        }
+
+        if (char === "'" || char === '"' || char === "`") {
+            quote = char;
+            continue;
+        }
+
+        if (char === ";") {
+            const text = sql.slice(start, i).trim();
+            if (text) statements.push({ text, start, end: i });
+            start = i + 1;
+        }
     }
 
+    const finalText = sql.slice(start).trim();
+    if (finalText) {
+        statements.push({ text: finalText, start, end: sql.length });
+    }
 
     return statements;
-
 }
 
-
-/* ============================================================
- * GET STATEMENT UNDER CURSOR
- * ============================================================ */
-
-function getStatementUnderCursor(
-    sql,
-    cursorPosition
-) {
-
-    const statements =
-        splitSqlStatementsWithPositions(
-            sql
-        );
-
-
-    for (
-        const statement of statements
-    ) {
-
-        if (
-            cursorPosition >=
-                statement.start &&
-            cursorPosition <=
-                statement.end
-        ) {
-
-            return statement.text;
-
-        }
-
-    }
-
-
-    return "";
-
-}
-
-
-/* ============================================================
- * SPLIT SQL WITH POSITIONS
- * ============================================================ */
-
-function splitSqlStatementsWithPositions(
-    sql
-) {
-
-    const result = [];
-
-
-    let start =
-        0;
-
-
-    let quote =
-        null;
-
-
-    let inLineComment =
-        false;
-
-
-    let inBlockComment =
-        false;
-
-
-    for (
-        let index = 0;
-        index < sql.length;
-        index++
-    ) {
-
-        const character =
-            sql[index];
-
-
-        const next =
-            sql[index + 1];
-
-
-        if (inLineComment) {
-
-            if (
-                character === "\n"
-            ) {
-
-                inLineComment =
-                    false;
-
-            }
-
-
-            continue;
-
-        }
-
-
-        if (inBlockComment) {
-
-            if (
-                character === "*" &&
-                next === "/"
-            ) {
-
-                index++;
-
-
-                inBlockComment =
-                    false;
-
-            }
-
-
-            continue;
-
-        }
-
-
-        if (
-            !quote &&
-            character === "-" &&
-            next === "-"
-        ) {
-
-            index++;
-
-
-            inLineComment =
-                true;
-
-
-            continue;
-
-        }
-
-
-        if (
-            !quote &&
-            character === "/" &&
-            next === "*"
-        ) {
-
-            index++;
-
-
-            inBlockComment =
-                true;
-
-
-            continue;
-
-        }
-
-
-        if (quote) {
-
-            if (
-                character === quote
-            ) {
-
-                if (
-                    next === quote
-                ) {
-
-                    index++;
-
-                }
-
-                else {
-
-                    quote =
-                        null;
-
-                }
-
-            }
-
-
-            continue;
-
-        }
-
-
-        if (
-            character === "'" ||
-            character === '"' ||
-            character === "`"
-        ) {
-
-            quote =
-                character;
-
-
-            continue;
-
-        }
-
-
-        if (
-            character === ";"
-        ) {
-
-            const text =
-                sql
-                    .slice(
-                        start,
-                        index
-                    )
-                    .trim();
-
-
-            if (text) {
-
-                result.push({
-
-                    text,
-
-                    start,
-
-                    end:
-                        index
-
-                });
-
-            }
-
-
-            start =
-                index + 1;
-
-        }
-
-    }
-
-
-    const finalText =
-        sql
-            .slice(start)
-            .trim();
-
-
-    if (finalText) {
-
-        result.push({
-
-            text:
-                finalText,
-
-            start,
-
-            end:
-                sql.length
-
-        });
-
-    }
-
-
-    return result;
-
-}
-
-
-/* ============================================================
- * FRIENDLY SQL ERROR NORMALIZATION
- * ============================================================
- * Converts SQLite missing-table errors into a learner-friendly
- * message that identifies the active database. Other errors are
- * preserved unchanged.
- * ============================================================ */
-function formatPlaygroundError(error) {
-
-    const rawMessage = String(
-        error?.message || error || "SQL query execution failed."
+function getExecutionTarget() {
+    const fullSql = sqlEditor?.value || "";
+    const selected = sqlEditor?.value.slice(
+        sqlEditor.selectionStart,
+        sqlEditor.selectionEnd
     ).trim();
 
-    const missingTableMatch = rawMessage.match(
-        /no such table:\s*["'`]?([A-Za-z0-9_]+)["'`]?/i
-    );
-
-    if (missingTableMatch && activeDatabase) {
-        return `Error: ${missingTableMatch[1]} table is not present in ${String(activeDatabase).toLowerCase()} db`;
+    if (selected) {
+        return { statements: [selected], description: "selected SQL" };
     }
 
-    return rawMessage;
+    const statements = splitStatementsWithPositions(fullSql);
 
+    if (statements.length <= 1) {
+        return { statements: statements.map(item => item.text), description: "SQL statement" };
+    }
+
+    const cursor = sqlEditor.selectionStart;
+    const current = statements.find(item => cursor >= item.start && cursor <= item.end);
+
+    if (current) {
+        return { statements: [current.text], description: "statement under cursor" };
+    }
+
+    return { statements: statements.map(item => item.text), description: "SQL worksheet" };
 }
 
-
 /* ============================================================
- * EXECUTION TARGET
+ * ACTIVE-DATABASE TABLE VALIDATION
  * ============================================================
  *
- * Behaviour:
+ * The browser SQL engine is intentionally shared by the learning
+ * databases. Before execution we therefore validate table references
+ * against the currently active database ourselves.
  *
- * 1. Selected text exists:
- *      execute selected text.
+ * Example:
+ *   Active database: Banking
+ *   SELECT * FROM doctors;
  *
- * 2. Nothing selected:
- *      execute statement under cursor.
+ * Result:
+ *   doctors table is not present in Banking db.
  *
- * 3. Ctrl/Cmd + Shift + Enter:
- *      execute complete script.
+ * This keeps the Playground behavior deterministic and prevents a table
+ * belonging to Healthcare from being executed while Banking is active.
+ * The lookup is dynamic: any future table added to the loaded database
+ * metadata is automatically included.
  * ============================================================ */
-
-async function executeCurrentQuery(
-    options = {}
-) {
-
-    if (!sqlEditor) {
-
-        return;
-
+function validateTableReferences(statement) {
+    if (!activeDatabase) {
+        throw new Error("Please select or USE a database first.");
     }
 
-
-    const fullSql =
-        sqlEditor.value;
-
-
-    if (
-        !fullSql.trim()
-    ) {
-
-        showStatus(
-            "Please enter a SQL query.",
-            "error"
-        );
-
-
-        return;
-
-    }
-
-
-    let statements = [];
-
-
-    if (
-        options.executeAll
-    ) {
-
-        statements =
-            splitSqlStatements(
-                fullSql
-            );
-
-    }
-
-    else if (
-        sqlEditor.selectionStart !==
-        sqlEditor.selectionEnd
-    ) {
-
-        const selectedText =
-            fullSql.slice(
-                sqlEditor.selectionStart,
-                sqlEditor.selectionEnd
-            );
-
-
-        statements =
-            splitSqlStatements(
-                selectedText
-            );
-
-    }
-
-    else {
-
-        const statement =
-            getStatementUnderCursor(
-                fullSql,
-                sqlEditor.selectionStart
-            );
-
-
-        if (statement) {
-
-            statements =
-                [statement];
-
-        }
-
-        else {
-
-            statements =
-                splitSqlStatements(
-                    fullSql
-                );
-
-        }
-
-    }
-
-
-    if (
-        statements.length === 0
-    ) {
-
-        showStatus(
-            "No executable SQL statement found.",
-            "error"
-        );
-
-
-        return;
-
-    }
-
-
-    showStatus(
-        `Executing ${statements.length} statement${
-            statements.length === 1
-                ? ""
-                : "s"
-        }...`,
-        "info"
+    const activeDb = databases.find(
+        database => database.name.toLowerCase() === activeDatabase.toLowerCase()
     );
 
-
-    try {
-
-        let lastResult =
-            null;
-
-
-        let executedCount =
-            0;
-
-
-        for (
-            const statement of statements
-        ) {
-
-            const result =
-                await executeSingleStatement(
-                    statement
-                );
-
-
-            executedCount++;
-
-
-            if (result) {
-
-                lastResult =
-                    result;
-
-            }
-
-        }
-
-
-        if (lastResult) {
-
-            displayResults(
-                lastResult
-            );
-
-        }
-
-
-        await loadDatabases();
-
-
-        renderDatabaseTree();
-
-
-        updateActiveDatabase();
-
-
-        showStatus(
-            `Query executed successfully. ${executedCount} statement${
-                executedCount === 1
-                    ? ""
-                    : "s"
-            } executed.`,
-            "success"
-        );
-
+    if (!activeDb) {
+        throw new Error(`Database '${activeDatabase}' is not available in Playground.`);
     }
 
-    catch (error) {
+    const activeTables = new Set(
+        activeDb.tables.map(table => table.name.toLowerCase())
+    );
 
-        console.error(
-            "SQL execution error:",
-            error
-        );
+    /*
+     * Build the complete table list from every loaded learning database.
+     * We only reject a reference when it is a known table in another
+     * learning database. Unknown names are left to SQLite so normal SQL
+     * errors continue to be reported by the engine.
+     */
+    const allTables = new Map();
 
-        const friendlyError =
-            formatPlaygroundError(error);
-
-        displayResults({
-
-            columns:
-                ["Error"],
-
-            rows: [
-                {
-                    Error:
-                        friendlyError
-                }
-            ],
-
-            executionTime:
-                0,
-
-            error:
-                true
-
+    databases.forEach(database => {
+        database.tables.forEach(table => {
+            allTables.set(table.name.toLowerCase(), database.name);
         });
+    });
 
-        showStatus(
-            friendlyError,
-            "error"
-        );
+    /*
+     * Detect table references in the common SQL clauses that introduce a
+     * table name. This covers SELECT/FROM/JOIN, UPDATE, INSERT INTO,
+     * DELETE FROM and common UPSERT-style INSERT statements.
+     */
+    const tableReferenceRegex = /\b(?:FROM|JOIN|UPDATE|INTO)\s+(?!\()([`"']?)([A-Za-z_][A-Za-z0-9_$]*)(?:\1)(?=\s|;|,|$)/gi;
+    const deleteFromRegex = /\bDELETE\s+FROM\s+([`"']?)([A-Za-z_][A-Za-z0-9_$]*)(?:\1)/gi;
 
+    const references = [];
+    let match;
+
+    while ((match = tableReferenceRegex.exec(statement)) !== null) {
+        references.push(match[2]);
     }
 
+    while ((match = deleteFromRegex.exec(statement)) !== null) {
+        references.push(match[2]);
+    }
+
+    for (const tableName of references) {
+        const normalized = tableName.toLowerCase();
+        const owningDatabase = allTables.get(normalized);
+
+        if (owningDatabase && !activeTables.has(normalized)) {
+            throw new Error(`${tableName} table is not present in ${activeDatabase} db.`);
+        }
+    }
 }
 
-
 /* ============================================================
- * EXECUTE SINGLE STATEMENT
+ * QUERY EXECUTION
  * ============================================================ */
 
-async function executeSingleStatement(
-    statement
-) {
-
-    const sql =
-        statement.trim();
-
+async function executeCurrentQuery(options = {}) {
+    const sql = sqlEditor?.value.trim() || "";
 
     if (!sql) {
-
-        return null;
-
+        showStatus("Please enter a SQL query.", "error");
+        return;
     }
 
+    const target = options.executeAll
+        ? { statements: splitSqlStatements(sql), description: "SQL worksheet" }
+        : getExecutionTarget();
 
-    /*
-     * USE database_name;
-     */
-    const useMatch =
-        sql.match(
-            /^USE\s+(?:["'`])?([A-Za-z0-9_]+)(?:["'`])?\s*$/i
-        );
-
-
-    if (useMatch) {
-
-        const databaseName =
-            useMatch[1];
-
-
-        if (
-            !setActiveDatabase(
-                databaseName
-            )
-        ) {
-
-            throw new Error(
-                `Database '${databaseName}' is not present in Playground.`
-            );
-
-        }
-
-
-        return {
-
-            columns:
-                ["Message"],
-
-            rows: [
-                {
-                    Message:
-                        `Database changed to ${databaseName}.`
-                }
-            ],
-
-            rowCount:
-                1,
-
-            executionTime:
-                0
-
-        };
-
+    if (!target.statements.length) {
+        showStatus("No executable SQL statement was found.", "error");
+        return;
     }
 
-
-    /*
-     * SHOW DATABASES;
-     */
-    if (
-        /^SHOW\s+DATABASES?$/i.test(
-            sql
-        )
-    ) {
-
-        return {
-
-            columns:
-                ["Database"],
-
-            rows:
-                databases.map(
-                    database => ({
-                        Database:
-                            database.name
-                    })
-                ),
-
-            rowCount:
-                databases.length,
-
-            executionTime:
-                0
-
-        };
-
-    }
-
-
-    /*
-     * SHOW TABLES;
-     */
-    if (
-        /^SHOW\s+TABLES?$/i.test(
-            sql
-        )
-    ) {
-
-        requireActiveDatabase();
-
-
-        const database =
-            findDatabase(
-                activeDatabase
-            );
-
-
-        return {
-
-            columns:
-                ["Table"],
-
-            rows:
-                database.tables.map(
-                    table => ({
-                        Table:
-                            table.name
-                    })
-                ),
-
-            rowCount:
-                database.tables.length,
-
-            executionTime:
-                0
-
-        };
-
-    }
-
-
-    /*
-     * DESCRIBE / DESC
-     */
-    const describeMatch =
-        sql.match(
-            /^(?:DESCRIBE|DESC)\s+(?:TABLE\s+)?["'`]?([A-Za-z0-9_]+)["'`]?\s*$/i
-        );
-
-
-    if (describeMatch) {
-
-        requireActiveDatabase();
-
-
-        return await describeTable(
-            describeMatch[1]
-        );
-
-    }
-
-
-    /*
-     * Every normal SQL statement requires
-     * an active database.
-     */
-    requireActiveDatabase();
-
-
-    return await executeNormalSQL(
-        sql
-    );
-
-}
-
-
-/* ============================================================
- * REQUIRE ACTIVE DATABASE
- * ============================================================ */
-
-function requireActiveDatabase() {
-
-    if (
-        !activeDatabase
-    ) {
-
-        throw new Error(
-            "Please select or USE a database first."
-        );
-
-    }
-
-
-    if (
-        !findDatabase(
-            activeDatabase
-        )
-    ) {
-
-        throw new Error(
-            `Database '${activeDatabase}' is not available in Playground.`
-        );
-
-    }
-
-}
-
-
-/* ============================================================
- * EXECUTE NORMAL SQL
- * ============================================================ */
-
-async function executeNormalSQL(
-    statement
-) {
-
-    /*
-     * Prefer the shared API helper when available.
-     */
-    if (
-        typeof window.executeSqlQuery ===
-        "function"
-    ) {
-
-        const result =
-            await window.executeSqlQuery(
-                statement,
-                null,
-                activeDatabase
-            );
-
-
-        return normalizeQueryResult(
-            result
-        );
-
-    }
-
-
-    /*
-     * Fallback direct API request.
-     */
-    const response =
-        await fetch(
-            PLAYGROUND_API_BASE_URL +
-            "/api/query",
-            {
-
-                method:
-                    "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json"
-
-                },
-
-                body:
-                    JSON.stringify({
-
-                        query:
-                            statement,
-
-                        database:
-                            activeDatabase,
-
-                        expectedOutput:
-                            null
-
-                    })
-
-            }
-        );
-
-
-    let data = null;
-
+    runQueryButton.disabled = true;
+    showStatus(`Executing ${target.description}...`, "info");
 
     try {
+        let lastResult = null;
 
-        data =
-            await response.json();
-
-    }
-
-    catch {
-
-        throw new Error(
-            "Invalid SQL API response."
-        );
-
-    }
-
-
-    if (
-        !response.ok
-    ) {
-
-        throw new Error(
-            data?.message ||
-            "SQL query execution failed."
-        );
-
-    }
-
-
-    return normalizeQueryResult(
-        data
-    );
-
-}
-
-
-/* ============================================================
- * NORMALIZE QUERY RESULT
- * ============================================================ */
-
-function normalizeQueryResult(
-    result
-) {
-
-    if (!result) {
-
-        return {
-
-            columns: [],
-
-            rows: [],
-
-            rowCount: 0,
-
-            executionTime: 0
-
-        };
-
-    }
-
-
-    const rows =
-        Array.isArray(
-            result.rows
-        )
-            ? result.rows
-            : (
-                Array.isArray(
-                    result.data
-                )
-                    ? result.data
-                    : []
+        for (const statement of target.statements) {
+            const useMatch = statement.match(
+                /^USE\s+["'`]?([A-Za-z0-9_-]+)["'`]?\s*$/i
             );
 
+            if (useMatch) {
+                await setActiveDatabase(useMatch[1], { silent: true });
+                lastResult = {
+                    success: true,
+                    columns: ["Message"],
+                    rows: [{ Message: `Database changed to ${activeDatabase}` }],
+                    rowCount: 1,
+                    executionTime: 0
+                };
+                continue;
+            }
 
-    let columns =
-        Array.isArray(
-            result.columns
-        )
-            ? result.columns
+            if (!activeDatabase) {
+                throw new Error("Please select or USE a database first.");
+            }
+
+            if (!window.browserSqlEngine || typeof window.browserSqlEngine.execute !== "function") {
+                throw new Error("Browser SQL engine is unavailable. Refresh the Playground.");
+            }
+
+            /* Reject tables that belong to another learning database. */
+            validateTableReferences(statement);
+
+            lastResult = await window.browserSqlEngine.execute(statement, {
+                database: activeDatabase
+            });
+        }
+
+        displayResults(normalizeResult(lastResult));
+        showStatus("Query executed successfully.", "success");
+    } catch (error) {
+        displayResults({
+            success: false,
+            columns: ["Error"],
+            rows: [{ Error: error.message }],
+            rowCount: 1,
+            executionTime: 0,
+            isError: true
+        });
+        showStatus("Query failed: " + error.message, "error");
+    } finally {
+        runQueryButton.disabled = false;
+    }
+}
+
+function normalizeResult(result) {
+    if (!result) {
+        return { columns: [], rows: [], rowCount: 0, executionTime: 0 };
+    }
+
+    const rows = Array.isArray(result.rows)
+        ? result.rows
+        : Array.isArray(result.data)
+            ? result.data
             : [];
 
+    let columns = Array.isArray(result.columns) ? result.columns : [];
 
-    if (
-        columns.length === 0 &&
-        rows.length > 0
-    ) {
-
-        columns =
-            Object.keys(
-                rows[0]
-            );
-
+    if (!columns.length && rows.length) {
+        columns = Object.keys(rows[0]);
     }
-
 
     return {
-
         ...result,
-
         columns,
-
         rows,
-
-        rowCount:
-            Number.isFinite(
-                result.rowCount
-            )
-                ? result.rowCount
-                : rows.length,
-
-        executionTime:
-            Number(
-                result.executionTime
-            ) || 0
-
+        rowCount: Number.isFinite(result.rowCount) ? result.rowCount : rows.length,
+        executionTime: Number(result.executionTime) || 0
     };
-
 }
 
-
 /* ============================================================
- * DESCRIBE TABLE
+ * RESULTS PANEL
  * ============================================================ */
 
-async function describeTable(
-    tableName
-) {
+function displayResults(data) {
+    latestResults = normalizeResult(data);
 
-    requireActiveDatabase();
+    const columns = latestResults.columns;
+    const rows = latestResults.rows;
 
-    const table = findTable(
-        activeDatabase,
-        tableName
-    );
+    resultsSummary.textContent = `${rows.length} row${rows.length === 1 ? "" : "s"} · ${latestResults.executionTime} ms`;
 
-    if (!table) {
-        throw new Error(
-            `Table '${tableName}' is not present in database '${activeDatabase}'.`
-        );
+    if (!rows.length) {
+        resultsContainer.innerHTML = `
+            <div class="empty-results">
+                <div class="empty-results-icon">▦</div>
+                <p>No rows returned.</p>
+            </div>
+        `;
+    } else {
+        const table = document.createElement("table");
+        table.className = "results-table";
+
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        columns.forEach(column => {
+            const th = document.createElement("th");
+            th.textContent = column;
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+
+        const tbody = document.createElement("tbody");
+        rows.forEach(row => {
+            const tr = document.createElement("tr");
+            columns.forEach(column => {
+                const td = document.createElement("td");
+                const value = row?.[column];
+                td.textContent = value === null || value === undefined ? "NULL" : String(value);
+                if (value === null || value === undefined) td.className = "result-null";
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+
+        table.append(thead, tbody);
+        resultsContainer.replaceChildren(table);
     }
 
-    const metadata = await fetchTableMetadata(
-        activeDatabase,
-        tableName
-    );
+    downloadButton.disabled = rows.length === 0;
+    showResults();
+}
 
-    const columns = Array.isArray(metadata?.columns)
-        ? metadata.columns
-        : (Array.isArray(table.columns) ? table.columns : []);
+function showResults() {
+    resultsSection.classList.remove("results-hidden", "results-maximized", "results-minimized");
+    resultsSection.style.height = `${resultsHeight}px`;
+    resultsSection.style.flexBasis = `${resultsHeight}px`;
+    resultsSection.style.maxHeight = "calc(100% - 80px)";
+}
 
-    const foreignKeys = Array.isArray(metadata?.foreignKeys)
-        ? metadata.foreignKeys
-        : (Array.isArray(table.foreignKeys) ? table.foreignKeys : []);
+function hideResults() {
+    resultsSection.classList.add("results-hidden");
+    resultsSection.classList.remove("results-maximized", "results-minimized");
+}
 
+function initializeResultsResize() {
+    if (!resizeHandle) return;
+
+    resizeHandle.addEventListener("pointerdown", event => {
+        if (resultsSection.classList.contains("results-maximized")) return;
+        if (resultsSection.classList.contains("results-hidden")) return;
+
+        resultsDragging = true;
+        dragStartY = event.clientY;
+        dragStartHeight = resultsSection.getBoundingClientRect().height;
+
+        document.body.classList.add("results-resizing");
+        resultsSection.classList.add("is-resizing");
+
+        resizeHandle.setPointerCapture?.(event.pointerId);
+        event.preventDefault();
+    });
+
+    document.addEventListener("pointermove", event => {
+        if (!resultsDragging) return;
+
+        const workspace = document.getElementById("playground-workspace");
+        const available = workspace?.getBoundingClientRect().height || window.innerHeight;
+        const maximum = Math.max(
+            MIN_RESULTS_HEIGHT,
+            Math.floor(available * MAX_RESULTS_HEIGHT_RATIO)
+        );
+
+        const nextHeight = clamp(
+            dragStartHeight + (dragStartY - event.clientY),
+            MIN_RESULTS_HEIGHT,
+            maximum
+        );
+
+        resultsHeight = nextHeight;
+        resultsSection.style.height = `${nextHeight}px`;
+        resultsSection.style.flexBasis = `${nextHeight}px`;
+    });
+
+    const stopDragging = () => {
+        if (!resultsDragging) return;
+        resultsDragging = false;
+        document.body.classList.remove("results-resizing");
+        resultsSection.classList.remove("is-resizing");
+    };
+
+    document.addEventListener("pointerup", stopDragging);
+    document.addEventListener("pointercancel", stopDragging);
+}
+
+function minimizeResults() {
+    resultsSection.classList.remove("results-maximized");
+    resultsSection.classList.toggle("results-minimized");
+
+    if (resultsSection.classList.contains("results-minimized")) {
+        resultsSection.style.height = "46px";
+        resultsSection.style.flexBasis = "46px";
+    } else {
+        resultsSection.style.height = `${resultsHeight}px`;
+        resultsSection.style.flexBasis = `${resultsHeight}px`;
+    }
+}
+
+function maximizeResults() {
+    resultsSection.classList.remove("results-minimized");
+    resultsSection.classList.toggle("results-maximized");
+
+    if (resultsSection.classList.contains("results-maximized")) {
+        resultsSection.style.height = "100%";
+        resultsSection.style.flexBasis = "auto";
+        resultsSection.style.maxHeight = "none";
+    } else {
+        resultsSection.style.height = `${resultsHeight}px`;
+        resultsSection.style.flexBasis = `${resultsHeight}px`;
+    }
+}
+
+/* ============================================================
+ * DESCRIBE / SCHEMA
+ * ============================================================ */
+
+function openTableSelector(mode) {
+    if (!activeDatabase) {
+        showStatus("Please select or USE a database first.", "error");
+        return;
+    }
+
+    const database = getDatabase(activeDatabase);
+
+    if (!database?.tables.length) {
+        showStatus(`No tables are available in ${activeDatabase}.`, "info");
+        return;
+    }
+
+    selectorTitle.textContent = mode === "describe"
+        ? `Describe table · ${activeDatabase}`
+        : `Schema · ${activeDatabase}`;
+
+    selectorList.replaceChildren();
+
+    database.tables.forEach(table => {
+        const row = document.createElement("div");
+        row.className = "table-selector-item";
+
+        const name = document.createElement("div");
+        name.className = "table-selector-table-name";
+        name.innerHTML = `<span class="table-selector-table-icon">▦</span><span>${escapeHTML(table.name)}</span>`;
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "table-selector-describe-button";
+        button.textContent = mode === "describe" ? "Describe" : "View Schema";
+
+        button.addEventListener("click", () => {
+            activeTable = { database: activeDatabase, table: table.name };
+            closeTableSelector();
+
+            if (mode === "describe") {
+                renderDescribe(table);
+            } else {
+                renderSchema(table);
+            }
+        });
+
+        row.append(name, button);
+        selectorList.appendChild(row);
+    });
+
+    openModal(selectorModal, selectorOverlay);
+}
+
+function renderDescribe(table) {
+    detailsTitle.textContent = `Describe: ${activeDatabase}.${table.name}`;
+
+    const columns = table.columns || [];
+    const foreignKeys = table.foreignKeys || [];
     const foreignKeyByColumn = new Map();
+
     foreignKeys.forEach(fk => {
         foreignKeyByColumn.set(String(fk.from), fk);
     });
 
-    return {
-        columns: [
-            "Column",
-            "Data Type",
-            "Nullable",
-            "Key",
-            "Default",
-            "References"
-        ],
-        rows: columns.map(column => {
-            const fk = foreignKeyByColumn.get(String(column.name));
-            return {
-                Column: column.name,
-                "Data Type": column.type || "",
-                Nullable: Number(column.notnull) === 1 ? "NO" : "YES",
-                Key: `${Number(column.pk) > 0 ? "PK" : ""}${Number(column.pk) > 0 && fk ? " / " : ""}${fk ? "FK" : ""}` || "—",
-                Default: column.dflt_value ?? "—",
-                References: fk ? `${fk.table}.${fk.to}` : "—"
-            };
-        }),
-        rowCount: columns.length,
-        executionTime: 0
-    };
-}
-
-
-/* ============================================================
- * FETCH TABLE METADATA
- * ============================================================ */
-
-async function fetchTableMetadata(
-    databaseName,
-    tableName
-) {
-
-    /* schemaRoutes.js exposes /api/schema/:database/:tables. */
-    const response = await fetch(
-        PLAYGROUND_API_BASE_URL +
-        "/api/schema/" +
-        encodeURIComponent(databaseName) +
-        "/" +
-        encodeURIComponent(tableName)
-    );
-
-    let data = null;
-
-    try {
-        data = await response.json();
-    }
-    catch {
-        throw new Error("Unable to read table metadata.");
-    }
-
-    if (!response.ok) {
-        throw new Error(
-            data?.message ||
-            "Unable to load table metadata."
-        );
-    }
-
-    const tableMetadata = Array.isArray(data?.tables)
-        ? data.tables.find(
-            table =>
-                String(table?.tableName || "").toLowerCase() ===
-                String(tableName).toLowerCase()
-        )
-        : null;
-
-    if (!tableMetadata) {
-        throw new Error(
-            `Table '${tableName}' is not present in database '${databaseName}'.`
-        );
-    }
-
-    return tableMetadata;
-}
-
-
-/* ============================================================
- * NORMALIZE COLUMN METADATA
- * ============================================================ */
-
-function normalizeColumns(
-    columns
-) {
-
-    if (
-        !Array.isArray(columns)
-    ) {
-
-        return [];
-
-    }
-
-
-    return columns.map(
-        column => ({
-
-            name:
-                String(
-                    column?.name ||
-                    column?.column_name ||
-                    column?.columnName ||
-                    ""
-                ),
-
-            type:
-                String(
-                    column?.type ||
-                    column?.data_type ||
-                    column?.dataType ||
-                    ""
-                ),
-
-            nullable:
-                normalizeNullable(
-                    column
-                ),
-
-            key:
-                String(
-                    column?.key ||
-                    column?.constraint ||
-                    column?.primaryKey ||
-                    ""
-                ),
-
-            defaultValue:
-                column?.default ??
-                column?.defaultValue ??
-                ""
-
-        })
-    );
-
-}
-
-
-/* ============================================================
- * NORMALIZE NULLABLE
- * ============================================================ */
-
-function normalizeNullable(
-    column
-) {
-
-    if (
-        column?.nullable !==
-        undefined
-    ) {
-
-        return String(
-            column.nullable
-        );
-
-    }
-
-
-    if (
-        column?.is_nullable !==
-        undefined
-    ) {
-
-        return String(
-            column.is_nullable
-        );
-
-    }
-
-
-    if (
-        column?.isNullable !==
-        undefined
-    ) {
-
-        return String(
-            column.isNullable
-        );
-
-    }
-
-
-    return "";
-
-}
-
-
-/* ============================================================
- * DISPLAY RESULTS
- * ============================================================ */
-
-function displayResults(
-    data
-) {
-
-    latestResults =
-        normalizeQueryResult(
-            data
-        );
-
-
-    const columns =
-        latestResults.columns;
-
-
-    const rows =
-        latestResults.rows;
-
-
-    if (
-        resultsSummary
-    ) {
-
-        resultsSummary.textContent =
-            `${rows.length} row${
-                rows.length === 1
-                    ? ""
-                    : "s"
-            } • ${
-                latestResults.executionTime ||
-                0
-            } ms`;
-
-    }
-
-
-    if (
-        !resultsContainer
-    ) {
-
-        return;
-
-    }
-
-
-    if (
-        latestResults.error
-    ) {
-
-        resultsContainer.innerHTML = `
-
-            <div class="empty-results error-results">
-
-                ${escapeHTML(
-                    rows[0]?.Error ||
-                    "Query failed."
-                )}
-
+    detailsContainer.innerHTML = `
+        <div class="table-details-heading">
+            <div>
+                <strong>${escapeHTML(table.name)}</strong>
+                <span>${escapeHTML(activeDatabase)} · ${columns.length} columns</span>
             </div>
+            <span class="metadata-badge">DESCRIBE</span>
+        </div>
+        <div class="schema-table-wrapper">
+            <table class="schema-table">
+                <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th>Data Type</th>
+                        <th>Nullable</th>
+                        <th>Key</th>
+                        <th>Default</th>
+                        <th>References</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${columns.map(column => {
+                        const fk = foreignKeyByColumn.get(String(column.name));
+                        return `
+                            <tr>
+                                <td class="schema-column-name">${escapeHTML(column.name)}</td>
+                                <td class="schema-type">${escapeHTML(column.type || "")}</td>
+                                <td>${Number(column.notnull) === 1 ? '<span class="schema-required">NO</span>' : '<span class="schema-nullable">YES</span>'}</td>
+                                <td>${Number(column.pk) > 0 ? '<span class="schema-primary-key">PK</span>' : "—"}${fk ? ' <span class="schema-foreign-key">FK</span>' : ""}</td>
+                                <td>${escapeHTML(column.dflt_value ?? "—")}</td>
+                                <td>${fk ? `${escapeHTML(fk.table)}.${escapeHTML(fk.to)}` : "—"}</td>
+                            </tr>
+                        `;
+                    }).join("")}
+                </tbody>
+            </table>
+        </div>
+    `;
 
-        `;
+    openModal(detailsModal, detailsOverlay);
+}
 
-    }
+function renderSchema(table) {
+    detailsTitle.textContent = `Schema: ${activeDatabase}.${table.name}`;
 
-    else if (
-        columns.length === 0
-    ) {
+    const foreignKeys = table.foreignKeys || [];
+    const indexes = table.indexes || [];
 
-        resultsContainer.innerHTML = `
-
-            <div class="empty-results">
-
-                Query executed successfully.
-
+    detailsContainer.innerHTML = `
+        <div class="table-details-heading">
+            <div>
+                <strong>${escapeHTML(table.name)}</strong>
+                <span>${escapeHTML(activeDatabase)} · CREATE TABLE definition</span>
             </div>
+            <span class="metadata-badge schema-badge">SCHEMA</span>
+        </div>
 
-        `;
+        <section class="schema-definition-card">
+            <div class="schema-section-title">CREATE TABLE</div>
+            <pre class="schema-definition">${escapeHTML(table.schemaSql || "No CREATE TABLE statement available.")}</pre>
+        </section>
 
+        <section class="schema-extra-section">
+            <div class="schema-section-title">FOREIGN KEYS</div>
+            ${foreignKeys.length ? `
+                <div class="schema-list-card">
+                    ${foreignKeys.map(fk => `
+                        <div class="schema-list-row">
+                            <span>${escapeHTML(fk.from)}</span>
+                            <span class="schema-arrow">→</span>
+                            <strong>${escapeHTML(fk.table)}.${escapeHTML(fk.to)}</strong>
+                        </div>
+                    `).join("")}
+                </div>
+            ` : '<div class="schema-empty-note">No foreign keys defined for this table.</div>'}
+        </section>
+
+        <section class="schema-extra-section">
+            <div class="schema-section-title">INDEXES</div>
+            ${indexes.length ? `
+                <div class="schema-list-card">
+                    ${indexes.map(index => `
+                        <div class="schema-list-row index-row">
+                            <strong>${escapeHTML(index.name)}</strong>
+                            <code>${escapeHTML(index.sql || "Index definition unavailable")}</code>
+                        </div>
+                    `).join("")}
+                </div>
+            ` : '<div class="schema-empty-note">No explicit indexes defined for this table.</div>'}
+        </section>
+    `;
+
+    openModal(detailsModal, detailsOverlay);
+}
+
+/* ============================================================
+ * RELATIONSHIP / DATA MODEL VIEWER
+ * ============================================================ */
+
+function showRelationships() {
+    if (!activeDatabase) {
+        showStatus("Please select or USE a database first.", "error");
+        return;
     }
 
-    else {
+    const database = getDatabase(activeDatabase);
+    if (!database) return;
 
-        resultsContainer.innerHTML = `
+    renderRelationshipDiagram(database);
+    openModal(relationshipsModal, relationshipsOverlay);
+}
 
-            <div class="results-table-wrapper">
+function renderRelationshipDiagram(database) {
+    const tables = database.tables;
+    const relationships = [];
 
-                <table class="results-table">
+    tables.forEach(table => {
+        (table.foreignKeys || []).forEach(fk => {
+            relationships.push({
+                fromTable: table.name,
+                fromColumn: fk.from,
+                toTable: fk.table,
+                toColumn: fk.to
+            });
+        });
+    });
 
-                    <thead>
+    const columnsPerRow = tables.length <= 4 ? tables.length : 4;
+    const cardWidth = 220;
+    const cardGapX = 55;
+    const cardGapY = 75;
+    const cardHeightEstimate = 170;
+    const rowCount = Math.max(1, Math.ceil(tables.length / columnsPerRow));
+    const canvasWidth = Math.max(900, columnsPerRow * cardWidth + (columnsPerRow - 1) * cardGapX + 80);
+    const canvasHeight = Math.max(540, rowCount * cardHeightEstimate + (rowCount - 1) * cardGapY + 80);
 
-                        <tr>
+    const positions = new Map();
 
-                            ${columns
-                                .map(
-                                    column => `
-                                        <th>
-                                            ${escapeHTML(
-                                                column
-                                            )}
-                                        </th>
-                                    `
-                                )
-                                .join("")
-                            }
+    tables.forEach((table, index) => {
+        const row = Math.floor(index / columnsPerRow);
+        const column = index % columnsPerRow;
+        const x = 35 + column * (cardWidth + cardGapX);
+        const y = 35 + row * (cardHeightEstimate + cardGapY);
+        positions.set(table.name, { x, y, width: cardWidth, height: cardHeightEstimate });
+    });
 
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        ${
-                            rows.length > 0
-                                ? rows
-                                    .map(
-                                        row => `
-                                            <tr>
-
-                                                ${
-                                                    columns
-                                                        .map(
-                                                            column => `
-                                                                <td>
-                                                                    ${escapeHTML(
-                                                                        row?.[
-                                                                            column
-                                                                        ] ??
-                                                                        "NULL"
-                                                                    )}
-                                                                </td>
-                                                            `
-                                                        )
-                                                        .join("")
-                                                }
-
-                                            </tr>
-                                        `
-                                    )
-                                    .join("")
-                                : `
-                                    <tr>
-
-                                        <td
-                                            colspan="${columns.length}"
-                                        >
-                                            No rows returned.
-                                        </td>
-
-                                    </tr>
-                                  `
-                        }
-
-                    </tbody>
-
-                </table>
-
+    relationshipsContainer.innerHTML = `
+        <div class="relationship-model-toolbar">
+            <div>
+                <strong>${escapeHTML(database.name)} Data Model</strong>
+                <span>${tables.length} tables · ${relationships.length} foreign-key relationship${relationships.length === 1 ? "" : "s"}</span>
             </div>
+            <div class="relationship-legend">
+                <span><b>PK</b> Primary Key</span>
+                <span><b>FK</b> Foreign Key</span>
+            </div>
+        </div>
+        <div class="relationship-canvas" style="width:${canvasWidth}px;height:${canvasHeight}px;">
+            <svg class="relationship-svg" viewBox="0 0 ${canvasWidth} ${canvasHeight}" aria-hidden="true">
+                <defs>
+                    <marker id="relationship-arrow-${Date.now()}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                        <path d="M0,0 L8,4 L0,8 Z" fill="#60a5fa"></path>
+                    </marker>
+                </defs>
+            </svg>
+            ${tables.map(table => renderRelationshipTable(table, positions.get(table.name))).join("")}
+        </div>
+        ${relationships.length ? `
+            <div class="relationship-list">
+                <div class="schema-section-title">RELATIONSHIPS</div>
+                ${relationships.map(rel => `
+                    <div class="relationship-list-row">
+                        <span>${escapeHTML(rel.fromTable)}.${escapeHTML(rel.fromColumn)}</span>
+                        <span class="schema-arrow">→</span>
+                        <strong>${escapeHTML(rel.toTable)}.${escapeHTML(rel.toColumn)}</strong>
+                    </div>
+                `).join("")}
+            </div>
+        ` : `
+            <div class="relationships-empty-state compact">
+                <div class="relationships-empty-icon">🔗</div>
+                <strong>No foreign-key relationships found.</strong>
+                <p>The database does not currently define FK links between its tables.</p>
+            </div>
+        `}
+    `;
 
-        `;
-
-    }
-
-
-    if (
-        downloadButton
-    ) {
-
-        downloadButton.disabled =
-            columns.length === 0;
-
-    }
-
-
-    showResults();
-
+    drawRelationshipLines(database, positions, canvasWidth, canvasHeight);
 }
 
+function renderRelationshipTable(table, position) {
+    if (!position) return "";
+
+    const foreignColumns = new Set((table.foreignKeys || []).map(fk => String(fk.from)));
+
+    return `
+        <article class="relationship-table" style="left:${position.x}px;top:${position.y}px;">
+            <div class="relationship-table-header">
+                <span>▦</span>
+                <span>${escapeHTML(table.name)}</span>
+            </div>
+            <div class="relationship-table-body">
+                ${(table.columns || []).map(column => `
+                    <div class="relationship-column">
+                        <span class="relationship-column-name">
+                            ${Number(column.pk) > 0 ? '<b class="relationship-key pk">PK</b>' : ""}
+                            ${foreignColumns.has(String(column.name)) ? '<b class="relationship-key fk">FK</b>' : ""}
+                            ${escapeHTML(column.name)}
+                        </span>
+                        <span class="relationship-column-type">${escapeHTML(column.type || "")}</span>
+                    </div>
+                `).join("")}
+            </div>
+        </article>
+    `;
+}
+
+function drawRelationshipLines(database, positions) {
+    const svg = relationshipsContainer.querySelector(".relationship-svg");
+    if (!svg) return;
+
+    const markerId = svg.querySelector("marker")?.id;
+    const relationships = [];
+
+    database.tables.forEach(table => {
+        (table.foreignKeys || []).forEach(fk => {
+            relationships.push({
+                fromTable: table.name,
+                toTable: fk.table
+            });
+        });
+    });
+
+    relationships.forEach(rel => {
+        const from = positions.get(rel.fromTable);
+        const to = positions.get(rel.toTable);
+        if (!from || !to) return;
+
+        const fromX = from.x + from.width / 2;
+        const fromY = from.y + from.height / 2;
+        const toX = to.x + to.width / 2;
+        const toY = to.y + to.height / 2;
+
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        const distance = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        const startX = fromX + (dx / distance) * 90;
+        const startY = fromY + (dy / distance) * 60;
+        const endX = toX - (dx / distance) * 90;
+        const endY = toY - (dy / distance) * 60;
+
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", String(startX));
+        line.setAttribute("y1", String(startY));
+        line.setAttribute("x2", String(endX));
+        line.setAttribute("y2", String(endY));
+        line.setAttribute("class", "relationship-line-svg");
+        if (markerId) line.setAttribute("marker-end", `url(#${markerId})`);
+        svg.appendChild(line);
+    });
+}
 
 /* ============================================================
- * SHOW RESULTS
+ * MODAL HELPERS
  * ============================================================ */
 
-function showResults() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    resultsSection.classList.remove(
-        "results-hidden"
-    );
-
-
-    resultsSection.classList.remove(
-        "results-minimized"
-    );
-
-
-    resultsSection.style.flexBasis =
-        `${resultsHeight}px`;
-
+function openModal(modal, overlay) {
+    if (!modal) return;
+    modal.classList.remove("hidden");
+    overlay?.classList.remove("hidden");
+    overlay?.setAttribute("aria-hidden", "false");
 }
 
-
-/* ============================================================
- * HIDE RESULTS
- * ============================================================ */
-
-function hideResults() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    resultsSection.classList.add(
-        "results-hidden"
-    );
-
+function closeModal(modal, overlay) {
+    modal?.classList.add("hidden");
+    overlay?.classList.add("hidden");
+    overlay?.setAttribute("aria-hidden", "true");
 }
 
-
-/* ============================================================
- * MINIMIZE RESULTS
- * ============================================================ */
-
-function minimizeResults() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    resultsSection.classList.remove(
-        "results-maximized"
-    );
-
-
-    resultsSection.classList.toggle(
-        "results-minimized"
-    );
-
-
-    if (
-        !resultsSection.classList.contains(
-            "results-minimized"
-        )
-    ) {
-
-        resultsSection.style.flexBasis =
-            `${resultsHeight}px`;
-
-    }
-
+function closeTableSelector() {
+    closeModal(selectorModal, selectorOverlay);
 }
 
-
 /* ============================================================
- * MAXIMIZE RESULTS
- * ============================================================ */
-
-function maximizeResults() {
-
-    if (!resultsSection) {
-
-        return;
-
-    }
-
-
-    resultsSection.classList.remove(
-        "results-minimized"
-    );
-
-
-    resultsSection.classList.toggle(
-        "results-maximized"
-    );
-
-
-    if (
-        resultsSection.classList.contains(
-            "results-maximized"
-        )
-    ) {
-
-        resultsSection.style.flexBasis =
-            "85vh";
-
-    }
-
-    else {
-
-        resultsSection.style.flexBasis =
-            `${resultsHeight}px`;
-
-    }
-
-}
-
-
-/* ============================================================
- * RESULTS DRAG / RESIZE
- * ============================================================ */
-
-function initializeResultsResize() {
-
-    if (
-        !resizeHandle ||
-        !resultsSection
-    ) {
-
-        return;
-
-    }
-
-
-    let dragging =
-        false;
-
-
-    let startY =
-        0;
-
-
-    let startHeight =
-        0;
-
-
-    resizeHandle.addEventListener(
-        "pointerdown",
-        event => {
-
-            if (
-                resultsSection.classList.contains(
-                    "results-maximized"
-                )
-            ) {
-
-                return;
-
-            }
-
-
-            dragging =
-                true;
-
-
-            startY =
-                event.clientY;
-
-
-            startHeight =
-                resultsSection.getBoundingClientRect()
-                    .height;
-
-
-            resizeHandle.setPointerCapture(
-                event.pointerId
-            );
-
-
-            document.body.style.userSelect =
-                "none";
-
-        }
-    );
-
-
-    resizeHandle.addEventListener(
-        "pointermove",
-        event => {
-
-            if (!dragging) {
-
-                return;
-
-            }
-
-
-            const difference =
-                startY -
-                event.clientY;
-
-
-            const maximum =
-                window.innerHeight *
-                MAX_RESULTS_HEIGHT_RATIO;
-
-
-            const newHeight =
-                Math.min(
-                    Math.max(
-                        startHeight +
-                        difference,
-                        MIN_RESULTS_HEIGHT
-                    ),
-                    maximum
-                );
-
-
-            resultsHeight =
-                newHeight;
-
-
-            resultsSection.style.flexBasis =
-                `${newHeight}px`;
-
-        }
-    );
-
-
-    const stopDragging =
-        () => {
-
-            dragging =
-                false;
-
-
-            document.body.style.userSelect =
-                "";
-
-        };
-
-
-    resizeHandle.addEventListener(
-        "pointerup",
-        stopDragging
-    );
-
-
-    resizeHandle.addEventListener(
-        "pointercancel",
-        stopDragging
-    );
-
-}
-
-
-/* ============================================================
- * QUERY TABS
- * ============================================================ */
-
-function renderQueryTabs() {
-
-    if (!queryTabs) {
-
-        return;
-
-    }
-
-
-    queryTabs
-        .querySelectorAll(
-            ".query-tab"
-        )
-        .forEach(
-            tab =>
-                tab.remove()
-        );
-
-
-    queryState.forEach(
-        (
-            query,
-            id
-        ) => {
-
-            const tab =
-                document.createElement(
-                    "button"
-                );
-
-
-            tab.type =
-                "button";
-
-
-            tab.className =
-                "query-tab";
-
-
-            tab.dataset.queryId =
-                String(id);
-
-
-            if (
-                id ===
-                activeQueryId
-            ) {
-
-                tab.classList.add(
-                    "active"
-                );
-
-            }
-
-
-            tab.innerHTML = `
-
-                <span
-                    class="query-tab-name"
-                    title="Double-click to rename"
-                >
-                    ${escapeHTML(
-                        query.name
-                    )}
-                </span>
-
-                <button
-                    type="button"
-                    class="query-tab-close"
-                    aria-label="Close query"
-                    title="Close query"
-                >
-                    ×
-                </button>
-
-            `;
-
-
-            tab.addEventListener(
-                "click",
-                event => {
-
-                    if (
-                        event.target.closest(
-                            ".query-tab-close"
-                        )
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    switchQuery(
-                        id
-                    );
-
-                }
-            );
-
-
-            tab.addEventListener(
-                "dblclick",
-                event => {
-
-                    if (
-                        event.target.closest(
-                            ".query-tab-close"
-                        )
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    renameQueryTab(
-                        id
-                    );
-
-                }
-            );
-
-
-            const closeButton =
-                tab.querySelector(
-                    ".query-tab-close"
-                );
-
-
-            closeButton?.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-
-                    closeQueryTab(
-                        id
-                    );
-
-                }
-            );
-
-
-            queryTabs.insertBefore(
-                tab,
-                newQueryButton
-            );
-
-        }
-    );
-
-}
-
-
-/* ============================================================
- * CREATE QUERY TAB
- * ============================================================ */
-
-function createQueryTab() {
-
-    saveCurrentQuery();
-
-
-    queryCounter =
-        Math.max(
-            queryCounter,
-            ...Array.from(
-                queryState.keys()
-            )
-        ) + 1;
-
-
-    queryState.set(
-        queryCounter,
-        {
-
-            name:
-                `Query ${queryCounter}`,
-
-            sql:
-                ""
-
-        }
-    );
-
-
-    persistQueries();
-
-
-    activeQueryId =
-        queryCounter;
-
-
-    renderQueryTabs();
-
-
-    sqlEditor.value =
-        "";
-
-
-    sqlEditor.focus();
-
-}
-
-
-/* ============================================================
- * SWITCH QUERY
- * ============================================================ */
-
-function switchQuery(
-    queryId
-) {
-
-    saveCurrentQuery();
-
-
-    const query =
-        queryState.get(
-            queryId
-        );
-
-
-    if (!query) {
-
-        return;
-
-    }
-
-
-    activeQueryId =
-        queryId;
-
-
-    activeTable =
-        null;
-
-
-    sqlEditor.value =
-        query.sql ||
-        "";
-
-
-    renderQueryTabs();
-
-
-    persistQueries();
-
-
-    sqlEditor.focus();
-
-}
-
-
-/* ============================================================
- * SAVE CURRENT QUERY
- * ============================================================ */
-
-function saveCurrentQuery() {
-
-    const query =
-        queryState.get(
-            activeQueryId
-        );
-
-
-    if (!query) {
-
-        return;
-
-    }
-
-
-    query.sql =
-        sqlEditor?.value ||
-        "";
-
-
-    persistQueries();
-
-}
-
-
-/* ============================================================
- * RENAME QUERY TAB
- * ============================================================ */
-
-function renameQueryTab(
-    queryId
-) {
-
-    const query =
-        queryState.get(
-            queryId
-        );
-
-
-    if (!query) {
-
-        return;
-
-    }
-
-
-    const newName =
-        window.prompt(
-            "Enter query name:",
-            query.name
-        );
-
-
-    if (
-        newName ===
-        null
-    ) {
-
-        return;
-
-    }
-
-
-    const cleaned =
-        newName
-            .trim();
-
-
-    if (!cleaned) {
-
-        showStatus(
-            "Query name cannot be empty.",
-            "error"
-        );
-
-
-        return;
-
-    }
-
-
-    query.name =
-        cleaned;
-
-
-    persistQueries();
-
-
-    renderQueryTabs();
-
-
-    showStatus(
-        `Query renamed to '${cleaned}'.`,
-        "success"
-    );
-
-}
-
-
-/* ============================================================
- * CLOSE QUERY TAB
- * ============================================================ */
-
-function closeQueryTab(
-    queryId
-) {
-
-    if (
-        queryState.size <=
-        1
-    ) {
-
-        showStatus(
-            "At least one query sheet must remain open.",
-            "info"
-        );
-
-
-        return;
-
-    }
-
-
-    const query =
-        queryState.get(
-            queryId
-        );
-
-
-    if (!query) {
-
-        return;
-
-    }
-
-
-    const confirmed =
-        window.confirm(
-            `Close '${query.name}'?`
-        );
-
-
-    if (!confirmed) {
-
-        return;
-
-    }
-
-
-    queryState.delete(
-        queryId
-    );
-
-
-    if (
-        activeQueryId ===
-        queryId
-    ) {
-
-        const nextId =
-            Array.from(
-                queryState.keys()
-            )[0];
-
-
-        activeQueryId =
-            nextId;
-
-
-        sqlEditor.value =
-            queryState.get(
-                nextId
-            )?.sql ||
-            "";
-
-    }
-
-
-    persistQueries();
-
-
-    renderQueryTabs();
-
-
-    sqlEditor.focus();
-
-}
-
-
-/* ============================================================
- * PERSIST QUERY STATE
- * ============================================================ */
-
-function persistQueries() {
-
-    saveCurrentQueryWithoutPersist();
-
-
-    const serializable =
-        Array.from(
-            queryState.entries()
-        )
-            .map(
-                (
-                    [
-                        id,
-                        query
-                    ]
-                ) => ({
-
-                    id,
-
-                    name:
-                        query.name,
-
-                    sql:
-                        query.sql
-
-                })
-            );
-
-
-    localStorage.setItem(
-        PLAYGROUND_QUERY_STATE_KEY,
-        JSON.stringify({
-
-            activeQueryId,
-
-            queryCounter,
-
-            queries:
-                serializable
-
-        })
-    );
-
-}
-
-
-/* ============================================================
- * SAVE QUERY WITHOUT RECURSIVE PERSIST
- * ============================================================ */
-
-function saveCurrentQueryWithoutPersist() {
-
-    const query =
-        queryState.get(
-            activeQueryId
-        );
-
-
-    if (query) {
-
-        query.sql =
-            sqlEditor?.value ||
-            query.sql ||
-            "";
-
-    }
-
-}
-
-
-/* ============================================================
- * LOAD PERSISTED QUERIES
+ * QUERY TABS / PERSISTENCE
  * ============================================================ */
 
 function loadPersistedQueries() {
-
     try {
-
-        const raw =
-            localStorage.getItem(
-                PLAYGROUND_QUERY_STATE_KEY
-            );
-
-
-        if (!raw) {
-
-            return;
-
-        }
-
-
-        const saved =
-            JSON.parse(
-                raw
-            );
-
-
-        if (
-            !Array.isArray(
-                saved?.queries
-            )
-        ) {
-
-            return;
-
-        }
-
+        const saved = JSON.parse(localStorage.getItem(PLAYGROUND_STORAGE_KEY) || "null");
+        if (!Array.isArray(saved) || !saved.length) return;
 
         queryState.clear();
-
-
-        saved.queries.forEach(
-            query => {
-
-                const id =
-                    Number(
-                        query.id
-                    );
-
-
-                if (
-                    !Number.isFinite(
-                        id
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                queryState.set(
-                    id,
-                    {
-
-                        name:
-                            String(
-                                query.name ||
-                                `Query ${id}`
-                            ),
-
-                        sql:
-                            String(
-                                query.sql ||
-                                ""
-                            )
-
-                    }
-                );
-
-            }
-        );
-
-
-        if (
-            queryState.size ===
-            0
-        ) {
-
-            queryState.set(
-                1,
-                {
-
-                    name:
-                        "Query 1",
-
-                    sql:
-                        ""
-
-                }
-            );
-
-        }
-
-
-        queryCounter =
-            Number(
-                saved.queryCounter
-            ) ||
-            Math.max(
-                ...queryState.keys()
-            );
-
-
-        activeQueryId =
-            Number(
-                saved.activeQueryId
-            );
-
-
-        if (
-            !queryState.has(
-                activeQueryId
-            )
-        ) {
-
-            activeQueryId =
-                Array.from(
-                    queryState.keys()
-                )[0];
-
-        }
-
-    }
-
-    catch (error) {
-
-        console.warn(
-            "Could not restore query state:",
-            error
-        );
-
-    }
-
-}
-
-
-/* ============================================================
- * TABLE SELECTOR
- * ============================================================ */
-
-function openTableSelector(
-    action
-) {
-
-    requireActiveDatabaseForUI();
-
-
-    const database =
-        findDatabase(
-            activeDatabase
-        );
-
-
-    if (
-        !database ||
-        database.tables.length ===
-        0
-    ) {
-
-        showStatus(
-            `No tables are available in database '${activeDatabase}'.`,
-            "info"
-        );
-
-
-        return;
-
-    }
-
-
-    if (
-        selectorTitle
-    ) {
-
-        selectorTitle.textContent =
-            `${action} - ${activeDatabase}`;
-
-    }
-
-
-    if (
-        selectorList
-    ) {
-
-        selectorList.innerHTML =
-            "";
-
-    }
-
-
-    database.tables.forEach(
-        table => {
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-
-            /*
-             * IMPORTANT UI FIX:
-             * The stylesheet already provides the polished table-selector
-             * layout, but the previous markup used generic row/button classes.
-             * That caused the browser's default white button styling to appear
-             * when Describe / Schema was opened.
-             *
-             * Keep the existing functionality exactly the same; only apply the
-             * intended presentation classes here.
-             */
-            row.className =
-                "table-selector-item";
-
-
-            row.innerHTML = `
-
-                <span class="table-selector-table-name">
-                    <span class="table-selector-table-icon">▦</span>
-                    <span>
-                        ${escapeHTML(
-                            table.name
-                        )}
-                    </span>
-                </span>
-
-                <button
-                    class="table-selector-describe-button"
-                    type="button"
-                    aria-label="${escapeHTML(action)} ${escapeHTML(table.name)}"
-                >
-                    ${escapeHTML(
-                        action
-                    )}
-                </button>
-
-            `;
-
-
-            row.querySelector(
-                "button"
-            ).addEventListener(
-                "click",
-                () => {
-
-                    activeTable = {
-
-                        database:
-                            activeDatabase,
-
-                        table:
-                            table.name
-
-                    };
-
-
-                    selectorModal?.classList.add(
-                        "hidden"
-                    );
-
-
-                    loadTableDetails(
-                        table.name,
-                        action
-                    );
-
-                }
-            );
-
-
-            selectorList?.appendChild(
-                row
-            );
-
-        }
-    );
-
-
-    selectorModal?.classList.remove(
-        "hidden"
-    );
-
-}
-
-
-/* ============================================================
- * REQUIRE ACTIVE DATABASE FOR UI
- * ============================================================ */
-
-function requireActiveDatabaseForUI() {
-
-    if (
-        !activeDatabase
-    ) {
-
-        showStatus(
-            "Please select or USE a database first.",
-            "error"
-        );
-
-
-        return false;
-
-    }
-
-
-    return true;
-
-}
-
-
-/* ============================================================
- * LOAD TABLE DETAILS
- * ============================================================ */
-
-async function loadTableDetails(
-    tableName,
-    mode
-) {
-
-    requireActiveDatabase();
-
-    const table = findTable(
-        activeDatabase,
-        tableName
-    );
-
-    if (!table) {
-        showStatus(
-            `Table '${tableName}' is not present in database '${activeDatabase}'.`,
-            "error"
-        );
-        return;
-    }
-
-    detailsModal?.classList.remove("hidden");
-
-    if (detailsTitle) {
-        detailsTitle.textContent =
-            `${mode}: ${activeDatabase}.${tableName}`;
-    }
-
-    if (detailsContainer) {
-        detailsContainer.innerHTML = `
-            <div class="empty-results">
-                Loading table metadata...
-            </div>
-        `;
-    }
-
-    try {
-        const metadata = await fetchTableMetadata(
-            activeDatabase,
-            tableName
-        );
-
-        const columns = Array.isArray(metadata?.columns)
-            ? metadata.columns
-            : (table.columns || []);
-
-        const foreignKeys = Array.isArray(metadata?.foreignKeys)
-            ? metadata.foreignKeys
-            : (table.foreignKeys || []);
-
-        const foreignKeyByColumn = new Map();
-        foreignKeys.forEach(fk => {
-            foreignKeyByColumn.set(String(fk.from), fk);
-        });
-
-        if (mode === "Describe") {
-            detailsContainer.innerHTML = `
-                <div class="table-details-heading">
-                    <div>
-                        <strong>${escapeHTML(tableName)}</strong>
-                        <span>${escapeHTML(activeDatabase)} · ${columns.length} columns</span>
-                    </div>
-                    <span class="metadata-badge">DESCRIBE</span>
-                </div>
-
-                <div class="schema-table-wrapper">
-                    <table class="schema-table">
-                        <thead>
-                            <tr>
-                                <th>Column</th>
-                                <th>Data Type</th>
-                                <th>Nullable</th>
-                                <th>Key</th>
-                                <th>Default</th>
-                                <th>References</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${columns.map(column => {
-                                const fk = foreignKeyByColumn.get(String(column.name));
-                                return `
-                                    <tr>
-                                        <td class="schema-column-name">${escapeHTML(column.name)}</td>
-                                        <td class="schema-type">${escapeHTML(column.type || "")}</td>
-                                        <td>${Number(column.notnull) === 1 ? '<span class="schema-required">NO</span>' : '<span class="schema-nullable">YES</span>'}</td>
-                                        <td>${Number(column.pk) > 0 ? '<span class="schema-primary-key">PK</span>' : "—"}${fk ? ' <span class="schema-foreign-key">FK</span>' : ""}</td>
-                                        <td>${escapeHTML(column.dflt_value ?? "—")}</td>
-                                        <td>${fk ? `${escapeHTML(fk.table)}.${escapeHTML(fk.to)}` : "—"}</td>
-                                    </tr>
-                                `;
-                            }).join("")}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }
-        else {
-            const generatedColumns = columns.map(column => {
-                const nullable = Number(column.notnull) === 1 ? " NOT NULL" : "";
-                const primary = Number(column.pk) > 0 ? " PRIMARY KEY" : "";
-                const defaultValue = column.dflt_value !== null && column.dflt_value !== undefined
-                    ? ` DEFAULT ${column.dflt_value}`
-                    : "";
-                return `    ${column.name} ${column.type || ""}${primary}${nullable}${defaultValue}`;
-            });
-
-            const generatedForeignKeys = foreignKeys.map(fk =>
-                `    FOREIGN KEY (${fk.from}) REFERENCES ${fk.table}(${fk.to})`
-            );
-
-            const definitionLines = generatedColumns.concat(generatedForeignKeys);
-            const createStatement = definitionLines.length
-                ? `CREATE TABLE ${tableName} (\n${definitionLines.join(",\n")}\n);`
-                : `CREATE TABLE ${tableName} (...);`;
-
-            detailsContainer.innerHTML = `
-                <div class="table-details-heading">
-                    <div>
-                        <strong>${escapeHTML(tableName)}</strong>
-                        <span>${escapeHTML(activeDatabase)} · complete schema information</span>
-                    </div>
-                    <span class="metadata-badge schema-badge">SCHEMA</span>
-                </div>
-
-                <section class="schema-definition-card">
-                    <div class="schema-section-title">CREATE TABLE</div>
-                    <pre class="schema-definition">${escapeHTML(createStatement)}</pre>
-                </section>
-
-                <section class="schema-extra-section">
-                    <div class="schema-section-title">COLUMNS</div>
-                    <div class="schema-table-wrapper">
-                        <table class="schema-table">
-                            <thead>
-                                <tr>
-                                    <th>Column</th>
-                                    <th>Data Type</th>
-                                    <th>Nullable</th>
-                                    <th>Key</th>
-                                    <th>Default</th>
-                                    <th>References</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${columns.map(column => {
-                                    const fk = foreignKeyByColumn.get(String(column.name));
-                                    return `
-                                        <tr>
-                                            <td class="schema-column-name">${escapeHTML(column.name)}</td>
-                                            <td class="schema-type">${escapeHTML(column.type || "")}</td>
-                                            <td>${Number(column.notnull) === 1 ? '<span class="schema-required">NO</span>' : '<span class="schema-nullable">YES</span>'}</td>
-                                            <td>${Number(column.pk) > 0 ? '<span class="schema-primary-key">PK</span>' : "—"}${fk ? ' <span class="schema-foreign-key">FK</span>' : ""}</td>
-                                            <td>${escapeHTML(column.dflt_value ?? "—")}</td>
-                                            <td>${fk ? `${escapeHTML(fk.table)}.${escapeHTML(fk.to)}` : "—"}</td>
-                                        </tr>
-                                    `;
-                                }).join("")}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="schema-extra-section">
-                    <div class="schema-section-title">FOREIGN KEYS</div>
-                    ${foreignKeys.length ? `
-                        <div class="schema-list-card">
-                            ${foreignKeys.map(fk => `
-                                <div class="schema-list-row">
-                                    <span>${escapeHTML(fk.from)}</span>
-                                    <span class="schema-arrow">→</span>
-                                    <strong>${escapeHTML(fk.table)}.${escapeHTML(fk.to)}</strong>
-                                </div>
-                            `).join("")}
-                        </div>
-                    ` : '<div class="schema-empty-note">No foreign keys defined for this table.</div>'}
-                </section>
-            `;
-        }
-    }
-    catch (error) {
-        if (detailsContainer) {
-            detailsContainer.innerHTML = `
-                <div class="empty-results error-results">
-                    ${escapeHTML(error.message)}
-                </div>
-            `;
-        }
-    }
-}
-
-
-/* ============================================================
- * RELATIONSHIPS
- * ============================================================ */
-
-async function showRelationships() {
-
-    requireActiveDatabase();
-
-    relationshipsModal?.classList.remove("hidden");
-
-    if (relationshipsContainer) {
-        relationshipsContainer.innerHTML = `
-            <div class="empty-results">
-                Loading ${escapeHTML(activeDatabase)} data model...
-            </div>
-        `;
-    }
-
-    try {
-        const database = findDatabase(activeDatabase);
-        const tableNames = (database?.tables || []).map(table => table.name);
-
-        if (!tableNames.length) {
-            relationshipsContainer.innerHTML = `
-                <div class="relationships-empty-state">
-                    <div class="relationships-empty-icon">🔗</div>
-                    <strong>No tables found.</strong>
-                </div>
-            `;
-            return;
-        }
-
-        /*
-         * schemaRoutes.js supports multiple table names in one request
-         * and returns columns + foreignKeys for every requested table.
-         * This avoids the unavailable /api/schema/relationships/... route.
-         */
-        const response = await fetch(
-            PLAYGROUND_API_BASE_URL +
-            "/api/schema/" +
-            encodeURIComponent(activeDatabase) +
-            "/" +
-            tableNames.map(name => encodeURIComponent(name)).join(",")
-        );
-
-        let data = null;
-
-        try {
-            data = await response.json();
-        }
-        catch {
-            throw new Error("Invalid schema metadata response.");
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                data?.message ||
-                "Unable to load database relationships."
-            );
-        }
-
-        const metadataTables = Array.isArray(data?.tables)
-            ? data.tables
-            : [];
-
-        const metadataByName = new Map(
-            metadataTables.map(table => [
-                String(table.tableName || "").toLowerCase(),
-                table
-            ])
-        );
-
-        const enrichedTables = (database.tables || []).map(table => {
-            const metadata = metadataByName.get(
-                table.name.toLowerCase()
-            );
-
-            return {
-                ...table,
-                columns:
-                    metadata?.columns ||
-                    table.columns ||
-                    [],
-                foreignKeys:
-                    metadata?.foreignKeys ||
-                    table.foreignKeys ||
-                    []
-            };
-        });
-
-        const relationships = [];
-
-        enrichedTables.forEach(table => {
-            (table.foreignKeys || []).forEach(fk => {
-                relationships.push({
-                    fromTable: table.name,
-                    fromColumn: fk.from,
-                    toTable: fk.table,
-                    toColumn: fk.to
-                });
+        queryCounter = 0;
+
+        saved.forEach(item => {
+            const id = Number(item.id);
+            if (!Number.isInteger(id) || id < 1) return;
+            queryCounter = Math.max(queryCounter, id);
+            queryState.set(id, {
+                name: String(item.name || `Query ${id}`),
+                sql: String(item.sql || "")
             });
         });
 
-        const columnsPerRow =
-            enrichedTables.length <= 4
-                ? Math.max(1, enrichedTables.length)
-                : 4;
-
-        const cardWidth = 220;
-        const cardGapX = 55;
-        const cardGapY = 75;
-        const cardHeightEstimate = 170;
-
-        const rowCount = Math.max(
-            1,
-            Math.ceil(
-                enrichedTables.length /
-                columnsPerRow
-            )
-        );
-
-        const canvasWidth = Math.max(
-            900,
-            columnsPerRow * cardWidth +
-            (columnsPerRow - 1) * cardGapX +
-            80
-        );
-
-        const canvasHeight = Math.max(
-            540,
-            rowCount * cardHeightEstimate +
-            (rowCount - 1) * cardGapY +
-            80
-        );
-
-        const positions = new Map();
-
-        enrichedTables.forEach(
-            (table, index) => {
-
-                const row =
-                    Math.floor(
-                        index /
-                        columnsPerRow
-                    );
-
-                const column =
-                    index %
-                    columnsPerRow;
-
-                positions.set(
-                    table.name,
-                    {
-                        x:
-                            35 +
-                            column *
-                                (
-                                    cardWidth +
-                                    cardGapX
-                                ),
-
-                        y:
-                            35 +
-                            row *
-                                (
-                                    cardHeightEstimate +
-                                    cardGapY
-                                ),
-
-                        width:
-                            cardWidth,
-
-                        height:
-                            cardHeightEstimate
-                    }
-                );
-
-            }
-        );
-
-        relationshipsContainer.innerHTML = `
-
-            <div class="relationship-model-toolbar">
-
-                <div>
-
-                    <strong>
-                        ${escapeHTML(
-                            activeDatabase
-                        )}
-                        Data Model
-                    </strong>
-
-                    <span>
-                        ${enrichedTables.length}
-                        tables ·
-                        ${relationships.length}
-                        foreign-key relationship${
-                            relationships.length === 1
-                                ? ""
-                                : "s"
-                        }
-                    </span>
-
-                </div>
-
-                <div class="relationship-legend">
-
-                    <span>
-                        <b>PK</b>
-                        Primary Key
-                    </span>
-
-                    <span>
-                        <b>FK</b>
-                        Foreign Key
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="relationship-canvas"
-                style="
-                    width:${canvasWidth}px;
-                    height:${canvasHeight}px;
-                "
-            >
-
-                <svg
-                    class="relationship-svg"
-                    viewBox="
-                        0
-                        0
-                        ${canvasWidth}
-                        ${canvasHeight}
-                    "
-                    aria-hidden="true"
-                >
-
-                    <defs>
-
-                        <marker
-                            id="relationship-arrow-${Date.now()}"
-                            markerWidth="8"
-                            markerHeight="8"
-                            refX="7"
-                            refY="4"
-                            orient="auto"
-                        >
-
-                            <path
-                                d="M0,0 L8,4 L0,8 Z"
-                                fill="#60a5fa"
-                            ></path>
-
-                        </marker>
-
-                    </defs>
-
-                </svg>
-
-
-                ${enrichedTables
-                    .map(
-                        table =>
-                            renderRelationshipTable(
-                                table,
-                                positions.get(
-                                    table.name
-                                )
-                            )
-                    )
-                    .join("")
-                }
-
-            </div>
-
-
-            ${
-                relationships.length
-                    ? `
-
-                        <div class="relationship-list">
-
-                            <div class="schema-section-title">
-                                RELATIONSHIPS
-                            </div>
-
-                            ${
-                                relationships
-                                    .map(
-                                        relationship => `
-
-                                            <div
-                                                class="relationship-list-row"
-                                            >
-
-                                                <span>
-                                                    ${escapeHTML(
-                                                        relationship.fromTable
-                                                    )}.${escapeHTML(
-                                                        relationship.fromColumn
-                                                    )}
-                                                </span>
-
-                                                <span class="schema-arrow">
-                                                    →
-                                                </span>
-
-                                                <strong>
-                                                    ${escapeHTML(
-                                                        relationship.toTable
-                                                    )}.${escapeHTML(
-                                                        relationship.toColumn
-                                                    )}
-                                                </strong>
-
-                                            </div>
-
-                                        `
-                                    )
-                                    .join("")
-                            }
-
-                        </div>
-
-                      `
-                    : `
-
-                        <div
-                            class="
-                                relationships-empty-state
-                                compact
-                            "
-                        >
-
-                            <div class="relationships-empty-icon">
-                                🔗
-                            </div>
-
-                            <strong>
-                                No foreign-key relationships found.
-                            </strong>
-
-                            <p>
-                                The database does not currently define
-                                FK links between its tables.
-                            </p>
-
-                        </div>
-
-                      `
-            }
-
-        `;
-
-        drawRelationshipLines(
-            enrichedTables,
-            positions
-        );
-
-    }
-
-    catch (error) {
-
-        if (relationshipsContainer) {
-
-            relationshipsContainer.innerHTML = `
-
-                <div
-                    class="
-                        empty-results
-                        error-results
-                    "
-                >
-
-                    ${escapeHTML(
-                        error.message
-                    )}
-
-                </div>
-
-            `;
-
+        if (!queryState.size) {
+            queryCounter = 1;
+            queryState.set(1, { name: "Query 1", sql: "" });
         }
 
+        const firstId = [...queryState.keys()][0];
+        activeQueryId = queryState.has(activeQueryId) ? activeQueryId : firstId;
+    } catch (error) {
+        console.warn("Could not restore Playground queries:", error);
     }
-
 }
 
-
-/* ============================================================
- * RELATIONSHIP TABLE RENDERING
- * ============================================================ */
-
-function renderRelationshipTable(
-    table,
-    position
-) {
-
-    if (!position) {
-        return "";
+function savePersistedQueries() {
+    try {
+        const data = [...queryState.entries()].map(([id, state]) => ({
+            id,
+            name: state.name,
+            sql: state.sql
+        }));
+        localStorage.setItem(PLAYGROUND_STORAGE_KEY, JSON.stringify(data));
+    } catch (error) {
+        console.warn("Could not save Playground queries:", error);
     }
-
-    const foreignColumns =
-        new Set(
-            (table.foreignKeys || [])
-                .map(
-                    fk =>
-                        String(
-                            fk.from
-                        )
-                )
-        );
-
-    return `
-
-        <article
-            class="relationship-table"
-            style="
-                left:${position.x}px;
-                top:${position.y}px;
-            "
-        >
-
-            <div class="relationship-table-header">
-
-                <span>▦</span>
-
-                <span>
-                    ${escapeHTML(
-                        table.name
-                    )}
-                </span>
-
-            </div>
-
-
-            <div class="relationship-table-body">
-
-                ${
-                    (table.columns || [])
-                        .map(
-                            column => `
-
-                                <div
-                                    class="relationship-column"
-                                >
-
-                                    <span
-                                        class="
-                                            relationship-column-name
-                                        "
-                                    >
-
-                                        ${
-                                            Number(
-                                                column.pk
-                                            ) > 0
-                                                ? `
-                                                    <b
-                                                        class="
-                                                            relationship-key
-                                                            pk
-                                                        "
-                                                    >
-                                                        PK
-                                                    </b>
-                                                  `
-                                                : ""
-                                        }
-
-                                        ${
-                                            foreignColumns.has(
-                                                String(
-                                                    column.name
-                                                )
-                                            )
-                                                ? `
-                                                    <b
-                                                        class="
-                                                            relationship-key
-                                                            fk
-                                                        "
-                                                    >
-                                                        FK
-                                                    </b>
-                                                  `
-                                                : ""
-                                        }
-
-                                        ${escapeHTML(
-                                            column.name
-                                        )}
-
-                                    </span>
-
-                                    <span
-                                        class="
-                                            relationship-column-type
-                                        "
-                                    >
-                                        ${escapeHTML(
-                                            column.type ||
-                                            ""
-                                        )}
-                                    </span>
-
-                                </div>
-
-                            `
-                        )
-                        .join("")
-                }
-
-            </div>
-
-        </article>
-
-    `;
-
 }
 
+function renderQueryTabs() {
+    if (!queryTabs) return;
 
-/* ============================================================
- * DRAW RELATIONSHIP LINES
- * ============================================================ */
+    queryTabs.replaceChildren();
 
-function drawRelationshipLines(
-    tables,
-    positions
-) {
+    queryState.forEach((state, id) => {
+        const tab = document.createElement("div");
+        tab.className = `query-tab ${id === activeQueryId ? "active" : ""}`;
+        tab.dataset.queryId = String(id);
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-selected", String(id === activeQueryId));
 
-    const svg =
-        relationshipsContainer?.querySelector(
-            ".relationship-svg"
-        );
+        const nameButton = document.createElement("button");
+        nameButton.type = "button";
+        nameButton.className = "query-tab-name-button";
+        nameButton.textContent = state.name;
+        nameButton.title = "Double-click to rename query";
 
-    if (!svg) {
+        nameButton.addEventListener("click", () => switchQuery(id));
+        nameButton.addEventListener("dblclick", event => {
+            event.stopPropagation();
+            renameQuery(id);
+        });
+
+        const close = document.createElement("button");
+        close.type = "button";
+        close.className = "query-tab-close";
+        close.textContent = "×";
+        close.title = "Close query";
+        close.setAttribute("aria-label", `Close ${state.name}`);
+        close.addEventListener("click", event => {
+            event.stopPropagation();
+            closeQuery(id);
+        });
+
+        tab.append(nameButton, close);
+        queryTabs.appendChild(tab);
+    });
+
+    queryTabs.appendChild(newQueryButton);
+}
+
+function createQueryTab() {
+    saveCurrentQuery();
+    queryCounter += 1;
+
+    queryState.set(queryCounter, {
+        name: `Query ${queryCounter}`,
+        sql: ""
+    });
+
+    activeQueryId = queryCounter;
+    savePersistedQueries();
+    renderQueryTabs();
+    sqlEditor.value = "";
+    updateActiveDatabaseUI();
+    hideResults();
+    sqlEditor.focus();
+}
+
+function switchQuery(id) {
+    if (!queryState.has(id)) return;
+
+    saveCurrentQuery();
+    activeQueryId = id;
+    sqlEditor.value = queryState.get(id).sql || "";
+    renderQueryTabs();
+    hideResults();
+    sqlEditor.focus();
+}
+
+function renameQuery(id) {
+    const state = queryState.get(id);
+    if (!state) return;
+
+    const name = window.prompt("Rename query", state.name);
+    if (name === null) return;
+
+    const cleaned = name.trim();
+    if (!cleaned) {
+        showStatus("Query name cannot be empty.", "error");
         return;
     }
 
-    const markerId =
-        svg.querySelector(
-            "marker"
-        )?.id;
-
-    tables.forEach(
-        table => {
-
-            (table.foreignKeys || [])
-                .forEach(
-                    fk => {
-
-                        const from =
-                            positions.get(
-                                table.name
-                            );
-
-                        const to =
-                            positions.get(
-                                String(
-                                    fk.table
-                                )
-                            );
-
-                        if (
-                            !from ||
-                            !to
-                        ) {
-                            return;
-                        }
-
-                        const fromX =
-                            from.x +
-                            from.width /
-                                2;
-
-                        const fromY =
-                            from.y +
-                            from.height /
-                                2;
-
-                        const toX =
-                            to.x +
-                            to.width /
-                                2;
-
-                        const toY =
-                            to.y +
-                            to.height /
-                                2;
-
-                        const dx =
-                            toX -
-                            fromX;
-
-                        const dy =
-                            toY -
-                            fromY;
-
-                        const distance =
-                            Math.max(
-                                1,
-                                Math.sqrt(
-                                    dx * dx +
-                                    dy * dy
-                                )
-                            );
-
-                        const line =
-                            document.createElementNS(
-                                "http://www.w3.org/2000/svg",
-                                "line"
-                            );
-
-                        line.setAttribute(
-                            "x1",
-                            String(
-                                fromX +
-                                (
-                                    dx /
-                                    distance
-                                ) *
-                                90
-                            )
-                        );
-
-                        line.setAttribute(
-                            "y1",
-                            String(
-                                fromY +
-                                (
-                                    dy /
-                                    distance
-                                ) *
-                                60
-                            )
-                        );
-
-                        line.setAttribute(
-                            "x2",
-                            String(
-                                toX -
-                                (
-                                    dx /
-                                    distance
-                                ) *
-                                90
-                            )
-                        );
-
-                        line.setAttribute(
-                            "y2",
-                            String(
-                                toY -
-                                (
-                                    dy /
-                                    distance
-                                ) *
-                                60
-                            )
-                        );
-
-                        line.setAttribute(
-                            "class",
-                            "relationship-line-svg"
-                        );
-
-                        if (markerId) {
-
-                            line.setAttribute(
-                                "marker-end",
-                                `url(#${markerId})`
-                            );
-
-                        }
-
-                        svg.appendChild(
-                            line
-                        );
-
-                    }
-                );
-
-        }
-    );
-
+    state.name = cleaned.slice(0, 80);
+    savePersistedQueries();
+    renderQueryTabs();
 }
 
-
-/* ============================================================
- * DOWNLOAD CSV
-
- * ============================================================ */
-
-function downloadCSV(
-    data
-) {
-
-    if (
-        !data ||
-        !Array.isArray(
-            data.columns
-        )
-    ) {
-
-        showStatus(
-            "There are no query results to download.",
-            "error"
-        );
-
-
+function closeQuery(id) {
+    if (queryState.size <= 1) {
+        showStatus("At least one query sheet must remain open.", "info");
         return;
-
     }
 
+    const state = queryState.get(id);
+    if (!state) return;
 
-    const lines = [];
+    if (!window.confirm(`Close ${state.name}?`)) return;
 
+    queryState.delete(id);
 
-    lines.push(
-        data.columns
-            .map(
-                csvEscape
-            )
-            .join(",")
-    );
+    if (activeQueryId === id) {
+        activeQueryId = [...queryState.keys()][0];
+        sqlEditor.value = queryState.get(activeQueryId)?.sql || "";
+    }
 
+    savePersistedQueries();
+    renderQueryTabs();
+    hideResults();
+}
 
-    const rows =
-        Array.isArray(
-            data.rows
-        )
-            ? data.rows
-            : [];
+function saveCurrentQuery() {
+    const state = queryState.get(activeQueryId);
+    if (!state || !sqlEditor) return;
+    state.sql = sqlEditor.value;
+    savePersistedQueries();
+}
 
+/* ============================================================
+ * CSV DOWNLOAD
+ * ============================================================ */
 
-    rows.forEach(
-        row => {
+function downloadCSV(data) {
+    if (!data || !Array.isArray(data.columns) || !Array.isArray(data.rows)) return;
 
-            lines.push(
-                data.columns
-                    .map(
-                        column =>
-                            csvEscape(
-                                row?.[
-                                    column
-                                ]
-                            )
-                    )
-                    .join(",")
-            );
+    const lines = [data.columns.map(csvEscape).join(",")];
 
-        }
-    );
+    data.rows.forEach(row => {
+        lines.push(data.columns.map(column => csvEscape(row?.[column])).join(","));
+    });
 
-
-    const blob =
-        new Blob(
-            [
-                lines.join(
-                    "\r\n"
-                )
-            ],
-            {
-                type:
-                    "text/csv;charset=utf-8;"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href =
-        url;
-
-
-    link.download =
-        `playground-${(
-            activeDatabase ||
-            "results"
-        )}-results.csv`;
-
-
-    document.body.appendChild(
-        link
-    );
-
-
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `playground-${(activeDatabase || "results").toLowerCase()}-results.csv`;
+    document.body.appendChild(link);
     link.click();
-
-
     link.remove();
-
-
-    URL.revokeObjectURL(
-        url
-    );
-
+    URL.revokeObjectURL(url);
 }
 
-
-/* ============================================================
- * CSV ESCAPE
- * ============================================================ */
-
-function csvEscape(
-    value
-) {
-
-    if (
-        value ===
-        null ||
-        value ===
-        undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    const text =
-        String(
-            value
-        );
-
-
-    if (
-        /[",\r\n]/.test(
-            text
-        )
-    ) {
-
-        return (
-            '"' +
-            text.replace(
-                /"/g,
-                '""'
-            ) +
-            '"'
-        );
-
-    }
-
-
-    return text;
-
+function csvEscape(value) {
+    if (value === null || value === undefined) return "";
+    const text = String(value).replace(/"/g, '""');
+    return `"${text}"`;
 }
 
-
 /* ============================================================
- * STATUS MESSAGE
- * ============================================================ */
-
-function showStatus(
-    message,
-    type = ""
-) {
-
-    if (
-        !statusElement
-    ) {
-
-        return;
-
-    }
-
-
-    statusElement.textContent =
-        message;
-
-
-    statusElement.className =
-        "playground-status";
-
-
-    if (type) {
-
-        statusElement.classList.add(
-            type
-        );
-
-    }
-
-}
-
-
-/* ============================================================
- * ESCAPE HTML
- * ============================================================ */
-
-function escapeHTML(
-    value
-) {
-
-    return String(
-        value ??
-        ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
-
-/* ============================================================
- * INITIALIZE EVENTS
+ * EVENTS
  * ============================================================ */
 
 function initializeEvents() {
+    runQueryButton?.addEventListener("click", () => executeCurrentQuery());
+    newQueryButton?.addEventListener("click", createQueryTab);
 
-    runQueryButton?.addEventListener(
-        "click",
-        () => executeCurrentQuery()
-    );
+    document.getElementById("describe-table-button")?.addEventListener("click", () => openTableSelector("describe"));
+    document.getElementById("view-schema-button")?.addEventListener("click", () => openTableSelector("schema"));
+    document.getElementById("view-relationships-button")?.addEventListener("click", showRelationships);
 
+    downloadButton?.addEventListener("click", () => downloadCSV(latestResults));
+    minimizeButton?.addEventListener("click", minimizeResults);
+    maximizeButton?.addEventListener("click", maximizeResults);
+    closeResultsButton?.addEventListener("click", hideResults);
 
-    newQueryButton?.addEventListener(
-        "click",
-        createQueryTab
-    );
+    closeSelector?.addEventListener("click", closeTableSelector);
+    selectorOverlay?.addEventListener("click", closeTableSelector);
 
+    closeDetails?.addEventListener("click", () => closeModal(detailsModal, detailsOverlay));
+    detailsOverlay?.addEventListener("click", () => closeModal(detailsModal, detailsOverlay));
 
-    describeTableButton?.addEventListener(
-        "click",
-        () =>
-            openTableSelector(
-                "Describe"
-            )
-    );
+    closeRelationships?.addEventListener("click", () => closeModal(relationshipsModal, relationshipsOverlay));
+    relationshipsOverlay?.addEventListener("click", () => closeModal(relationshipsModal, relationshipsOverlay));
 
+    searchInput?.addEventListener("input", renderDatabaseTree);
 
-    viewSchemaButton?.addEventListener(
-        "click",
-        () =>
-            openTableSelector(
-                "Schema"
-            )
-    );
+    sqlEditor?.addEventListener("input", saveCurrentQuery);
 
-
-    viewRelationshipsButton?.addEventListener(
-        "click",
-        showRelationships
-    );
-
-
-    downloadButton?.addEventListener(
-        "click",
-        () =>
-            downloadCSV(
-                latestResults
-            )
-    );
-
-
-    minimizeButton?.addEventListener(
-        "click",
-        minimizeResults
-    );
-
-
-    maximizeButton?.addEventListener(
-        "click",
-        maximizeResults
-    );
-
-
-    closeResultsButton?.addEventListener(
-        "click",
-        hideResults
-    );
-
-
-    closeSelector?.addEventListener(
-        "click",
-        () =>
-            selectorModal?.classList.add(
-                "hidden"
-            )
-    );
-
-
-    closeDetails?.addEventListener(
-        "click",
-        () =>
-            detailsModal?.classList.add(
-                "hidden"
-            )
-    );
-
-
-    closeRelationships?.addEventListener(
-        "click",
-        () =>
-            relationshipsModal?.classList.add(
-                "hidden"
-            )
-    );
-
-
-    closeSidebar?.addEventListener(
-        "click",
-        () =>
-            document
-                .getElementById(
-                    "database-sidebar"
-                )
-                ?.classList.remove(
-                    "mobile-open"
-                )
-    );
-
-
-    searchInput?.addEventListener(
-        "input",
-        renderDatabaseTree
-    );
-
-
-    sqlEditor?.addEventListener(
-        "input",
-        saveCurrentQuery
-    );
-
-
-    sqlEditor?.addEventListener(
-        "keydown",
-        event => {
-
-            /*
-             * Ctrl + Enter / Cmd + Enter
-             *
-             * Execute statement under cursor
-             * or selected statement.
-             */
-            if (
-                event.key === "Enter" &&
-                (
-                    event.ctrlKey ||
-                    event.metaKey
-                ) &&
-                !event.shiftKey
-            ) {
-
-                event.preventDefault();
-
-
-                executeCurrentQuery();
-
-            }
-
-
-            /*
-             * Ctrl + Shift + Enter /
-             * Cmd + Shift + Enter
-             *
-             * Execute complete SQL worksheet.
-             */
-            if (
-                event.key === "Enter" &&
-                (
-                    event.ctrlKey ||
-                    event.metaKey
-                ) &&
-                event.shiftKey
-            ) {
-
-                event.preventDefault();
-
-
-                executeCurrentQuery(
-                    {
-                        executeAll:
-                            true
-                    }
-                );
-
-            }
-
+    sqlEditor?.addEventListener("keydown", event => {
+        if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && event.shiftKey) {
+            event.preventDefault();
+            executeCurrentQuery({ executeAll: true });
+            return;
         }
-    );
 
+        if (event.key === "Enter" && (event.ctrlKey || event.metaKey) && !event.shiftKey) {
+            event.preventDefault();
+            executeCurrentQuery();
+        }
+    });
+
+    document.addEventListener("keydown", event => {
+        if (event.key !== "Escape") return;
+        closeTableSelector();
+        closeModal(detailsModal, detailsOverlay);
+        closeModal(relationshipsModal, relationshipsOverlay);
+    });
+
+    closeSidebar?.addEventListener("click", closeMobileSidebar);
+    mobileSidebarButton?.addEventListener("click", openMobileSidebar);
+    mobileSidebarOverlay?.addEventListener("click", closeMobileSidebar);
 
     initializeResultsResize();
 
-
-    /*
-     * Restore Query 1 SQL text after the DOM
-     * is ready.
-     */
-    const activeQuery =
-        queryState.get(
-            activeQueryId
-        );
-
-
-    if (
-        activeQuery &&
-        sqlEditor
-    ) {
-
-        sqlEditor.value =
-            activeQuery.sql ||
-            "";
-
+    const initialState = queryState.get(activeQueryId);
+    if (initialState) {
+        sqlEditor.value = initialState.sql || "";
     }
-
 }
 
+function openMobileSidebar() {
+    document.getElementById("database-sidebar")?.classList.add("mobile-open");
+    mobileSidebarOverlay?.classList.add("visible");
+}
+
+function closeMobileSidebar() {
+    document.getElementById("database-sidebar")?.classList.remove("mobile-open");
+    mobileSidebarOverlay?.classList.remove("visible");
+}
+
+/* ============================================================
+ * HELPERS
+ * ============================================================ */
+
+function getDatabase(name) {
+    return databases.find(db => db.name === name) || null;
+}
+
+function quoteIdentifier(value) {
+    return `"${String(value).replace(/"/g, '""')}"`;
+}
+
+function quoteString(value) {
+    return `'${String(value).replace(/'/g, "''")}'`;
+}
+
+function clamp(value, minimum, maximum) {
+    return Math.min(Math.max(value, minimum), maximum);
+}
+
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function showStatus(message, type = "") {
+    if (!statusElement) return;
+    statusElement.textContent = message;
+    statusElement.className = `playground-status${type ? ` ${type}` : ""}`;
+}
 
 /* ============================================================
  * DEBUG HELPER
  * ============================================================ */
 
-window.getPlaygroundState =
-    function () {
-
-        return {
-
-            activeDatabase,
-
-            activeTable,
-
-            databaseCount:
-                databases.length,
-
-            databases:
-                databases.map(
-                    database => ({
-
-                        name:
-                            database.name,
-
-                        tableCount:
-                            database.tables.length
-
-                    })
-                ),
-
-            activeQuery:
-                activeQueryId,
-
-            queries:
-                Array.from(
-                    queryState.entries()
-                )
-                    .map(
-                        (
-                            [
-                                id,
-                                query
-                            ]
-                        ) => ({
-
-                            id,
-
-                            name:
-                                query.name,
-
-                            sqlLength:
-                                query.sql.length
-
-                        })
-                    )
-
-        };
-
+window.getPlaygroundState = function () {
+    return {
+        activeDatabase,
+        activeTable,
+        databaseCount: databases.length,
+        databases: databases.map(db => ({
+            name: db.name,
+            tableCount: db.tables.length
+        })),
+        activeQuery: activeQueryId,
+        queries: [...queryState.entries()].map(([id, query]) => ({
+            id,
+            name: query.name,
+            sqlLength: query.sql.length
+        }))
     };
+};
 
-
-/* ============================================================
- * GLOBAL STARTUP LOG
- * ============================================================ */
-
-console.log(
-    "✅ frontend/playground/playground.js loaded successfully."
-);
+console.log("✅ frontend/playground/playground.js loaded successfully.");
