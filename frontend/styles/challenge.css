@@ -287,6 +287,18 @@
     min-height: 0;
     height: auto;
     box-sizing: border-box;
+    /* FIX (overlapping question rows / hidden Start button):
+       .questions-grid caps its height at 60vh and scrolls. Without
+       flex-shrink:0, flexbox is allowed to compress each card BELOW
+       its actual text height once the list is long enough to exceed
+       that 60vh cap (min-height:0 above removes the browser's normal
+       "never shrink under content" protection). That compression is
+       exactly what made rows visually collide and swallowed the
+       Start button into the next card. Locking flex-shrink/grow to 0
+       forces every card to keep its natural, content-based height —
+       short questions stay compact, long ones grow — and the list
+       simply scrolls instead of overlapping. */
+    flex: 0 0 auto;
 }
 
 .question-popup-text {
@@ -344,7 +356,19 @@
 
 }
 
-.questions-grid button {
+/* FIX (Start button forced to 90px / not displaying correctly):
+   This rule is leftover from an older design where the entire
+   question card was a single <button>. Cards are now <div class=
+   "question-popup-card"> with a small nested <button class=
+   "popup-start-btn">, but ".questions-grid button" still matches
+   that nested button — and because "class + tag" (0,1,1) beats
+   ".popup-start-btn" alone (0,1,0), it was overriding padding,
+   border-radius, text-align and forcing min-height:90px onto the
+   small Start button. Combined with the card-shrinking bug above,
+   that oversized/misaligned button is what disappeared into the
+   overlap. Scoped to :not(.popup-start-btn) so it no longer touches
+   the Start button, restoring its intended compact size. */
+.questions-grid button:not(.popup-start-btn) {
 
     padding: 15px;
 
