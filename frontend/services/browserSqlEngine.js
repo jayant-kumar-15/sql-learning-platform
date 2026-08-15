@@ -1,24 +1,5 @@
 /*
  * ============================================================
- * FILE PATH: frontend/services/browserSqlEngine.js
- * ============================================================
- * PURPOSE
- * -------
- * SQL Learning Platform module.
- *
- * DOCUMENTATION
- * -------------
- * Keep this path header during future revisions. Add section
- * comments before every new major feature, state object,
- * event group, API call, or validation rule.
- *
- * Existing functionality is preserved in this documentation
- * revision.
- * ============================================================
- */
-
-/*
- * ============================================================
  * ROBUST QUERY RESULT VALIDATION
  * ============================================================
  *
@@ -1003,19 +984,11 @@ const browserSqlEngine = {
                 "banking"
             ) {
 
-                /*
-                 * ========================================================
-                 * PLAYGROUND BANKING DATA SOURCE
-                 * ========================================================
-                 *
-                 * Dedicated Playground schema and seed files keep the
-                 * large learning dataset independent from other pages.
-                 */
                 schemaFile =
-                    "../playground/data/banking-playground-schema.sql";
+                    "../assets/banking-schema.sql";
 
                 seedFile =
-                    "../playground/data/banking-playground-seed.sql";
+                    "../assets/banking-seed.sql";
 
             }
 
@@ -1024,19 +997,11 @@ const browserSqlEngine = {
                 "healthcare"
             ) {
 
-                /*
-                 * ========================================================
-                 * PLAYGROUND HEALTHCARE DATA SOURCE
-                 * ========================================================
-                 *
-                 * Dedicated Playground schema and seed files keep the
-                 * large learning dataset independent from other pages.
-                 */
                 schemaFile =
-                    "../playground/data/healthcare-playground-schema.sql";
+                    "../assets/healthcare-schema.sql";
 
                 seedFile =
-                    "../playground/data/healthcare-playground-seed.sql";
+                    "../assets/healthcare-seed.sql";
 
             }
 
@@ -1158,6 +1123,72 @@ const browserSqlEngine = {
             this.db.exec(
                 seedSql
             );
+
+
+            /* =================================================
+             * BANKING PAYMENTS COLUMN COMPATIBILITY
+             * =================================================
+             * Some older Banking schema/seed combinations used
+             * `payment_amount`, while the finalized Challenge
+             * questions use `amount`.
+             *
+             * Do NOT change the source schema or question files.
+             * If the loaded database has the legacy column only,
+             * expose the finalized `amount` column in this in-memory
+             * Challenge database so existing questions continue to
+             * execute correctly.
+             */
+            if (
+                databaseName.toLowerCase() === "banking"
+            ) {
+
+                try {
+
+                    const paymentTableInfo =
+                        this.db.exec(
+                            "PRAGMA table_info(payments);"
+                        );
+
+                    const paymentColumns =
+                        paymentTableInfo?.[0]?.values?.map(
+                            row => row[1]
+                        ) || [];
+
+                    if (
+                        !paymentColumns.includes("amount") &&
+                        paymentColumns.includes("payment_amount")
+                    ) {
+
+                        console.warn(
+                            "⚠️ Legacy Banking payments column detected. "+
+                            "Creating Challenge-compatible amount column."
+                        );
+
+                        this.db.exec(
+                            "ALTER TABLE payments ADD COLUMN amount REAL;"
+                        );
+
+                        this.db.exec(
+                            "UPDATE payments SET amount = payment_amount;"
+                        );
+
+                        console.log(
+                            "✅ Banking payments.amount compatibility column created."
+                        );
+                    }
+
+                }
+
+                catch (compatibilityError) {
+
+                    console.error(
+                        "❌ Banking payments compatibility check failed:",
+                        compatibilityError
+                    );
+
+                    throw compatibilityError;
+                }
+            }
 
 
             console.log(
