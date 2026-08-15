@@ -1,70 +1,10 @@
-CREATE TABLE branches (
-    branch_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    branch_name TEXT,
-    city TEXT
-);
-
-CREATE TABLE customers (
-    customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_name TEXT NOT NULL,
-    email TEXT,
-    city TEXT,
-    phone TEXT
-);
-
-CREATE TABLE employees (
-    employee_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    employee_name TEXT,
-    branch_id INTEGER,
-    designation TEXT,
-    FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
-);
-
-CREATE TABLE accounts (
-    account_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id INTEGER,
-    branch_id INTEGER,
-    account_type TEXT,
-    balance REAL,
-    account_open_date DATE,
-    account_status TEXT,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
-    FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
-);
-
-CREATE TABLE transactions (
-    transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    account_id INTEGER,
-    amount REAL,
-    transaction_type TEXT,
-    transaction_date DATE,
-    description TEXT,
-    FOREIGN KEY (account_id) REFERENCES accounts(account_id)
-);
-
-CREATE TABLE loans (
-    loan_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id INTEGER,
-    loan_amount REAL,
-    interest_rate REAL,
-    status TEXT,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-);
-
-CREATE TABLE credit_cards (
-    card_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_id INTEGER,
-    card_number TEXT,
-    card_type TEXT,
-    expiry_date DATE,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-);
-
-CREATE TABLE payments (
-    payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    account_id INTEGER,
-    amount REAL,
-    payment_method TEXT,
-    payment_date DATE,
-    FOREIGN KEY (account_id) REFERENCES accounts(account_id)
-);
+PRAGMA foreign_keys=ON;
+CREATE TABLE branches(branch_id INTEGER PRIMARY KEY,branch_code TEXT NOT NULL UNIQUE,branch_name TEXT NOT NULL,city TEXT NOT NULL,state TEXT NOT NULL,branch_type TEXT NOT NULL,opened_date TEXT NOT NULL);
+CREATE TABLE employees(employee_id INTEGER PRIMARY KEY,branch_id INTEGER NOT NULL,employee_name TEXT NOT NULL,job_title TEXT NOT NULL,email TEXT NOT NULL UNIQUE,hire_date TEXT NOT NULL,salary REAL NOT NULL,FOREIGN KEY(branch_id) REFERENCES branches(branch_id));
+CREATE TABLE customers(customer_id INTEGER PRIMARY KEY,customer_number TEXT NOT NULL UNIQUE,first_name TEXT NOT NULL,last_name TEXT NOT NULL,email TEXT NOT NULL,phone TEXT,date_of_birth TEXT NOT NULL,city TEXT NOT NULL,state TEXT NOT NULL,customer_status TEXT NOT NULL,registration_date TEXT NOT NULL);
+CREATE TABLE accounts(account_id INTEGER PRIMARY KEY,customer_id INTEGER NOT NULL,branch_id INTEGER NOT NULL,account_number TEXT NOT NULL UNIQUE,account_type TEXT NOT NULL,balance REAL NOT NULL,opened_date TEXT NOT NULL,account_status TEXT NOT NULL,FOREIGN KEY(customer_id) REFERENCES customers(customer_id),FOREIGN KEY(branch_id) REFERENCES branches(branch_id));
+CREATE TABLE credit_cards(credit_card_id INTEGER PRIMARY KEY,customer_id INTEGER NOT NULL,card_number TEXT NOT NULL UNIQUE,card_type TEXT NOT NULL,credit_limit REAL NOT NULL,available_limit REAL NOT NULL,issue_date TEXT NOT NULL,expiry_date TEXT NOT NULL,card_status TEXT NOT NULL,FOREIGN KEY(customer_id) REFERENCES customers(customer_id));
+CREATE TABLE loans(loan_id INTEGER PRIMARY KEY,customer_id INTEGER NOT NULL,branch_id INTEGER NOT NULL,loan_type TEXT NOT NULL,principal_amount REAL NOT NULL,interest_rate REAL NOT NULL,term_months INTEGER NOT NULL,start_date TEXT NOT NULL,loan_status TEXT NOT NULL,FOREIGN KEY(customer_id) REFERENCES customers(customer_id),FOREIGN KEY(branch_id) REFERENCES branches(branch_id));
+CREATE TABLE transactions(transaction_id INTEGER PRIMARY KEY,account_id INTEGER NOT NULL,transaction_date TEXT NOT NULL,transaction_type TEXT NOT NULL,amount REAL NOT NULL,description TEXT,transaction_status TEXT NOT NULL,FOREIGN KEY(account_id) REFERENCES accounts(account_id));
+CREATE TABLE payments(payment_id INTEGER PRIMARY KEY,loan_id INTEGER NOT NULL,payment_date TEXT NOT NULL,payment_amount REAL NOT NULL,payment_method TEXT NOT NULL,payment_status TEXT NOT NULL,FOREIGN KEY(loan_id) REFERENCES loans(loan_id));
+CREATE INDEX idx_emp_branch ON employees(branch_id); CREATE INDEX idx_acc_customer ON accounts(customer_id); CREATE INDEX idx_acc_branch ON accounts(branch_id); CREATE INDEX idx_tx_account ON transactions(account_id); CREATE INDEX idx_loan_customer ON loans(customer_id); CREATE INDEX idx_payment_loan ON payments(loan_id);

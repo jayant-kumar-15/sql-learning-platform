@@ -1,78 +1,11 @@
-CREATE TABLE hospitals (
-    hospital_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hospital_name TEXT NOT NULL,
-    city TEXT,
-    state TEXT
-);
-
-CREATE TABLE departments (
-    department_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    hospital_id INTEGER,
-    department_name TEXT,
-    FOREIGN KEY (hospital_id) REFERENCES hospitals(hospital_id)
-);
-
-CREATE TABLE doctors (
-    doctor_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    doctor_name TEXT NOT NULL,
-    specialization TEXT,
-    hospital_id INTEGER,
-    department_id INTEGER,
-    experience_years INTEGER,
-    FOREIGN KEY (hospital_id) REFERENCES hospitals(hospital_id),
-    FOREIGN KEY (department_id) REFERENCES departments(department_id)
-);
-
-CREATE TABLE patients (
-    patient_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    patient_name TEXT NOT NULL,
-    age INTEGER,
-    gender TEXT,
-    city TEXT,
-    phone TEXT,
-    date_of_birth DATE,
-    blood_group TEXT
-);
-
-CREATE TABLE insurance (
-    insurance_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    insurance_company TEXT,
-    insurance_type TEXT
-);
-
-CREATE TABLE appointments (
-    appointment_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    patient_id INTEGER,
-    doctor_id INTEGER,
-    appointment_date DATE,
-    status TEXT,
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
-    FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
-);
-
-CREATE TABLE prescriptions (
-    prescription_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    appointment_id INTEGER,
-    medicine_name TEXT,
-    dosage TEXT,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id)
-);
-
-CREATE TABLE billing (
-    bill_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    patient_id INTEGER,
-    amount REAL,
-    payment_status TEXT,
-    insurance_id INTEGER,
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
-    FOREIGN KEY (insurance_id) REFERENCES insurance(insurance_id)
-);
-
-CREATE TABLE lab_reports (
-    report_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    patient_id INTEGER,
-    report_type TEXT,
-    result TEXT,
-    report_date DATE,
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
-);
+PRAGMA foreign_keys=ON;
+CREATE TABLE hospitals(hospital_id INTEGER PRIMARY KEY,hospital_code TEXT NOT NULL UNIQUE,hospital_name TEXT NOT NULL,city TEXT NOT NULL,state TEXT NOT NULL,hospital_type TEXT NOT NULL,established_date TEXT NOT NULL);
+CREATE TABLE departments(department_id INTEGER PRIMARY KEY,hospital_id INTEGER NOT NULL,department_name TEXT NOT NULL,floor_number INTEGER,department_head TEXT,FOREIGN KEY(hospital_id) REFERENCES hospitals(hospital_id));
+CREATE TABLE doctors(doctor_id INTEGER PRIMARY KEY,hospital_id INTEGER NOT NULL,department_id INTEGER NOT NULL,doctor_name TEXT NOT NULL,specialization TEXT NOT NULL,email TEXT NOT NULL UNIQUE,phone TEXT,experience_years INTEGER NOT NULL,joining_date TEXT NOT NULL,doctor_status TEXT NOT NULL,FOREIGN KEY(hospital_id) REFERENCES hospitals(hospital_id),FOREIGN KEY(department_id) REFERENCES departments(department_id));
+CREATE TABLE patients(patient_id INTEGER PRIMARY KEY,patient_number TEXT NOT NULL UNIQUE,first_name TEXT NOT NULL,last_name TEXT NOT NULL,date_of_birth TEXT NOT NULL,gender TEXT NOT NULL,blood_group TEXT,city TEXT NOT NULL,state TEXT NOT NULL,phone TEXT,registration_date TEXT NOT NULL,patient_status TEXT NOT NULL);
+CREATE TABLE insurance(insurance_id INTEGER PRIMARY KEY,patient_id INTEGER NOT NULL,provider_name TEXT NOT NULL,policy_number TEXT NOT NULL UNIQUE,policy_type TEXT NOT NULL,coverage_amount REAL NOT NULL,start_date TEXT NOT NULL,end_date TEXT NOT NULL,insurance_status TEXT NOT NULL,FOREIGN KEY(patient_id) REFERENCES patients(patient_id));
+CREATE TABLE appointments(appointment_id INTEGER PRIMARY KEY,patient_id INTEGER NOT NULL,doctor_id INTEGER NOT NULL,hospital_id INTEGER NOT NULL,appointment_date TEXT NOT NULL,appointment_type TEXT NOT NULL,appointment_status TEXT NOT NULL,reason TEXT,FOREIGN KEY(patient_id) REFERENCES patients(patient_id),FOREIGN KEY(doctor_id) REFERENCES doctors(doctor_id),FOREIGN KEY(hospital_id) REFERENCES hospitals(hospital_id));
+CREATE TABLE prescriptions(prescription_id INTEGER PRIMARY KEY,appointment_id INTEGER NOT NULL,patient_id INTEGER NOT NULL,doctor_id INTEGER NOT NULL,medication_name TEXT NOT NULL,dosage TEXT NOT NULL,frequency TEXT NOT NULL,start_date TEXT NOT NULL,end_date TEXT,prescription_status TEXT NOT NULL,FOREIGN KEY(appointment_id) REFERENCES appointments(appointment_id),FOREIGN KEY(patient_id) REFERENCES patients(patient_id),FOREIGN KEY(doctor_id) REFERENCES doctors(doctor_id));
+CREATE TABLE lab_reports(lab_report_id INTEGER PRIMARY KEY,appointment_id INTEGER NOT NULL,patient_id INTEGER NOT NULL,test_name TEXT NOT NULL,test_date TEXT NOT NULL,result_value TEXT NOT NULL,reference_range TEXT,result_status TEXT NOT NULL,FOREIGN KEY(appointment_id) REFERENCES appointments(appointment_id),FOREIGN KEY(patient_id) REFERENCES patients(patient_id));
+CREATE TABLE billing(billing_id INTEGER PRIMARY KEY,patient_id INTEGER NOT NULL,appointment_id INTEGER,insurance_id INTEGER,billing_date TEXT NOT NULL,service_description TEXT NOT NULL,amount REAL NOT NULL,payment_status TEXT NOT NULL,FOREIGN KEY(patient_id) REFERENCES patients(patient_id),FOREIGN KEY(appointment_id) REFERENCES appointments(appointment_id),FOREIGN KEY(insurance_id) REFERENCES insurance(insurance_id));
+CREATE INDEX idx_dept_hospital ON departments(hospital_id); CREATE INDEX idx_doc_hospital ON doctors(hospital_id); CREATE INDEX idx_doc_department ON doctors(department_id); CREATE INDEX idx_appt_patient ON appointments(patient_id); CREATE INDEX idx_appt_doctor ON appointments(doctor_id); CREATE INDEX idx_bill_patient ON billing(patient_id);
