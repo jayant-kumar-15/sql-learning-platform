@@ -154,6 +154,48 @@ select {
 
 
 /* ============================================================
+   PLAYGROUND PAGE FLEX SHELL
+   ------------------------------------------------------------
+   The HTML uses .playground-layout and .platform-header.
+   Keep the whole application as a two-row flex layout so the
+   database explorer and SQL workspace occupy the full viewport
+   immediately below the top navigation.
+   ============================================================ */
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.platform-header {
+    flex: 0 0 auto;
+}
+
+.playground-layout {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+
+    display: flex;
+    flex-direction: row;
+
+    overflow: hidden;
+}
+
+.playground-workspace {
+    flex: 1 1 auto;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+
+/* ============================================================
    3. TOP NAVIGATION
    ============================================================ */
 
@@ -299,31 +341,6 @@ select {
     color: #ffffff;
 
     border-color: #475569;
-}
-
-
-/* ============================================================
-   5. PLAYGROUND APPLICATION LAYOUT
-   ============================================================
-
-   The HTML uses .playground-layout as the flex container for the
-   database explorer and the main worksheet. Keeping this container
-   height-constrained is essential so the SQL editor fills the
-   available right-hand workspace instead of dropping to the bottom.
-   ============================================================ */
-
-.playground-layout {
-    flex: 1 1 auto;
-
-    min-width: 0;
-    min-height: 0;
-
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    overflow: hidden;
 }
 
 
@@ -731,8 +748,6 @@ select {
    ============================================================ */
 
 .playground-workspace {
-    position: relative;
-
     flex: 1 1 auto;
 
     min-width: 0;
@@ -803,9 +818,6 @@ select {
    ============================================================ */
 
 .active-database-hint {
-    display: none;
-
-
     min-height: 36px;
 
     display: flex;
@@ -1534,13 +1546,13 @@ select {
 
     width: 100%;
 
-    height: 150px;
+    height: 220px;
 
-    min-height: 88px;
+    min-height: 90px;
 
     max-height: calc(100% - 80px);
 
-    flex: 0 0 150px;
+    flex: 0 0 220px;
 
     display: flex;
     flex-direction: column;
@@ -3024,10 +3036,10 @@ button:disabled {
     }
 
 
-     .results-section {
+    .results-section {
         min-height: 85px;
 
-        height: 150px;
+        height: 200px;
     }
 
 
@@ -3140,155 +3152,310 @@ button:disabled {
 
 
 /* ============================================================
-   PLAYGROUND DATABASE FOLD / UNFOLD CONTROL
+   PLAYGROUND UI FIXES - REVISION
+   ============================================================
+   These overrides intentionally affect only Playground controls.
+   - No white focus/selection block on explorer tables.
+   - No white active block on Query 1 / query tabs.
+   - Relationship data-model canvas and connector lines.
+   - Schema definition / FK metadata presentation.
    ============================================================ */
 
-.database-header {
+.database-tree .table-item,
+.database-tree .table-item.selected,
+.database-tree .table-item:focus,
+.database-tree .table-item:focus-visible {
+    appearance: none;
+    -webkit-appearance: none;
     width: 100%;
-    min-height: 36px;
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 0 10px;
-    background: transparent;
-    color: #cbd5e1;
-    user-select: none;
-}
-
-.database-toggle-button {
-    width: 22px !important;
-    min-width: 22px !important;
-    height: 26px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border: 0 !important;
-    border-radius: 4px !important;
-    outline: none !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
+    border: 0;
+    outline: 0;
     background: transparent !important;
-    color: #64748b !important;
-    cursor: pointer !important;
+    color: #94a3b8;
     box-shadow: none !important;
+    user-select: none;
+    -webkit-user-select: none;
+    text-align: left;
 }
 
-.database-toggle-button:hover {
+.database-tree .table-item:hover,
+.database-tree .table-item:active {
     background: #111c31 !important;
-    color: #93c5fd !important;
+    color: #dbeafe;
 }
 
-.database-toggle-button:focus-visible {
-    outline: 1px solid #3b82f6 !important;
-    outline-offset: 1px !important;
+.database-tree .table-item::selection,
+.database-tree .table-item *::selection {
+    background: transparent;
 }
 
-.database-toggle-button .database-arrow {
-    width: 14px;
-    min-width: 14px;
+.query-tabs .query-tab,
+.query-tabs .query-tab.active,
+.query-tabs .query-tab:focus,
+.query-tabs .query-tab:focus-visible {
+    appearance: none;
+    -webkit-appearance: none;
+    outline: 0 !important;
+    background: #111c31 !important;
+    color: #94a3b8;
+    box-shadow: none !important;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.query-tabs .query-tab:hover {
+    background: #172338 !important;
+    color: #dbeafe;
+}
+
+.query-tabs .query-tab.active {
+    background: #111c31 !important;
+    color: #60a5fa;
+    box-shadow: inset 0 2px 0 #3b82f6 !important;
+}
+
+.query-tabs .query-tab-name {
+    background: transparent !important;
     color: inherit;
-    text-align: center;
-    font-size: 9px;
-    line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-.database-header .database-name {
-    cursor: pointer;
+.query-tabs .query-tab-name::selection {
+    background: transparent;
 }
 
-.database-header .database-name:hover {
-    color: #f8fafc;
-}
-
-/* Use the hidden attribute as the single source of truth. */
-.table-list[hidden] {
-    display: none !important;
-}
-
-.table-list:not([hidden]) {
-    display: block !important;
-}
-
-/* ============================================================
-   DESCRIBE / SCHEMA TABLE SELECTOR - FIRST CLICK
-   ============================================================ */
-
-.modal.modal-medium {
-    width: min(680px, calc(100vw - 32px));
-}
-
-.table-selector-list {
-    padding: 16px;
-    background: #0f172a;
-}
-
-.table-selector-item {
-    min-height: 60px;
-    gap: 24px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    border: 1px solid #263247;
-    border-radius: 7px;
-    background: #0b1120;
-    color: #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
-}
-
-.table-selector-item:last-child {
-    margin-bottom: 0;
-}
-
-.table-selector-item:hover {
+/* Schema / Describe */
+.metadata-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 0 8px;
+    border: 1px solid #334155;
+    border-radius: 5px;
     background: #111c31;
-    border-color: #3b82f6;
+    color: #93c5fd;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .05em;
 }
 
-.table-selector-table-name {
-    flex: 1 1 auto;
-    gap: 10px;
-    color: #f1f5f9;
-    font-size: 13px;
+.schema-badge {
+    color: #c4b5fd;
+    border-color: #4c1d95;
+    background: #1e1640;
+}
+
+.schema-column-name {
+    color: #e2e8f0 !important;
     font-weight: 600;
 }
 
-.table-selector-table-icon {
+.schema-type {
+    color: #93c5fd !important;
+    font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.schema-definition-card,
+.schema-extra-section {
+    margin-bottom: 13px;
+}
+
+.schema-section-title {
+    margin-bottom: 7px;
+    color: #93c5fd;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .07em;
+}
+
+.schema-definition {
+    margin: 0;
+    padding: 12px 13px;
+    border: 1px solid #263247;
+    border-radius: 6px;
+    background: #07101f;
+    color: #cbd5e1;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 11px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow: auto;
+}
+
+.schema-list-card {
+    overflow: hidden;
+    border: 1px solid #263247;
+    border-radius: 6px;
+    background: #0b1120;
+}
+
+.schema-list-row {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 10px;
+    border-bottom: 1px solid #1e293b;
+    color: #cbd5e1;
+    font-size: 11px;
+}
+
+.schema-list-row:last-child {
+    border-bottom: 0;
+}
+
+.schema-list-row strong {
+    color: #93c5fd;
+}
+
+.schema-list-row code {
+    color: #94a3b8;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.schema-arrow {
     color: #60a5fa;
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 700;
 }
 
-.table-selector-describe-button,
-.table-selector-item button.table-selector-describe-button {
-    flex: 0 0 auto;
-    min-width: 112px;
-    height: 34px !important;
-    padding: 0 14px !important;
-    border: 1px solid #3b82f6 !important;
-    border-radius: 5px !important;
-    outline: none !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    background: #172554 !important;
-    background-image: none !important;
-    color: #bfdbfe !important;
-    cursor: pointer !important;
-    font-family: inherit !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    line-height: 1 !important;
-    text-align: center !important;
-    box-shadow: none !important;
+.schema-empty-note {
+    padding: 10px 12px;
+    border: 1px dashed #334155;
+    border-radius: 5px;
+    color: #64748b;
+    font-size: 10px;
 }
 
-.table-selector-describe-button:hover,
-.table-selector-item button.table-selector-describe-button:hover {
-    background: #1e3a8a !important;
-    border-color: #60a5fa !important;
-    color: #ffffff !important;
+/* Relationship / Data Model */
+.relationship-model-toolbar {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 10px;
+    padding: 9px 12px;
+    border: 1px solid #263247;
+    border-radius: 6px;
+    background: #0f172a;
 }
 
-.table-selector-describe-button:focus-visible {
-    outline: 2px solid rgba(96, 165, 250, .35) !important;
-    outline-offset: 2px !important;
+.relationship-model-toolbar > div:first-child {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.relationship-model-toolbar strong {
+    color: #f1f5f9;
+    font-size: 12px;
+}
+
+.relationship-model-toolbar span {
+    color: #64748b;
+    font-size: 10px;
+}
+
+.relationship-legend {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    flex-direction: row !important;
+}
+
+.relationship-legend span {
+    color: #94a3b8;
+    font-size: 9px;
+}
+
+.relationship-legend b {
+    color: #93c5fd;
+}
+
+.relationship-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.relationship-line-svg {
+    stroke: #60a5fa;
+    stroke-width: 2;
+    fill: none;
+    opacity: .9;
+}
+
+.relationship-table {
+    z-index: 2;
+}
+
+.relationship-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    margin-right: 4px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.relationship-key.pk {
+    background: #172554;
+    color: #93c5fd;
+}
+
+.relationship-key.fk {
+    background: #2e1065;
+    color: #c4b5fd;
+}
+
+.relationship-list {
+    margin-top: 12px;
+    border: 1px solid #263247;
+    border-radius: 6px;
+    background: #0b1120;
+    overflow: hidden;
+}
+
+.relationship-list .schema-section-title {
+    margin: 0;
+    padding: 9px 11px;
+    border-bottom: 1px solid #263247;
+    background: #111c31;
+}
+
+.relationship-list-row {
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 11px;
+    border-bottom: 1px solid #1e293b;
+    color: #cbd5e1;
+    font-size: 10px;
+}
+
+.relationship-list-row:last-child {
+    border-bottom: 0;
+}
+
+.relationship-list-row strong {
+    color: #93c5fd;
+}
+
+.relationships-empty-state.compact {
+    min-height: 140px;
 }
