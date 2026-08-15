@@ -10,7 +10,7 @@
     <title>SQL Challenges</title>
 
     <link rel="stylesheet" href="../styles/main.css?v=17">
-    <link rel="stylesheet" href="../styles/challenge.css?v=21">
+    <link rel="stylesheet" href="../styles/challenge.css?v=20">
 
 
 </head>
@@ -36,41 +36,13 @@
 
     <main class="challenge-container">
 
-        <!-- ============================================================
-             CHALLENGE LEVEL SUMMARY
-             Compact status card shown at the top of the page.
-             Detailed milestone messages are intentionally NOT shown here;
-             milestone celebrations appear in the animated popup instead.
-             ============================================================ -->
-        <div class="challenge-header-row">
+        <h1>🏆 SQL Challenges</h1>
 
-            <div class="challenge-heading">
-                <h1>🏆 SQL Challenges</h1>
+        <p class="subtitle">
 
-                <p class="subtitle">
-                    Practice SQL with real healthcare and banking datasets.
-                </p>
-            </div>
+            Practice SQL with real healthcare and banking datasets.
 
-            <!-- ============================================================
-                 ACTIVE LEVEL DISPLAY
-                 ============================================================
-                 Only the user's highest currently active level is displayed.
-                 Lower/completed levels are intentionally hidden so the card
-                 never shows Beginner + Intermediate + Expert together.
-                 ============================================================ -->
-            <section class="your-level-card" aria-label="Your SQL level">
-                <div class="your-level-header">
-                    <span>🏅 Your Level</span>
-                </div>
-
-                <div class="your-level-row active-level-row">
-                    <span id="your-level-label">🟢 Easy</span>
-                    <strong id="your-level-status">0 / 50</strong>
-                </div>
-            </section>
-
-        </div>
+        </p>
 
         <div class="score-board">
 
@@ -184,7 +156,43 @@
 
 </section>
 
+            <!-- ============================================================
+                 CHALLENGE V1 PROGRESSION
+                 ============================================================ -->
 
+            <section class="challenge-progression" aria-label="Challenge progression">
+
+                <div class="progression-card intermediate-progression-card">
+                    <div class="progression-card-header">
+                        <div>
+                            <span class="progression-level-label">🟡 Intermediate Progress</span>
+                            <h2 id="intermediate-rank-title">⭐ SQL Explorer</h2>
+                        </div>
+                        <span id="intermediate-completed-count" class="progression-count">0 / 100</span>
+                    </div>
+                    <div id="intermediate-stars" class="progression-stars">☆☆☆☆☆</div>
+                    <div class="progression-bar">
+                        <div id="intermediate-progression-fill" class="progression-bar-fill"></div>
+                    </div>
+                    <p id="intermediate-rank-message" class="progression-message">Complete 20 Intermediate questions to earn your first star.</p>
+                </div>
+
+                <div class="progression-card expert-progression-card">
+                    <div class="progression-card-header">
+                        <div>
+                            <span class="progression-level-label">🔴 Expert Rank</span>
+                            <h2 id="expert-rank-title">🔒 Expert Awaits</h2>
+                        </div>
+                        <span id="expert-completed-count" class="progression-count">0 / 50</span>
+                    </div>
+                    <div id="expert-rank-badge" class="expert-rank-badge">🔒</div>
+                    <div class="progression-bar">
+                        <div id="expert-progression-fill" class="progression-bar-fill"></div>
+                    </div>
+                    <p id="expert-rank-message" class="progression-message">Solve 10 Expert challenges to earn the BOSS rank.</p>
+                </div>
+
+            </section>
 
             <div class="challenge-layout">
 
@@ -359,45 +367,6 @@
 
 </div>
 
-        <!-- ============================================================
-             LEVEL-UP CELEBRATION POPUP
-             Milestone messages are shown only when a new rank/star is earned.
-             ============================================================ -->
-        <div
-            id="level-celebration-overlay"
-            class="level-celebration-overlay"
-            style="display: none;"
-        >
-            <div
-                id="level-celebration-popup"
-                class="level-celebration-popup"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="level-celebration-title"
-            >
-                <div class="celebration-particles" aria-hidden="true">
-                    <span>✨</span>
-                    <span>🎉</span>
-                    <span>⭐</span>
-                    <span>🔥</span>
-                    <span>✨</span>
-                    <span>🎊</span>
-                </div>
-
-                <div id="level-celebration-badge" class="level-celebration-badge">🏆</div>
-                <h2 id="level-celebration-title">🎉 Level Up!</h2>
-                <p id="level-celebration-message"></p>
-
-                <button
-                    type="button"
-                    id="level-celebration-close"
-                    class="level-celebration-close"
-                >
-                    Continue 🚀
-                </button>
-            </div>
-        </div>
-
                 <!-- ============================================================
      TABLE SCHEMA POPUP
      ============================================================ -->
@@ -458,15 +427,15 @@
 
 <script src="../services/sqliteWasmLoader.js?v=1"></script>
 
-<script src="../services/browserSqlEngine.js?v=7"></script>
+<script src="../services/browserSqlEngine.js?v=6"></script>
 
 <script src="../services/challengeValidator.js?v=6"></script>
 
-<script src="../services/sqlEngine.js?v=3"></script>
+<script src="../services/sqlEngine.js?v=4"></script>
 
 <script src="../assets/challenges.js?v=18"></script>
 
-<script src="../assets/challenge.js?v=28"></script>
+<script src="../assets/challenge.js?v=26"></script>
 
 </body>
 </html>
