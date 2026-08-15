@@ -1130,68 +1130,6 @@ const browserSqlEngine = {
             );
 
 
-            /* =================================================
-             * BANKING PAYMENTS COLUMN COMPATIBILITY
-             * =================================================
-             * Older Banking data used `payment_amount`, while the
-             * finalized Challenge schema/question set uses `amount`.
-             * This browser-only compatibility step prevents an older
-             * cached schema from breaking a valid Challenge query.
-             */
-            if (
-                databaseName.toLowerCase() ===
-                "banking"
-            ) {
-
-                try {
-
-                    const paymentInfo =
-                        this.db.exec(
-                            "PRAGMA table_info(payments);"
-                        );
-
-                    const paymentColumns =
-                        paymentInfo &&
-                        paymentInfo[0] &&
-                        Array.isArray(paymentInfo[0].values)
-                            ? paymentInfo[0].values.map(
-                                function (row) {
-                                    return row[1];
-                                }
-                            )
-                            : [];
-
-                    if (
-                        !paymentColumns.includes("amount") &&
-                        paymentColumns.includes("payment_amount")
-                    ) {
-
-                        this.db.exec(
-                            "ALTER TABLE payments ADD COLUMN amount REAL;"
-                        );
-
-                        this.db.exec(
-                            "UPDATE payments SET amount = payment_amount;"
-                        );
-
-                        console.log(
-                            "✅ Banking payments compatibility column `amount` created."
-                        );
-
-                    }
-
-                } catch (compatibilityError) {
-
-                    console.warn(
-                        "⚠️ Banking payments compatibility check failed:",
-                        compatibilityError
-                    );
-
-                }
-
-            }
-
-
             /*
              * Re-enable foreign keys.
              */
@@ -1260,6 +1198,72 @@ const browserSqlEngine = {
             throw error;
 
         }
+
+    },
+
+
+    /* ========================================================
+     * TRUSTED REFERENCE RESULT
+     * ========================================================
+     * Challenge questions are validated against the CURRENT
+     * challenge database, not a small/static expectedOutput sample.
+     * This keeps validation correct after the playground seed grows
+     * from V1 sample data to the full Banking/Healthcare datasets.
+     *
+     * IMPORTANT:
+     * - The reference query comes only from the trusted challenge
+     *   definition (solution / solution_sql).
+     * - It is used for validation only; it is never shown as the
+     *   user's executed query.
+     * ========================================================
+     */
+
+    async getReferenceResult(
+        databaseName = "Banking",
+        solutionQuery
+    ) {
+
+        if (
+            !solutionQuery ||
+            typeof solutionQuery !== "string"
+        ) {
+
+            return [];
+
+        }
+
+
+        const db =
+            await this.initialize(
+                databaseName
+            );
+
+
+        if (!db) {
+
+            throw new Error(
+                "Browser SQLite database is not available."
+            );
+
+        }
+
+
+        const result =
+            db.exec({
+
+                sql:
+                    solutionQuery,
+
+                rowMode:
+                    "object",
+
+                returnValue:
+                    "resultRows"
+
+            });
+
+
+        return result || [];
 
     },
 
@@ -1381,107 +1385,63 @@ const browserSqlEngine = {
             }
 
 
-            /* =================================================
-             * DYNAMIC CHALLENGE REFERENCE RESULT
-             * =================================================
-             * The trusted question solution is executed against the
-             * SAME current SQLite database as the user's query. This
-             * prevents stale static expectedOutput data from breaking
-             * challenges after the datasets are expanded.
+            /*
+             * ====================================================
+             * CHALLENGE VALIDATION REFERENCE
+             * ====================================================
              *
-             * Normal RESULT questions intentionally ignore row order.
+             * For fixed challenges, the authoritative expected result
+             * must be calculated from the CURRENT loaded database.
+             * Static expectedOutput is retained only as a V1 fallback
+             * and for the visible preview in the challenge JSON.
+             *
+             * This prevents the old bug where a question had a 3/5-row
+             * sample but the expanded dataset produced hundreds of rows.
              */
-            let isCorrect = null;
             let validationExpectedRows = null;
+            let isCorrect = null;
 
-            const challenge =
-                options.challenge || null;
-
-            const solutionQuery =
-                challenge &&
-                typeof challenge.solution === "string"
-                    ? challenge.solution.trim()
-                    : (
-                        challenge &&
-                        typeof challenge.solution_sql === "string"
-                            ? challenge.solution_sql.trim()
-                            : ""
-                    );
-
-            const normalizedSolution =
-                solutionQuery.toLowerCase();
-
-            const isSelectableSolution =
-                normalizedSolution.startsWith("select ") ||
-                normalizedSolution.startsWith("select\n") ||
-                normalizedSolution.startsWith("with ");
 
             if (
-                challenge &&
-                solutionQuery &&
-                isSelectableSolution
+                options.challenge &&
+                (
+                    typeof options.challenge.solution ===
+                        "string" ||
+                    typeof options.challenge.solution_sql ===
+                        "string"
+                )
             ) {
 
-                try {
+                const referenceQuery =
+                    typeof options.challenge.solution ===
+                        "string"
+                        ? options.challenge.solution.trim()
+                        : options.challenge.solution_sql.trim();
 
-                    /* Execute the trusted reference solution. */
-                    const solutionResult =
-                        db.exec({
-                            sql: solutionQuery,
-                            rowMode: "object",
-                            returnValue: "resultRows"
-                        });
 
-                    validationExpectedRows =
-                        solutionResult || [];
-
-                    const validationType =
-                        String(
-                            challenge.validationType ||
-                            "RESULT"
-                        )
-                        .trim()
-                        .toUpperCase();
-
-                    /*
-                     * ORDERED_RESULT is handled by challengeValidator.
-                     * RESULT is compared here without row-order dependence.
-                     */
-                    if (
-                        validationType === "RESULT"
-                    ) {
-
-                        isCorrect =
-                            compareQueryResults(
-                                rows,
-                                validationExpectedRows
-                            );
-
-                    }
-
-                    console.log(
-                        "🧠 Dynamic reference rows:",
-                        validationExpectedRows.length
-                    );
-
-                } catch (solutionError) {
-
-                    console.warn(
-                        "⚠️ Dynamic solution validation failed. Falling back to static expectedOutput.",
-                        solutionError
-                    );
+                if (referenceQuery) {
 
                     validationExpectedRows =
-                        null;
+                        await this.getReferenceResult(
+                            databaseName,
+                            referenceQuery
+                        );
+
+                    isCorrect =
+                        true;
 
                 }
 
             }
 
 
-            /* Backward-compatible fallback for older V1 questions. */
+            /*
+             * Non-challenge callers still use the supplied expectedOutput.
+             */
             if (
-                validationExpectedRows === null &&
+                !Array.isArray(
+                    validationExpectedRows
+                ) &&
                 Array.isArray(
                     options.expectedOutput
                 )
@@ -1542,7 +1502,11 @@ const browserSqlEngine = {
                 isCorrect:
                     isCorrect,
 
-                /* Dynamic reference result for central validation. */
+                /*
+                 * Challenge validator uses this full live reference
+                 * result. Row order is then handled according to the
+                 * question's validationType / wording.
+                 */
                 validationExpectedRows:
                     validationExpectedRows
 
@@ -1564,55 +1528,6 @@ const browserSqlEngine = {
             );
 
         }
-
-    },
-
-
-    /* ========================================================
-     * GET TRUSTED CHALLENGE REFERENCE RESULT
-     * ========================================================
-     * Used only by the Challenge page to refresh the visible
-     * Expected Output using the current database contents.
-     */
-    async getReferenceResult(
-        databaseName,
-        solutionQuery
-    ) {
-
-        if (
-            !solutionQuery ||
-            typeof solutionQuery !== "string"
-        ) {
-            return [];
-        }
-
-        const normalizedQuery =
-            solutionQuery.trim().toLowerCase();
-
-        if (
-            !(
-                normalizedQuery.startsWith("select ") ||
-                normalizedQuery.startsWith("select\n") ||
-                normalizedQuery.startsWith("with ")
-            )
-        ) {
-            return [];
-        }
-
-        const db =
-            await this.initialize(
-                databaseName ||
-                "Banking"
-            );
-
-        const result =
-            db.exec({
-                sql: solutionQuery,
-                rowMode: "object",
-                returnValue: "resultRows"
-            });
-
-        return result || [];
 
     }
 
