@@ -10,7 +10,7 @@
     <title>SQL Challenges</title>
 
     <link rel="stylesheet" href="../styles/main.css?v=17">
-    <link rel="stylesheet" href="../styles/challenge.css?v=20">
+    <link rel="stylesheet" href="../styles/challenge.css?v=21">
 
 
 </head>
@@ -36,13 +36,39 @@
 
     <main class="challenge-container">
 
-        <h1>🏆 SQL Challenges</h1>
+        <!-- ============================================================
+             ACTIVE LEVEL HEADER
+             ------------------------------------------------------------
+             Only the user's highest currently active level is shown here.
+             Detailed Intermediate/Expert progression cards are intentionally
+             removed from the main content area.
+             ============================================================ -->
+        <div class="challenge-header-row">
 
-        <p class="subtitle">
+            <div class="challenge-heading">
 
-            Practice SQL with real healthcare and banking datasets.
+                <h1>🏆 SQL Challenges</h1>
 
-        </p>
+                <p class="subtitle">
+                    Practice SQL with real healthcare and banking datasets.
+                </p>
+
+            </div>
+
+            <section
+                id="active-level-card"
+                class="your-level-card"
+                aria-live="polite"
+                aria-label="Current challenge level"
+            >
+                <div class="your-level-header">Your Level</div>
+
+                <div class="your-level-row active-level-row">
+                    <strong id="active-level-status">Easy - 0/50</strong>
+                </div>
+            </section>
+
+        </div>
 
         <div class="score-board">
 
@@ -157,42 +183,12 @@
 </section>
 
             <!-- ============================================================
-                 CHALLENGE V1 PROGRESSION
+                 ACTIVE LEVEL ONLY
+                 ------------------------------------------------------------
+                 The previous large Intermediate/Expert progression cards
+                 were removed. The single active level is shown in the
+                 header above.
                  ============================================================ -->
-
-            <section class="challenge-progression" aria-label="Challenge progression">
-
-                <div class="progression-card intermediate-progression-card">
-                    <div class="progression-card-header">
-                        <div>
-                            <span class="progression-level-label">🟡 Intermediate Progress</span>
-                            <h2 id="intermediate-rank-title">⭐ SQL Explorer</h2>
-                        </div>
-                        <span id="intermediate-completed-count" class="progression-count">0 / 100</span>
-                    </div>
-                    <div id="intermediate-stars" class="progression-stars">☆☆☆☆☆</div>
-                    <div class="progression-bar">
-                        <div id="intermediate-progression-fill" class="progression-bar-fill"></div>
-                    </div>
-                    <p id="intermediate-rank-message" class="progression-message">Complete 20 Intermediate questions to earn your first star.</p>
-                </div>
-
-                <div class="progression-card expert-progression-card">
-                    <div class="progression-card-header">
-                        <div>
-                            <span class="progression-level-label">🔴 Expert Rank</span>
-                            <h2 id="expert-rank-title">🔒 Expert Awaits</h2>
-                        </div>
-                        <span id="expert-completed-count" class="progression-count">0 / 50</span>
-                    </div>
-                    <div id="expert-rank-badge" class="expert-rank-badge">🔒</div>
-                    <div class="progression-bar">
-                        <div id="expert-progression-fill" class="progression-bar-fill"></div>
-                    </div>
-                    <p id="expert-rank-message" class="progression-message">Solve 10 Expert challenges to earn the BOSS rank.</p>
-                </div>
-
-            </section>
 
             <div class="challenge-layout">
 
@@ -419,6 +415,56 @@
 
 </div>
                 
+    <!-- ============================================================
+         MILESTONE CELEBRATION POPUP
+         ------------------------------------------------------------
+         Shown only when the user reaches a new Intermediate star
+         or Expert rank milestone.
+         ============================================================ -->
+    <div
+        id="milestone-celebration-overlay"
+        class="level-celebration-overlay"
+        style="display: none;"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="milestone-celebration-title"
+    >
+        <div class="level-celebration-popup">
+
+            <div class="celebration-particles" aria-hidden="true">
+                <span>🎉</span>
+                <span>✨</span>
+                <span>🎊</span>
+                <span>⭐</span>
+                <span>🎉</span>
+                <span>✨</span>
+            </div>
+
+            <div
+                id="milestone-celebration-icon"
+                class="level-celebration-badge"
+                aria-hidden="true"
+            >
+                🎉
+            </div>
+
+            <h2 id="milestone-celebration-title">
+                Level Up!
+            </h2>
+
+            <p id="milestone-celebration-message"></p>
+
+            <button
+                type="button"
+                id="milestone-celebration-close"
+                class="level-celebration-close"
+            >
+                Continue 🚀
+            </button>
+
+        </div>
+    </div>
+
     </main>
 
 <script src="../js/queryApi.js?v=2"></script>
@@ -427,15 +473,15 @@
 
 <script src="../services/sqliteWasmLoader.js?v=1"></script>
 
-<script src="../services/browserSqlEngine.js?v=7"></script>
+<script src="../services/browserSqlEngine.js?v=6"></script>
 
-<script src="../services/challengeValidator.js?v=7"></script>
+<script src="../services/challengeValidator.js?v=6"></script>
 
-<script src="../services/sqlEngine.js?v=5"></script>
+<script src="../services/sqlEngine.js?v=4"></script>
 
 <script src="../assets/challenges.js?v=18"></script>
 
-<script src="../assets/challenge.js?v=25"></script>
+<script src="../assets/challenge.js?v=27"></script>
 
 </body>
 </html>
