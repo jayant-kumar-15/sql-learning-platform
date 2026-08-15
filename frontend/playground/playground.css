@@ -303,6 +303,31 @@ select {
 
 
 /* ============================================================
+   5. PLAYGROUND APPLICATION LAYOUT
+   ============================================================
+
+   The HTML uses .playground-layout as the flex container for the
+   database explorer and the main worksheet. Keeping this container
+   height-constrained is essential so the SQL editor fills the
+   available right-hand workspace instead of dropping to the bottom.
+   ============================================================ */
+
+.playground-layout {
+    flex: 1 1 auto;
+
+    min-width: 0;
+    min-height: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    overflow: hidden;
+}
+
+
+/* ============================================================
    5. DATABASE EXPLORER
    ============================================================ */
 
@@ -706,6 +731,8 @@ select {
    ============================================================ */
 
 .playground-workspace {
+    position: relative;
+
     flex: 1 1 auto;
 
     min-width: 0;
@@ -776,6 +803,9 @@ select {
    ============================================================ */
 
 .active-database-hint {
+    display: none;
+
+
     min-height: 36px;
 
     display: flex;
@@ -1504,18 +1534,13 @@ select {
 
     width: 100%;
 
-    /*
-     * Keep the result panel compact after execution so the SQL
-     * worksheet remains the primary workspace. Users can drag
-     * the top handle to increase/decrease this height.
-     */
-    height: 180px;
+    height: 150px;
 
-    min-height: 90px;
+    min-height: 88px;
 
-    max-height: calc(100% - 60px);
+    max-height: calc(100% - 80px);
 
-    flex: 0 0 180px;
+    flex: 0 0 150px;
 
     display: flex;
     flex-direction: column;
@@ -1594,24 +1619,17 @@ select {
 .results-resize-handle {
     position: absolute;
 
-    /*
-     * Place the handle directly across the boundary between the
-     * worksheet and results. The slightly overlapping position
-     * makes it much easier to grab with a mouse or touch pointer.
-     */
-    top: -4px;
+    top: 0;
     left: 0;
     right: 0;
 
-    height: 12px;
+    height: 8px;
 
-    z-index: 50;
+    z-index: 15;
 
     cursor: ns-resize;
 
     background: transparent;
-
-    pointer-events: auto;
 
     touch-action: none;
 }
@@ -1622,7 +1640,7 @@ select {
 
     position: absolute;
 
-    top: 4px;
+    top: 3px;
     left: 50%;
 
     transform:
@@ -3006,10 +3024,10 @@ button:disabled {
     }
 
 
-    .results-section {
+     .results-section {
         min-height: 85px;
 
-        height: 180px;
+        height: 150px;
     }
 
 
@@ -3119,800 +3137,3 @@ button:disabled {
 /* ============================================================
    END OF PART 1
    ============================================================ */
-
-
-/* ============================================================
-   PLAYGROUND REVISION v3 OVERRIDES
-   ============================================================
-   These rules intentionally live at the end of the file so the
-   revised Playground layout wins over older experimental rules.
-   ============================================================ */
-
-/* ------------------------------------------------------------
-   A. MAIN WORKSPACE / EDITOR SPACE
-   ------------------------------------------------------------ */
-
-.playground-workspace {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    height: 100%;
-    overflow: hidden;
-}
-
-.playground-info-banner {
-    flex: 0 0 48px;
-    min-height: 48px;
-    height: 48px;
-    padding: 6px 14px;
-}
-
-/* The active database is now inline with the worksheet toolbar.
-   This removes the old 36px banner and gives that space back to
-   the SQL editor. */
-
-.active-database-hint {
-    display: none !important;
-}
-
-.active-database-inline {
-    min-width: 0;
-    max-width: min(360px, 35vw);
-    margin-left: 10px;
-    margin-right: auto;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    color: #64748b;
-    font-size: 10px;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-}
-
-.active-database-inline::first-letter {
-    color: #60a5fa;
-}
-
-.query-tabs-container {
-    flex: 0 0 38px;
-    height: 38px;
-    min-height: 38px;
-}
-
-.query-tab {
-    min-width: 135px;
-    height: 38px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    background: #111c31;
-    border-right: 1px solid #263247;
-}
-
-.query-tab-name-button {
-    flex: 1 1 auto;
-    min-width: 0;
-    height: 100%;
-    padding: 0 8px 0 14px;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    text-align: left;
-    font: inherit;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.query-tab-close {
-    width: 28px;
-    height: 28px;
-    margin-right: 4px;
-    flex: 0 0 28px;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: #64748b;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.query-tab-close:hover {
-    background: #263247;
-    color: #f8fafc;
-}
-
-.new-query-button {
-    height: 38px;
-    min-width: 42px;
-}
-
-.sql-editor-section {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: auto !important;
-    overflow: hidden;
-}
-
-.workspace-toolbar {
-    flex: 0 0 42px;
-    height: 42px;
-    min-height: 42px;
-}
-
-.workspace-title {
-    flex: 0 0 auto;
-}
-
-.workspace-actions {
-    flex: 0 0 auto;
-}
-
-.editor-wrapper {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    height: auto !important;
-}
-
-.sql-editor {
-    width: 100%;
-    height: 100% !important;
-    min-height: 0 !important;
-}
-
-.playground-status {
-    flex: 0 0 28px;
-    height: 28px;
-    min-height: 28px;
-}
-
-/* ------------------------------------------------------------
-   B. DATABASE EXPLORER: SCROLL + FOLD / UNFOLD
-   ------------------------------------------------------------ */
-
-.database-sidebar {
-    min-height: 0;
-    height: 100%;
-}
-
-.database-tree {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    scrollbar-width: thin;
-    scrollbar-color: #475569 #07101f;
-}
-
-.database-tree::-webkit-scrollbar {
-    width: 9px;
-}
-
-.database-tree::-webkit-scrollbar-track {
-    background: #07101f;
-}
-
-.database-tree::-webkit-scrollbar-thumb {
-    background: #475569;
-    border-radius: 8px;
-}
-
-.database-tree::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
-}
-
-.database-header {
-    width: 100%;
-    border: 0;
-    text-align: left;
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-.database-header:hover {
-    background: #111c31;
-}
-
-.database-name {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.database-active-badge {
-    margin-left: auto;
-    padding: 2px 5px;
-    border-radius: 3px;
-    background: #172554;
-    color: #60a5fa;
-    font-size: 8px;
-    font-weight: 800;
-    letter-spacing: .4px;
-}
-
-.table-list {
-    overflow: hidden;
-}
-
-.table-item {
-    width: 100%;
-    min-height: 31px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 10px 0 31px;
-    border: 0;
-    border-left: 2px solid transparent;
-    background: transparent;
-    color: #94a3b8;
-    text-align: left;
-    cursor: pointer;
-    font-size: 11px;
-}
-
-.table-item:hover {
-    background: #111c31;
-    color: #dbeafe;
-}
-
-.table-item.selected {
-    background: #172338;
-    border-left-color: #3b82f6;
-    color: #ffffff;
-}
-
-.table-item-name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.database-empty-state {
-    padding: 25px 12px;
-    color: #64748b;
-    text-align: center;
-    font-size: 11px;
-}
-
-/* ------------------------------------------------------------
-   C. RESULTS: HIDDEN UNTIL EXECUTION + COMPACT BY DEFAULT
-   ------------------------------------------------------------ */
-
-.results-section {
-    position: relative !important;
-    flex: 0 0 150px !important;
-    width: 100%;
-    height: 150px !important;
-    min-height: 88px !important;
-    max-height: 88vh !important;
-    display: flex;
-    flex-direction: column;
-    background: #0f172a;
-    border-top: 1px solid #334155;
-    overflow: hidden;
-    z-index: 20;
-}
-
-.results-section.results-hidden {
-    display: none !important;
-}
-
-.results-section.results-minimized {
-    flex: 0 0 46px !important;
-    height: 46px !important;
-    min-height: 46px !important;
-}
-
-.results-section.results-maximized {
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    max-height: none !important;
-    flex: none !important;
-    z-index: 200 !important;
-}
-
-.results-resize-handle {
-    position: absolute !important;
-    top: -6px !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 14px !important;
-    z-index: 300 !important;
-    cursor: ns-resize !important;
-    touch-action: none !important;
-    background: transparent !important;
-}
-
-.results-resize-handle::after {
-    top: 5px !important;
-    width: 72px !important;
-    height: 4px !important;
-    background: #64748b !important;
-    border-radius: 4px;
-}
-
-.results-resize-handle:hover::after {
-    background: #60a5fa !important;
-}
-
-.results-section.is-resizing,
-.results-section.is-resizing * {
-    transition: none !important;
-}
-
-body.results-resizing {
-    cursor: ns-resize !important;
-    user-select: none !important;
-}
-
-.results-header {
-    flex: 0 0 44px;
-    min-height: 44px;
-    height: 44px;
-}
-
-.results-container {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: auto;
-}
-
-.results-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11px;
-}
-
-.results-table th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    padding: 7px 9px;
-    background: #172338;
-    color: #93c5fd;
-    border-bottom: 1px solid #334155;
-    text-align: left;
-    white-space: nowrap;
-}
-
-.results-table td {
-    padding: 6px 9px;
-    background: #0b1120;
-    color: #cbd5e1;
-    border-bottom: 1px solid #1e293b;
-    white-space: nowrap;
-}
-
-.results-table tr:hover td {
-    background: #111c31;
-}
-
-.result-null {
-    color: #64748b !important;
-    font-style: italic;
-}
-
-/* ------------------------------------------------------------
-   D. DESCRIBE / SCHEMA STYLING
-   ------------------------------------------------------------ */
-
-.table-selector-item {
-    min-height: 52px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 18px !important;
-    padding: 8px 12px !important;
-    margin-bottom: 7px !important;
-    background: #0b1120 !important;
-    border: 1px solid #263247 !important;
-    border-radius: 6px !important;
-}
-
-.table-selector-table-name {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    color: #e2e8f0;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.table-selector-describe-button {
-    flex: 0 0 auto;
-    min-width: 86px;
-    height: 30px;
-    padding: 0 11px;
-    border: 1px solid #3b82f6;
-    border-radius: 5px;
-    background: #172554;
-    color: #bfdbfe;
-    cursor: pointer;
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.table-selector-describe-button:hover {
-    background: #1e3a8a;
-    border-color: #60a5fa;
-    color: #ffffff;
-}
-
-.table-details-container {
-    background: #0b1120;
-}
-
-.table-details-heading {
-    min-height: 48px;
-    padding: 2px 2px 12px;
-    margin: 0;
-}
-
-.table-details-heading > div {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.table-details-heading strong {
-    color: #f8fafc !important;
-    font-size: 16px !important;
-}
-
-.table-details-heading span {
-    color: #64748b;
-    font-size: 10px;
-}
-
-.metadata-badge {
-    display: inline-flex !important;
-    align-items: center;
-    padding: 4px 7px;
-    border-radius: 4px;
-    background: #172554;
-    color: #93c5fd !important;
-    font-size: 8px !important;
-    font-weight: 800;
-    letter-spacing: .6px;
-}
-
-.schema-badge {
-    background: #1e293b;
-    color: #cbd5e1 !important;
-}
-
-.schema-table-wrapper {
-    border: 1px solid #334155 !important;
-    border-radius: 7px !important;
-    background: #07101f;
-}
-
-.schema-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 11px;
-}
-
-.schema-table th {
-    padding: 10px 11px !important;
-    background: #172338 !important;
-    color: #93c5fd !important;
-    border-bottom: 1px solid #334155 !important;
-    text-align: left;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .2px;
-}
-
-.schema-table td {
-    padding: 9px 11px !important;
-    background: #0b1120 !important;
-    color: #cbd5e1 !important;
-    border-bottom: 1px solid #1e293b !important;
-    vertical-align: middle;
-}
-
-.schema-table tr:last-child td {
-    border-bottom: 0;
-}
-
-.schema-table tr:hover td {
-    background: #111c31 !important;
-}
-
-.schema-column-name {
-    color: #f1f5f9 !important;
-    font-weight: 700;
-}
-
-.schema-type {
-    color: #93c5fd !important;
-    font-family: "SFMono-Regular", Consolas, monospace;
-}
-
-.schema-primary-key,
-.schema-foreign-key {
-    margin-right: 3px;
-    padding: 3px 5px;
-    border-radius: 3px;
-    font-size: 8px;
-    font-weight: 800;
-}
-
-.schema-primary-key {
-    background: #172554;
-    color: #93c5fd;
-}
-
-.schema-foreign-key {
-    background: #2e1065;
-    color: #c4b5fd;
-}
-
-.schema-required {
-    color: #fca5a5;
-    font-weight: 700;
-}
-
-.schema-nullable {
-    color: #86efac;
-}
-
-/* Schema definition / indexes / FK sections */
-
-.schema-definition-card,
-.schema-extra-section {
-    margin-top: 13px;
-}
-
-.schema-section-title {
-    margin-bottom: 6px;
-    color: #64748b;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: .8px;
-}
-
-.schema-definition {
-    margin: 0;
-    padding: 14px;
-    overflow: auto;
-    max-height: 330px;
-    border: 1px solid #263247;
-    border-radius: 6px;
-    background: #050b16;
-    color: #c4b5fd;
-    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-    font-size: 11px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-}
-
-.schema-list-card {
-    overflow: hidden;
-    border: 1px solid #263247;
-    border-radius: 6px;
-    background: #0b1120;
-}
-
-.schema-list-row {
-    min-height: 38px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 10px;
-    border-bottom: 1px solid #1e293b;
-    color: #cbd5e1;
-    font-size: 10px;
-}
-
-.schema-list-row:last-child {
-    border-bottom: 0;
-}
-
-.schema-list-row strong {
-    color: #93c5fd;
-}
-
-.schema-list-row code {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #94a3b8;
-    font-family: "SFMono-Regular", Consolas, monospace;
-}
-
-.schema-arrow {
-    color: #60a5fa;
-    font-weight: 800;
-}
-
-.schema-empty-note {
-    padding: 11px;
-    border: 1px solid #1e293b;
-    border-radius: 5px;
-    color: #64748b;
-    font-size: 10px;
-}
-
-/* ------------------------------------------------------------
-   E. VISUAL DATA MODEL
-   ------------------------------------------------------------ */
-
-.relationships-container {
-    padding: 12px !important;
-    overflow: auto !important;
-    background: #050b16 !important;
-}
-
-.relationship-model-toolbar {
-    min-height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    padding: 4px 4px 10px;
-}
-
-.relationship-model-toolbar > div:first-child {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.relationship-model-toolbar strong {
-    color: #f8fafc;
-    font-size: 14px;
-}
-
-.relationship-model-toolbar span {
-    color: #64748b;
-    font-size: 10px;
-}
-
-.relationship-legend {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.relationship-legend b {
-    padding: 2px 4px;
-    border-radius: 3px;
-    background: #172554;
-    color: #93c5fd;
-    font-size: 8px;
-}
-
-.relationship-canvas {
-    position: relative !important;
-    overflow: hidden;
-    border: 1px solid #263247 !important;
-    border-radius: 8px !important;
-    background-color: #07101f !important;
-    background-image: radial-gradient(circle at 1px 1px, rgba(100,116,139,.17) 1px, transparent 1px) !important;
-    background-size: 20px 20px !important;
-}
-
-.relationship-svg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-}
-
-.relationship-line-svg {
-    stroke: #60a5fa;
-    stroke-width: 2;
-    stroke-opacity: .75;
-}
-
-.relationship-table {
-    z-index: 2 !important;
-    width: 220px !important;
-    background: #0f172a !important;
-    border: 1px solid #334155 !important;
-    border-radius: 7px !important;
-}
-
-.relationship-table-header {
-    min-height: 38px !important;
-    background: #172338 !important;
-    color: #bfdbfe !important;
-    border-bottom: 1px solid #334155 !important;
-}
-
-.relationship-column {
-    min-height: 27px !important;
-    border-bottom: 1px solid rgba(30,41,59,.7);
-}
-
-.relationship-key {
-    display: inline-block;
-    margin-right: 4px;
-    padding: 1px 3px;
-    border-radius: 2px;
-    font-size: 7px;
-    font-weight: 800;
-}
-
-.relationship-key.pk {
-    background: #172554;
-    color: #93c5fd;
-}
-
-.relationship-key.fk {
-    background: #2e1065;
-    color: #c4b5fd;
-}
-
-.relationship-list {
-    margin-top: 12px;
-    padding: 10px;
-    border: 1px solid #263247;
-    border-radius: 6px;
-    background: #0b1120;
-}
-
-.relationship-list-row {
-    min-height: 34px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid #1e293b;
-    color: #cbd5e1;
-    font-size: 10px;
-}
-
-.relationship-list-row:last-child {
-    border-bottom: 0;
-}
-
-.relationship-list-row strong {
-    color: #93c5fd;
-}
-
-.relationships-empty-state.compact {
-    min-height: 160px;
-}
-
-/* ------------------------------------------------------------
-   F. MOBILE
-   ------------------------------------------------------------ */
-
-@media (max-width: 800px) {
-    .active-database-inline {
-        max-width: 190px;
-        font-size: 9px;
-    }
-
-    .workspace-toolbar {
-        flex-wrap: wrap;
-        height: auto;
-        min-height: 42px;
-    }
-
-    .workspace-actions {
-        overflow-x: auto;
-        max-width: 100%;
-    }
-
-    .sql-editor-section {
-        min-height: 0 !important;
-    }
-
-    .results-section {
-        flex-basis: 140px !important;
-        height: 140px !important;
-    }
-}

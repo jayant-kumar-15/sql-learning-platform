@@ -43,7 +43,7 @@
  * CONFIGURATION
  * ============================================================ */
 
-const PLAYGROUND_STORAGE_KEY = "sqlLearningPlaygroundQueries_v2";
+const PLAYGROUND_STORAGE_KEY = "sqlLearningPlaygroundQueries_v3";
 const PLAYGROUND_ACTIVE_DB_KEY = "sqlPlaygroundActiveDatabase";
 const DEFAULT_RESULTS_HEIGHT = 150;
 const MIN_RESULTS_HEIGHT = 88;
@@ -60,7 +60,6 @@ const statusElement = document.getElementById("playground-status");
 const databaseTree = document.getElementById("database-tree");
 const searchInput = document.getElementById("database-search-input");
 const activeDbElement = document.getElementById("active-database-name");
-const activeDatabaseInline = document.getElementById("active-database-inline");
 const queryTabs = document.getElementById("query-tabs");
 const newQueryButton = document.getElementById("new-query-button");
 
@@ -307,10 +306,6 @@ function updateActiveDatabaseUI() {
         activeDbElement.textContent = name;
     }
 
-    if (activeDatabaseInline) {
-        activeDatabaseInline.textContent = `Active: ${name}  ·  USE database_name; to change`;
-        activeDatabaseInline.title = "Run USE Banking; or USE Healthcare; to change database.";
-    }
 
     if (sqlEditor) {
         sqlEditor.setAttribute(
@@ -750,6 +745,7 @@ function showResults() {
     resultsSection.classList.remove("results-hidden", "results-maximized", "results-minimized");
     resultsSection.style.height = `${resultsHeight}px`;
     resultsSection.style.flexBasis = `${resultsHeight}px`;
+    resultsSection.style.maxHeight = "calc(100% - 80px)";
 }
 
 function hideResults() {
@@ -778,8 +774,13 @@ function initializeResultsResize() {
     document.addEventListener("pointermove", event => {
         if (!resultsDragging) return;
 
-        const available = document.getElementById("playground-workspace")?.getBoundingClientRect().height || window.innerHeight;
-        const maximum = Math.max(MIN_RESULTS_HEIGHT, available * MAX_RESULTS_HEIGHT_RATIO);
+        const workspace = document.getElementById("playground-workspace");
+        const available = workspace?.getBoundingClientRect().height || window.innerHeight;
+        const maximum = Math.max(
+            MIN_RESULTS_HEIGHT,
+            Math.floor(available * MAX_RESULTS_HEIGHT_RATIO)
+        );
+
         const nextHeight = clamp(
             dragStartHeight + (dragStartY - event.clientY),
             MIN_RESULTS_HEIGHT,
@@ -822,6 +823,7 @@ function maximizeResults() {
     if (resultsSection.classList.contains("results-maximized")) {
         resultsSection.style.height = "100%";
         resultsSection.style.flexBasis = "auto";
+        resultsSection.style.maxHeight = "none";
     } else {
         resultsSection.style.height = `${resultsHeight}px`;
         resultsSection.style.flexBasis = `${resultsHeight}px`;
