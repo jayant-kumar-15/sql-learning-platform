@@ -40,8 +40,6 @@ const EXPERT_FILE =
  * Expert: 10 / 20 / 30 / 40 / 50 completed -> Boss / Killer /
  *         Gangster / Monster / Don.
  *
- * The Your Level card displays ONLY the highest active level.
- *
  * IMPORTANT: Only COMPLETED questions count toward levels.
  * ============================================================ */
 
@@ -260,21 +258,18 @@ const expertFill =
 /* ============================================================
  * YOUR LEVEL + CELEBRATION DOM
  * ============================================================
- * The level card now contains ONLY the highest currently active level.
- * Lower/completed levels are intentionally not shown here.
- *
- * Example:
- *   Intermediate - ★★★☆☆
- *   Expert - 💀 BOSS
- *
- * Milestone messages are shown only in the animated celebration popup.
+ * The level card contains status only. Milestone messages are shown
+ * in the animated celebration popup and are never placed in the card.
  * ============================================================ */
 
-const yourLevelLabel =
-    document.getElementById("your-level-label");
+const beginnerLevel =
+    document.getElementById("beginner-level");
 
-const yourLevelStatus =
-    document.getElementById("your-level-status");
+const intermediateLevel =
+    document.getElementById("intermediate-level");
+
+const expertLevel =
+    document.getElementById("expert-level");
 
 const levelCelebrationOverlay =
     document.getElementById("level-celebration-overlay");
@@ -417,7 +412,10 @@ if (solutionButton) {
  * ============================================================
  */
 
-function renderExpectedOutput(question) {
+function renderExpectedOutput(
+    question,
+    dynamicOutput = null
+) {
 
     if (!expectedOutputTable) {
         return;
@@ -425,8 +423,22 @@ function renderExpectedOutput(question) {
 
     expectedOutputTable.innerHTML = "";
 
+    /*
+     * ============================================================
+     * DYNAMIC EXPECTED OUTPUT
+     * ============================================================
+     *
+     * The question JSON may contain a small historical expectedOutput,
+     * while the live Banking/Healthcare database can contain hundreds or
+     * thousands of rows.
+     *
+     * When a dynamic solution result is available, display that result
+     * instead of the stale static JSON output.
+     */
     const output =
-        question.expectedOutput;
+        Array.isArray(dynamicOutput)
+            ? dynamicOutput
+            : question.expectedOutput;
 
     if (
         !Array.isArray(output) ||
@@ -550,6 +562,113 @@ function renderExpectedOutput(question) {
 
 
 /* ============================================================
+ * LOAD DYNAMIC EXPECTED OUTPUT
+ * ============================================================
+ *
+ * Execute the trusted solution query against the currently loaded
+ * browser SQLite database so the Expected Output panel always reflects
+ * the actual dataset.
+ *
+ * This is display-only. Challenge correctness is independently handled
+ * by challengeValidator using the same dynamic reference result.
+ * ============================================================
+ */
+async function loadDynamicExpectedOutput(
+    question
+) {
+
+    if (
+        !question ||
+        !question.solution ||
+        !window.browserSqlEngine
+    ) {
+
+        return;
+
+    }
+
+
+    const solution =
+        String(
+            question.solution
+        ).trim();
+
+
+    const normalizedSolution =
+        solution.toLowerCase();
+
+
+    /*
+     * Only execute read-only reference solutions here.
+     * SELECT and WITH are the supported challenge reference forms.
+     */
+    if (
+        !normalizedSolution.startsWith("select ") &&
+        !normalizedSolution.startsWith("select\n") &&
+        !normalizedSolution.startsWith("with ")
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const result =
+            await window.browserSqlEngine.execute(
+                solution,
+                {
+                    database:
+                        question.database
+                }
+            );
+
+
+        /*
+         * Prevent an older async request from replacing the output of a
+         * question the user has already navigated away from.
+         */
+        if (
+            currentQuestion !==
+            question
+        ) {
+
+            return;
+
+        }
+
+
+        if (
+            result &&
+            Array.isArray(
+                result.rows
+            )
+        ) {
+
+            renderExpectedOutput(
+                question,
+                result.rows
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.warn(
+            "⚠️ Dynamic expected output could not be loaded. " +
+            "Using the question JSON output instead.",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
  * SHOW QUESTION
  * ============================================================
  */
@@ -570,14 +689,34 @@ function showQuestion(question) {
     );
 
     if (
-    currentQuestion &&
-    typeof preloadChallengeDatabase ===
-        "function"
-) {
+        currentQuestion &&
+        typeof preloadChallengeDatabase ===
+            "function"
+    ) {
 
-    preloadChallengeDatabase(
-        currentQuestion.database
-    );
+        /*
+         * Preload the selected database first, then calculate the live
+         * Expected Output from the trusted solution query.
+         */
+        preloadChallengeDatabase(
+            currentQuestion.database
+        )
+        .then(function () {
+
+            loadDynamicExpectedOutput(
+                currentQuestion
+            );
+
+        })
+        .catch(function (error) {
+
+            console.warn(
+                "⚠️ Challenge database preload failed while " +
+                "loading dynamic expected output:",
+                error
+            );
+
+        });
 
     }
 
@@ -1958,94 +2097,56 @@ function updateYourLevelCard() {
     const expertCompleted =
         getCompletedCountForDifficulty("Expert");
 
-    /*
-     * ============================================================
-     * HIGHEST ACTIVE LEVEL ONLY
-     * ============================================================
-     * The card intentionally shows ONE level.
-     *
-     * Priority:
-     *   1. Expert   -> if the user has started Expert
-     *   2. Intermediate -> if Expert has not been started
-     *   3. Easy -> otherwise
-     *
-     * This prevents the card from showing completed/lower levels.
-     * ============================================================
-     */
+    /* ------------------------------------------------------------
+     * Easy status
+     * ------------------------------------------------------------ */
+    if (beginnerLevel) {
 
-    let levelLabel = "🟢 Easy";
-    let levelStatus =
-        beginnerCompleted +
-        " / " +
-        CHALLENGE_V1_TARGETS.Beginner;
+        beginnerLevel.textContent =
+            beginnerCompleted +
+            " / " +
+            CHALLENGE_V1_TARGETS.Beginner;
+
+    }
 
     /* ------------------------------------------------------------
-     * Expert is the highest active level.
-     * Before Boss is unlocked, show the locked Expert state.
-     * Once a rank is reached, show only the current rank.
+     * Intermediate star status
      * ------------------------------------------------------------ */
-    if (expertCompleted > 0) {
+    const intermediateMilestone =
+        getIntermediateStarMilestone(
+            intermediateCompleted
+        );
 
-        const expertMilestone =
-            getExpertRankMilestone(
-                expertCompleted
-            );
+    const intermediateStars =
+        intermediateMilestone
+            ? intermediateMilestone.stars
+            : 0;
 
-        levelLabel = "🔴 Expert";
+    if (intermediateLevel) {
 
-        levelStatus =
+        intermediateLevel.textContent =
+            "★".repeat(intermediateStars) +
+            "☆".repeat(5 - intermediateStars);
+
+    }
+
+    /* ------------------------------------------------------------
+     * Expert rank status
+     * ------------------------------------------------------------ */
+    const expertMilestone =
+        getExpertRankMilestone(
+            expertCompleted
+        );
+
+    if (expertLevel) {
+
+        expertLevel.textContent =
             expertMilestone
                 ? expertMilestone.badge +
                   " " +
                   expertMilestone.rank
                 : "🔒";
 
-    }
-
-    /* ------------------------------------------------------------
-     * Intermediate is the highest active level when Expert has not
-     * been started.
-     *
-     * The status shows only the current star level:
-     *   0-19  -> ☆☆☆☆☆
-     *   20-39 -> ★☆☆☆☆
-     *   40-59 -> ★★☆☆☆
-     *   60-79 -> ★★★☆☆
-     *   80-99 -> ★★★★☆
-     *   100   -> ★★★★★
-     * ------------------------------------------------------------ */
-    else if (intermediateCompleted > 0) {
-
-        const intermediateMilestone =
-            getIntermediateStarMilestone(
-                intermediateCompleted
-            );
-
-        const intermediateStars =
-            intermediateMilestone
-                ? intermediateMilestone.stars
-                : 0;
-
-        levelLabel = "🟡 Intermediate";
-
-        levelStatus =
-            "★".repeat(intermediateStars) +
-            "☆".repeat(5 - intermediateStars);
-
-    }
-
-    /*
-     * ------------------------------------------------------------
-     * Easy remains the active level until Intermediate is started.
-     * ------------------------------------------------------------
-     */
-
-    if (yourLevelLabel) {
-        yourLevelLabel.textContent = levelLabel;
-    }
-
-    if (yourLevelStatus) {
-        yourLevelStatus.textContent = levelStatus;
     }
 
 }
