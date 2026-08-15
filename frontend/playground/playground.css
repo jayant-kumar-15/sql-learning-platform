@@ -303,31 +303,6 @@ select {
 
 
 /* ============================================================
-   5. PLAYGROUND APPLICATION LAYOUT
-   ============================================================
-
-   The HTML uses .playground-layout as the flex container for the
-   database explorer and the main worksheet. Keeping this container
-   height-constrained is essential so the SQL editor fills the
-   available right-hand workspace instead of dropping to the bottom.
-   ============================================================ */
-
-.playground-layout {
-    flex: 1 1 auto;
-
-    min-width: 0;
-    min-height: 0;
-
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    overflow: hidden;
-}
-
-
-/* ============================================================
    5. DATABASE EXPLORER
    ============================================================ */
 
@@ -633,19 +608,37 @@ select {
 
     gap: 7px;
 
+    width: 100%;
     padding: 0 8px;
 
+    border: 0;
     border-radius: 4px;
 
-    color: #94a3b8;
+    /* Keep table rows visually consistent with the original
+       dark Database Explorer. Prevent the browser's default
+       button background from producing the white blocks seen
+       when a table is selected/clicked. */
+    background: transparent;
+    appearance: none;
+    -webkit-appearance: none;
 
+    color: #94a3b8;
+    text-align: left;
     cursor: pointer;
 
+    font: inherit;
     font-size: 11.5px;
 
     transition:
         background .12s ease,
         color .12s ease;
+}
+
+
+.table-item.selected {
+    background: transparent;
+    border-left-color: transparent;
+    color: #94a3b8;
 }
 
 
@@ -731,8 +724,6 @@ select {
    ============================================================ */
 
 .playground-workspace {
-    position: relative;
-
     flex: 1 1 auto;
 
     min-width: 0;
@@ -803,9 +794,6 @@ select {
    ============================================================ */
 
 .active-database-hint {
-    display: none;
-
-
     min-height: 36px;
 
     display: flex;
@@ -1534,13 +1522,13 @@ select {
 
     width: 100%;
 
-    height: 150px;
+    height: 220px;
 
-    min-height: 88px;
+    min-height: 90px;
 
     max-height: calc(100% - 80px);
 
-    flex: 0 0 150px;
+    flex: 0 0 220px;
 
     display: flex;
     flex-direction: column;
@@ -3024,10 +3012,10 @@ button:disabled {
     }
 
 
-     .results-section {
+    .results-section {
         min-height: 85px;
 
-        height: 150px;
+        height: 200px;
     }
 
 
