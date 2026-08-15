@@ -33,14 +33,7 @@ const EXPERT_FILE =
 
 
 /* ============================================================
- * CHALLENGE LEVEL CONFIGURATION
- * ============================================================
- * Easy: 50 questions.
- * Intermediate: 20 / 40 / 60 / 80 / 100 completed -> 1 to 5 stars.
- * Expert: 10 / 20 / 30 / 40 / 50 completed -> Boss / Killer /
- *         Gangster / Monster / Don.
- *
- * IMPORTANT: Only COMPLETED questions count toward levels.
+ * CHALLENGE V1 PROGRESSION CONFIGURATION
  * ============================================================ */
 
 const CHALLENGE_V1_TARGETS = {
@@ -50,11 +43,11 @@ const CHALLENGE_V1_TARGETS = {
 };
 
 const INTERMEDIATE_STAR_MILESTONES = [
-    { completed: 20, stars: 1, message: "🎉 First star unlocked!" },
-    { completed: 40, stars: 2, message: "🔥 Two stars! JOINs are starting to feel natural." },
-    { completed: 60, stars: 3, message: "🚀 Three stars! Your SQL reasoning is getting serious." },
-    { completed: 80, stars: 4, message: "💪 Four stars! You're almost at Intermediate Mastery." },
-    { completed: 100, stars: 5, message: "🏆 Five stars! Intermediate SQL mastered." }
+    { completed: 20, stars: 1, title: "⭐ SQL Explorer", message: "🎉 First star unlocked! Keep going — the SQL gets tougher from here." },
+    { completed: 40, stars: 2, title: "⭐⭐ Query Builder", message: "🔥 Two stars! JOINs and business logic are starting to feel natural." },
+    { completed: 60, stars: 3, title: "⭐⭐⭐ SQL Analyst", message: "🚀 Three stars! Your SQL reasoning is getting serious." },
+    { completed: 80, stars: 4, title: "⭐⭐⭐⭐ SQL Master", message: "💪 Four stars! You're one step away from Intermediate Mastery." },
+    { completed: 100, stars: 5, title: "⭐⭐⭐⭐⭐ Intermediate Master", message: "🏆 Five stars! Intermediate SQL mastered. Expert territory awaits." }
 ];
 
 const EXPERT_RANK_MILESTONES = [
@@ -62,7 +55,7 @@ const EXPERT_RANK_MILESTONES = [
     { completed: 20, rank: "KILLER", badge: "🔪", message: "🔪 Hey SQL Killer! Queries don't survive you anymore." },
     { completed: 30, rank: "GANGSTER", badge: "😎", message: "😎 Hey Gangster! You're making databases nervous." },
     { completed: 40, rank: "MONSTER", badge: "👹", message: "👹 Hey Monster! Even complex queries are afraid of you." },
-    { completed: 50, rank: "DON", badge: "🙏", message: "🙏 Namaste DON! SQL now runs in YOUR territory. 👑" }
+    { completed: 50, rank: "DON", badge: "🙏", message: "🙏 Namaste DON! 👑 SQL now runs in YOUR territory." }
 ];
 
 const INTERMEDIATE_MILESTONE_STORAGE_KEY =
@@ -256,38 +249,38 @@ const expertFill =
 
 
 /* ============================================================
- * YOUR LEVEL + CELEBRATION DOM
- * ============================================================
- * The level card contains status only. Milestone messages are shown
- * in the animated celebration popup and are never placed in the card.
+ * CHALLENGE V1 PROGRESSION DOM
  * ============================================================ */
 
-const beginnerLevel =
-    document.getElementById("beginner-level");
+const intermediateCompletedCount =
+    document.getElementById("intermediate-completed-count");
 
-const intermediateLevel =
-    document.getElementById("intermediate-level");
+const intermediateStars =
+    document.getElementById("intermediate-stars");
 
-const expertLevel =
-    document.getElementById("expert-level");
+const intermediateRankTitle =
+    document.getElementById("intermediate-rank-title");
 
-const levelCelebrationOverlay =
-    document.getElementById("level-celebration-overlay");
+const intermediateProgressionFill =
+    document.getElementById("intermediate-progression-fill");
 
-const levelCelebrationPopup =
-    document.getElementById("level-celebration-popup");
+const intermediateRankMessage =
+    document.getElementById("intermediate-rank-message");
 
-const levelCelebrationBadge =
-    document.getElementById("level-celebration-badge");
+const expertCompletedCount =
+    document.getElementById("expert-completed-count");
 
-const levelCelebrationTitle =
-    document.getElementById("level-celebration-title");
+const expertRankTitle =
+    document.getElementById("expert-rank-title");
 
-const levelCelebrationMessage =
-    document.getElementById("level-celebration-message");
+const expertRankBadge =
+    document.getElementById("expert-rank-badge");
 
-const levelCelebrationClose =
-    document.getElementById("level-celebration-close");
+const expertProgressionFill =
+    document.getElementById("expert-progression-fill");
+
+const expertRankMessage =
+    document.getElementById("expert-rank-message");
 
 
 /* ============================================================
@@ -412,10 +405,7 @@ if (solutionButton) {
  * ============================================================
  */
 
-function renderExpectedOutput(
-    question,
-    dynamicOutput = null
-) {
+function renderExpectedOutput(question) {
 
     if (!expectedOutputTable) {
         return;
@@ -423,22 +413,8 @@ function renderExpectedOutput(
 
     expectedOutputTable.innerHTML = "";
 
-    /*
-     * ============================================================
-     * DYNAMIC EXPECTED OUTPUT
-     * ============================================================
-     *
-     * The question JSON may contain a small historical expectedOutput,
-     * while the live Banking/Healthcare database can contain hundreds or
-     * thousands of rows.
-     *
-     * When a dynamic solution result is available, display that result
-     * instead of the stale static JSON output.
-     */
     const output =
-        Array.isArray(dynamicOutput)
-            ? dynamicOutput
-            : question.expectedOutput;
+        question.expectedOutput;
 
     if (
         !Array.isArray(output) ||
@@ -562,109 +538,73 @@ function renderExpectedOutput(
 
 
 /* ============================================================
- * LOAD DYNAMIC EXPECTED OUTPUT
+ * DYNAMIC EXPECTED OUTPUT
  * ============================================================
- *
- * Execute the trusted solution query against the currently loaded
- * browser SQLite database so the Expected Output panel always reflects
- * the actual dataset.
- *
- * This is display-only. Challenge correctness is independently handled
- * by challengeValidator using the same dynamic reference result.
+ * The visible Expected Output is refreshed from the trusted solution
+ * against the CURRENT Banking/Healthcare dataset. This prevents stale
+ * V1 sample output from becoming misleading after seed expansion.
+ * The question ID guard prevents an older async response from replacing
+ * the output of a newer question.
  * ============================================================
  */
-async function loadDynamicExpectedOutput(
-    question
-) {
+async function refreshDynamicExpectedOutput(question) {
 
     if (
         !question ||
-        !question.solution ||
-        !window.browserSqlEngine
+        !window.browserSqlEngine ||
+        typeof window.browserSqlEngine.getReferenceResult !== "function"
     ) {
-
         return;
-
     }
 
+    const solutionQuery =
+        typeof question.solution === "string"
+            ? question.solution.trim()
+            : (
+                typeof question.solution_sql === "string"
+                    ? question.solution_sql.trim()
+                    : ""
+            );
 
-    const solution =
-        String(
-            question.solution
-        ).trim();
-
-
-    const normalizedSolution =
-        solution.toLowerCase();
-
-
-    /*
-     * Only execute read-only reference solutions here.
-     * SELECT and WITH are the supported challenge reference forms.
-     */
-    if (
-        !normalizedSolution.startsWith("select ") &&
-        !normalizedSolution.startsWith("select\n") &&
-        !normalizedSolution.startsWith("with ")
-    ) {
-
+    if (!solutionQuery) {
         return;
-
     }
-
 
     try {
 
-        const result =
-            await window.browserSqlEngine.execute(
-                solution,
-                {
-                    database:
-                        question.database
-                }
+        const referenceRows =
+            await window.browserSqlEngine.getReferenceResult(
+                question.database,
+                solutionQuery
             );
 
-
-        /*
-         * Prevent an older async request from replacing the output of a
-         * question the user has already navigated away from.
-         */
         if (
-            currentQuestion !==
-            question
+            currentQuestion &&
+            currentQuestion.id === question.id
         ) {
 
-            return;
+            renderExpectedOutput({
+                ...question,
+                expectedOutput: referenceRows
+            });
 
         }
 
-
-        if (
-            result &&
-            Array.isArray(
-                result.rows
-            )
-        ) {
-
-            renderExpectedOutput(
-                question,
-                result.rows
-            );
-
-        }
-
-    }
-
-    catch (error) {
+    } catch (error) {
 
         console.warn(
-            "⚠️ Dynamic expected output could not be loaded. " +
-            "Using the question JSON output instead.",
+            "⚠️ Dynamic Expected Output refresh failed:",
             error
         );
 
-    }
+        if (
+            currentQuestion &&
+            currentQuestion.id === question.id
+        ) {
+            renderExpectedOutput(question);
+        }
 
+    }
 }
 
 
@@ -689,34 +629,14 @@ function showQuestion(question) {
     );
 
     if (
-        currentQuestion &&
-        typeof preloadChallengeDatabase ===
-            "function"
-    ) {
+    currentQuestion &&
+    typeof preloadChallengeDatabase ===
+        "function"
+) {
 
-        /*
-         * Preload the selected database first, then calculate the live
-         * Expected Output from the trusted solution query.
-         */
-        preloadChallengeDatabase(
-            currentQuestion.database
-        )
-        .then(function () {
-
-            loadDynamicExpectedOutput(
-                currentQuestion
-            );
-
-        })
-        .catch(function (error) {
-
-            console.warn(
-                "⚠️ Challenge database preload failed while " +
-                "loading dynamic expected output:",
-                error
-            );
-
-        });
+    preloadChallengeDatabase(
+        currentQuestion.database
+    );
 
     }
 
@@ -753,6 +673,11 @@ function showQuestion(question) {
      */
 
     renderExpectedOutput(
+        question
+    );
+
+    /* Refresh stale static output using the live reference solution. */
+    refreshDynamicExpectedOutput(
         question
     );
 
@@ -1823,39 +1748,7 @@ await sqlEngine.execute(
 
                 window.updateScoreBoard(    
                     allChallenges    
-                );
-
-                /* ============================================================
-                 * MILESTONE CELEBRATION TRIGGER
-                 * ============================================================
-                 * A celebration is shown only because this successful query
-                 * just completed a question. Existing milestones are not
-                 * replayed during page load or normal scoreboard refreshes.
-                 * ============================================================ */
-                const completedAfterAnswer =
-                    getCompletedCountForDifficulty(
-                        currentQuestion.difficulty
-                    );
-
-                if (
-                    currentQuestion.difficulty ===
-                    "Intermediate"
-                ) {
-
-                    checkForNewIntermediateMilestones(
-                        completedAfterAnswer
-                    );
-
-                } else if (
-                    currentQuestion.difficulty ===
-                    "Expert"
-                ) {
-
-                    checkForNewExpertMilestones(
-                        completedAfterAnswer
-                    );
-
-                }
+                );    
 
 
                 loadQuestions(    
@@ -1919,15 +1812,14 @@ await sqlEngine.execute(
 
 
 /* ============================================================
- * CHALLENGE LEVEL + CELEBRATION ENGINE
+ * CHALLENGE V1 PROGRESSION ENGINE
  * ============================================================
  *
- * The previous large progression cards have intentionally been removed.
- * This engine now updates only the compact "Your Level" card.
+ * Intermediate: 20 / 40 / 60 / 80 / 100 completed -> stars
+ * Expert: 10 / 20 / 30 / 40 / 50 completed -> Boss / Killer /
+ * Gangster / Monster / Don
  *
- * When a NEW Intermediate star or Expert rank is reached, the corresponding
- * user-provided message is shown once in an animated celebration popup.
- * localStorage prevents the same milestone from popping up again on reload.
+ * Only COMPLETED questions count toward these milestones.
  * ============================================================ */
 
 function getCompletedCountForDifficulty(difficulty) {
@@ -1975,183 +1867,100 @@ function saveMilestoneState(storageKey, state) {
 
 }
 
-/* ============================================================
- * LEVEL CELEBRATION POPUP
- * ============================================================
- * Shows a milestone message with a small animated celebration.
- * ============================================================ */
-function showLevelCelebration(badge, title, message) {
+function showProgressionMilestone(element, message) {
 
-    if (
-        !levelCelebrationOverlay ||
-        !levelCelebrationPopup
-    ) {
+    if (!element) {
         return;
     }
 
-    if (levelCelebrationBadge) {
-        levelCelebrationBadge.textContent = badge;
-    }
+    element.textContent = message;
 
-    if (levelCelebrationTitle) {
-        levelCelebrationTitle.textContent = title;
-    }
-
-    if (levelCelebrationMessage) {
-        levelCelebrationMessage.textContent = message;
-    }
-
-    levelCelebrationOverlay.style.display = "flex";
-
-    /* Restart the popup animation even when multiple milestones are reached. */
-    levelCelebrationPopup.classList.remove(
-        "level-celebration-pop"
+    element.classList.remove(
+        "progression-milestone"
     );
 
-    void levelCelebrationPopup.offsetWidth;
+    void element.offsetWidth;
 
-    levelCelebrationPopup.classList.add(
-        "level-celebration-pop"
+    element.classList.add(
+        "progression-milestone"
     );
 
 }
 
-function closeLevelCelebration() {
+function updateIntermediateProgression(completed) {
 
-    if (levelCelebrationOverlay) {
-        levelCelebrationOverlay.style.display = "none";
+    const target =
+        CHALLENGE_V1_TARGETS.Intermediate;
+
+    const percentage =
+        Math.min(
+            100,
+            Math.round(
+                (completed / target) * 100
+            )
+        );
+
+    if (intermediateCompletedCount) {
+        intermediateCompletedCount.textContent =
+            completed + " / " + target;
     }
 
-}
-
-if (levelCelebrationClose) {
-
-    levelCelebrationClose.addEventListener(
-        "click",
-        function () {
-            closeLevelCelebration();
-        }
-    );
-
-}
-
-if (levelCelebrationOverlay) {
-
-    levelCelebrationOverlay.addEventListener(
-        "click",
-        function (event) {
-
-            if (event.target === levelCelebrationOverlay) {
-                closeLevelCelebration();
-            }
-
-        }
-    );
-
-}
-
-function getIntermediateStarMilestone(completed) {
+    if (intermediateProgressionFill) {
+        intermediateProgressionFill.style.width =
+            percentage + "%";
+    }
 
     let current = null;
 
     INTERMEDIATE_STAR_MILESTONES.forEach(
         function (milestone) {
-
             if (completed >= milestone.completed) {
                 current = milestone;
             }
-
         }
     );
 
-    return current;
+    const stars = current ? current.stars : 0;
 
-}
+    if (intermediateStars) {
+        intermediateStars.textContent =
+            "★".repeat(stars) +
+            "☆".repeat(5 - stars);
+    }
 
-function getExpertRankMilestone(completed) {
+    if (intermediateRankTitle) {
+        intermediateRankTitle.textContent =
+            current
+                ? current.title
+                : "⭐ SQL Explorer";
+    }
 
-    let current = null;
+    if (intermediateRankMessage) {
 
-    EXPERT_RANK_MILESTONES.forEach(
-        function (milestone) {
+        if (current) {
 
-            if (completed >= milestone.completed) {
-                current = milestone;
+            intermediateRankMessage.textContent =
+                current.message;
+
+        } else {
+
+            const next =
+                INTERMEDIATE_STAR_MILESTONES.find(
+                    function (milestone) {
+                        return completed < milestone.completed;
+                    }
+                );
+
+            if (next) {
+                intermediateRankMessage.textContent =
+                    "Complete " +
+                    next.completed +
+                    " Intermediate questions to earn your next star.";
             }
 
         }
-    );
-
-    return current;
-
-}
-
-function updateYourLevelCard() {
-
-    const beginnerCompleted =
-        getCompletedCountForDifficulty("Beginner");
-
-    const intermediateCompleted =
-        getCompletedCountForDifficulty("Intermediate");
-
-    const expertCompleted =
-        getCompletedCountForDifficulty("Expert");
-
-    /* ------------------------------------------------------------
-     * Easy status
-     * ------------------------------------------------------------ */
-    if (beginnerLevel) {
-
-        beginnerLevel.textContent =
-            beginnerCompleted +
-            " / " +
-            CHALLENGE_V1_TARGETS.Beginner;
 
     }
-
-    /* ------------------------------------------------------------
-     * Intermediate star status
-     * ------------------------------------------------------------ */
-    const intermediateMilestone =
-        getIntermediateStarMilestone(
-            intermediateCompleted
-        );
-
-    const intermediateStars =
-        intermediateMilestone
-            ? intermediateMilestone.stars
-            : 0;
-
-    if (intermediateLevel) {
-
-        intermediateLevel.textContent =
-            "★".repeat(intermediateStars) +
-            "☆".repeat(5 - intermediateStars);
-
-    }
-
-    /* ------------------------------------------------------------
-     * Expert rank status
-     * ------------------------------------------------------------ */
-    const expertMilestone =
-        getExpertRankMilestone(
-            expertCompleted
-        );
-
-    if (expertLevel) {
-
-        expertLevel.textContent =
-            expertMilestone
-                ? expertMilestone.badge +
-                  " " +
-                  expertMilestone.rank
-                : "🔒";
-
-    }
-
-}
-
-function checkForNewIntermediateMilestones(completed) {
 
     const reached =
         getMilestoneState(
@@ -2175,9 +1984,8 @@ function checkForNewIntermediateMilestones(completed) {
                     reached
                 );
 
-                showLevelCelebration(
-                    "⭐".repeat(milestone.stars),
-                    "🎉 Level Up!",
+                showProgressionMilestone(
+                    intermediateRankMessage,
                     milestone.message
                 );
 
@@ -2188,7 +1996,81 @@ function checkForNewIntermediateMilestones(completed) {
 
 }
 
-function checkForNewExpertMilestones(completed) {
+function updateExpertProgression(completed) {
+
+    const target =
+        CHALLENGE_V1_TARGETS.Expert;
+
+    const percentage =
+        Math.min(
+            100,
+            Math.round(
+                (completed / target) * 100
+            )
+        );
+
+    if (expertCompletedCount) {
+        expertCompletedCount.textContent =
+            completed + " / " + target;
+    }
+
+    if (expertProgressionFill) {
+        expertProgressionFill.style.width =
+            percentage + "%";
+    }
+
+    let current = null;
+
+    EXPERT_RANK_MILESTONES.forEach(
+        function (milestone) {
+            if (completed >= milestone.completed) {
+                current = milestone;
+            }
+        }
+    );
+
+    if (expertRankTitle) {
+        expertRankTitle.textContent =
+            current
+                ? current.rank
+                : "🔒 Expert Awaits";
+    }
+
+    if (expertRankBadge) {
+        expertRankBadge.textContent =
+            current
+                ? current.badge
+                : "🔒";
+    }
+
+    if (expertRankMessage) {
+
+        if (current) {
+
+            expertRankMessage.textContent =
+                current.message;
+
+        } else {
+
+            const next =
+                EXPERT_RANK_MILESTONES.find(
+                    function (milestone) {
+                        return completed < milestone.completed;
+                    }
+                );
+
+            if (next) {
+                expertRankMessage.textContent =
+                    "Solve " +
+                    next.completed +
+                    " Expert challenges to earn the " +
+                    next.rank +
+                    " rank.";
+            }
+
+        }
+
+    }
 
     const reached =
         getMilestoneState(
@@ -2212,9 +2094,8 @@ function checkForNewExpertMilestones(completed) {
                     reached
                 );
 
-                showLevelCelebration(
-                    milestone.badge,
-                    "🏆 " + milestone.rank + " UNLOCKED!",
+                showProgressionMilestone(
+                    expertRankMessage,
                     milestone.message
                 );
 
@@ -2227,12 +2108,17 @@ function checkForNewExpertMilestones(completed) {
 
 function updateChallengeProgression() {
 
-    /*
-     * Keep the level card synchronized during every scoreboard refresh.
-     * Milestone celebrations are triggered only from a successful query,
-     * so an existing milestone never pops up merely because the page loaded.
-     */
-    updateYourLevelCard();
+    updateIntermediateProgression(
+        getCompletedCountForDifficulty(
+            "Intermediate"
+        )
+    );
+
+    updateExpertProgression(
+        getCompletedCountForDifficulty(
+            "Expert"
+        )
+    );
 
 }
 
@@ -2296,9 +2182,6 @@ if (resetButton) {
             localStorage.removeItem(
                 EXPERT_MILESTONE_STORAGE_KEY
             );
-
-            /* Close any open milestone celebration after a reset. */
-            closeLevelCelebration();
 
 
             window.updateScoreBoard(
