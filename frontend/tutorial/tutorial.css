@@ -1,184 +1,790 @@
-.tutorial-container {
+/*
+ * SQL Learning Platform - Tutorial CSS
+ * ============================================================
+ * FILE PATH
+ * ----------
+ * frontend/tutorial/tutorial.css
+ *
+ * PURPOSE
+ * -------
+ * Tutorial-only presentation layer.
+ *
+ * DESIGN GOALS
+ * ------------
+ * 1. Clean college/fresher-friendly learning layout.
+ * 2. Collapsible roadmap tracks.
+ * 3. Comfortable long-form lesson reading.
+ * 4. Small embedded SQL editor for practice.
+ * 5. Results hidden until execution.
+ * 6. Results constrained to a small viewport with scrolling.
+ * 7. Animated visual explanations for concepts such as ACID
+ *    and normalization.
+ *
+ * REVISION NOTE
+ * -------------
+ * Do not move these styles into main.css unless the component
+ * becomes a shared platform component.
+ * ============================================================
+ */
 
-    display: flex;
-
-    min-height: calc(100vh - 80px);
-}
-
-.tutorial-sidebar {
-
-    width: 300px;
-
-    background: #111827;
-
-    padding: 20px;
-
-    border-right: 1px solid #374151;
-}
-
-.tutorial-sidebar ul {
-
-    list-style: none;
-
-    margin-top: 20px;
-}
-
-.tutorial-sidebar li {
-
-    padding: 12px 0;
-
-    cursor: pointer;
-
-    color: #cbd5e1;
-}
-
-.tutorial-content {
-
-    flex: 1;
-
-    padding: 40px;
-}
-
-pre {
-
-    background: #1e293b;
-
-    padding: 20px;
-
-    border-radius: 10px;
-
-    margin: 20px 0;
-}
-
-table {
-
-    width: 100%;
-
-    border-collapse: collapse;
-
-    margin-top: 20px;
-}
-
-th,
-td {
-
-    border: 1px solid #374151;
-
-    padding: 12px;
-}
-
-@media (max-width: 900px) {
-
-    .tutorial-container {
-
-        flex-direction: column;
-    }
-
-    .tutorial-sidebar {
-
-        width: 100%;
-    }
+:root {
+    --tutorial-bg: #07111f;
+    --tutorial-panel: rgba(15, 27, 45, 0.94);
+    --tutorial-panel-soft: rgba(20, 36, 58, 0.82);
+    --tutorial-border: rgba(148, 163, 184, 0.20);
+    --tutorial-text: #e5edf8;
+    --tutorial-muted: #9fb0c5;
+    --tutorial-accent: #38bdf8;
+    --tutorial-accent-soft: rgba(56, 189, 248, 0.12);
+    --tutorial-success: #34d399;
+    --tutorial-warning: #fbbf24;
+    --tutorial-danger: #fb7185;
+    --tutorial-code: #08111f;
 }
 
 /* ============================================================
- * TUTORIAL V2 - DYNAMIC TRACK / LESSON PRESENTATION
- * ------------------------------------------------------------
- * Existing Tutorial CSS is preserved. These rules only style the
- * new dynamic track, lesson navigation and practice presentation.
+ * PAGE SHELL
  * ============================================================ */
 
-.tutorial-sidebar li.active {
-    color: #ffffff;
-    font-weight: 700;
+body {
+    background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.08), transparent 35%),
+        var(--tutorial-bg);
+    color: var(--tutorial-text);
 }
 
-.tutorial-track-link {
-    font-weight: 700;
-    margin-top: 8px;
-}
-
-.tutorial-track-lessons {
-    padding: 0 !important;
-    cursor: default !important;
-}
-
-.tutorial-track-lessons ul {
-    margin-top: 4px;
-    padding-left: 14px;
-}
-
-.tutorial-lesson-link {
-    font-size: 0.94rem;
-    padding: 8px 0 !important;
-}
-
-.tutorial-track-header {
-    margin-bottom: 28px;
-}
-
-.tutorial-track-badge {
-    display: inline-block;
-    padding: 8px 14px;
-    border: 1px solid #475569;
-    border-radius: 999px;
-    font-weight: 700;
-    background: #0f172a;
-}
-
-.tutorial-track-header p {
-    margin-top: 12px;
-    color: #94a3b8;
-}
-
-.tutorial-section,
-.tutorial-practice {
-    margin-top: 28px;
-}
-
-.tutorial-section h2,
-.tutorial-practice h2 {
-    margin-bottom: 10px;
-}
-
-.tutorial-lesson pre {
-    overflow-x: auto;
-    white-space: pre;
-}
-
-.tutorial-practice {
-    padding: 20px;
-    border: 1px solid #475569;
-    border-radius: 12px;
-    background: rgba(15, 23, 42, 0.55);
-}
-
-.tutorial-lesson-navigation {
+.tutorial-header {
+    min-height: 82px;
+    padding: 16px 28px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    margin-top: 36px;
-    padding-top: 20px;
-    border-top: 1px solid #374151;
+    gap: 24px;
+    border-bottom: 1px solid var(--tutorial-border);
+    background: rgba(5, 13, 25, 0.92);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
 }
 
-.tutorial-nav-button {
-    padding: 10px 16px;
-    border: 1px solid #475569;
+.tutorial-header h1 {
+    margin: 0;
+    font-size: 1.45rem;
+}
+
+.tutorial-header-subtitle {
+    margin: 4px 0 0;
+    color: var(--tutorial-muted);
+    font-size: 0.88rem;
+}
+
+.tutorial-header nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.tutorial-header nav a {
+    color: var(--tutorial-muted);
+    text-decoration: none;
+    padding: 8px 11px;
+    border-radius: 8px;
+    transition: 0.2s ease;
+}
+
+.tutorial-header nav a:hover,
+.tutorial-header nav a.active {
+    color: #fff;
+    background: var(--tutorial-accent-soft);
+}
+
+/* ============================================================
+ * TWO-PANEL LEARNING AREA
+ * ============================================================ */
+
+.tutorial-shell {
+    width: min(1500px, 100%);
+    margin: 0 auto;
+    min-height: calc(100vh - 82px);
+    display: grid;
+    grid-template-columns: 310px minmax(0, 1fr);
+}
+
+.tutorial-sidebar {
+    border-right: 1px solid var(--tutorial-border);
+    background: rgba(8, 18, 31, 0.88);
+    padding: 20px 14px;
+    position: sticky;
+    top: 82px;
+    height: calc(100vh - 82px);
+    overflow-y: auto;
+}
+
+.roadmap-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px 18px;
+}
+
+.roadmap-heading span {
+    font-size: 1.7rem;
+}
+
+.roadmap-heading h2 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.roadmap-heading p {
+    margin: 3px 0 0;
+    color: var(--tutorial-muted);
+    font-size: 0.78rem;
+}
+
+.tutorial-roadmap {
+    display: grid;
+    gap: 9px;
+}
+
+/* ============================================================
+ * COLLAPSIBLE TRACKS
+ * ============================================================ */
+
+.roadmap-track {
+    border: 1px solid var(--tutorial-border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(15, 27, 45, 0.55);
+}
+
+.roadmap-track summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 13px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-weight: 700;
+    user-select: none;
+}
+
+.roadmap-track summary::-webkit-details-marker {
+    display: none;
+}
+
+.roadmap-track summary::after {
+    content: "▾";
+    color: var(--tutorial-muted);
+    transition: transform 0.2s ease;
+}
+
+.roadmap-track:not([open]) summary::after {
+    transform: rotate(-90deg);
+}
+
+.roadmap-track[data-track="beginner"] summary {
+    border-left: 4px solid #22c55e;
+}
+
+.roadmap-track[data-track="intermediate"] summary {
+    border-left: 4px solid #f59e0b;
+}
+
+.roadmap-track[data-track="expert"] summary {
+    border-left: 4px solid #ef4444;
+}
+
+.roadmap-track[data-track="rdbms"] summary {
+    border-left: 4px solid #a78bfa;
+}
+
+.roadmap-track[data-track="interview"] summary {
+    border-left: 4px solid #38bdf8;
+}
+
+.track-lessons {
+    padding: 0 8px 8px;
+}
+
+.track-lesson {
+    width: 100%;
+    text-align: left;
+    border: 0;
+    background: transparent;
+    color: var(--tutorial-muted);
+    padding: 9px 10px;
     border-radius: 8px;
     cursor: pointer;
-    background: #1e293b;
-    color: #f8fafc;
+    font-size: 0.84rem;
+    line-height: 1.35;
+    transition: 0.18s ease;
 }
 
-.tutorial-nav-button:disabled {
-    opacity: 0.45;
+.track-lesson:hover,
+.track-lesson.active {
+    color: #fff;
+    background: var(--tutorial-accent-soft);
+}
+
+.track-lesson.active {
+    box-shadow: inset 3px 0 0 var(--tutorial-accent);
+}
+
+/* ============================================================
+ * MAIN LESSON
+ * ============================================================ */
+
+.tutorial-content {
+    min-width: 0;
+    padding: 34px clamp(18px, 4vw, 58px) 60px;
+}
+
+.tutorial-track-header {
+    margin-bottom: 22px;
+    padding: 18px 20px;
+    border: 1px solid var(--tutorial-border);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(30, 64, 175, 0.18), rgba(8, 18, 31, 0.60));
+}
+
+.track-badge {
+    display: inline-flex;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: var(--tutorial-accent-soft);
+    color: #bae6fd;
+    font-weight: 800;
+    font-size: 0.84rem;
+}
+
+.tutorial-track-header h1 {
+    margin: 12px 0 5px;
+    font-size: clamp(1.7rem, 3vw, 2.35rem);
+}
+
+.tutorial-track-header p {
+    margin: 0;
+    color: var(--tutorial-muted);
+    line-height: 1.6;
+}
+
+.lesson-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.lesson-meta span {
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.09);
+    color: #cbd5e1;
+    font-size: 0.76rem;
+}
+
+.tutorial-lesson {
+    display: grid;
+    gap: 18px;
+}
+
+.tutorial-lesson > h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.tutorial-section,
+.practice-card,
+.interview-card,
+.concept-visual-card {
+    border: 1px solid var(--tutorial-border);
+    border-radius: 15px;
+    background: var(--tutorial-panel);
+    padding: 20px;
+}
+
+.tutorial-section h3,
+.practice-card h3,
+.interview-card h3,
+.concept-visual-card h3 {
+    margin-top: 0;
+}
+
+.tutorial-section p,
+.practice-card p,
+.interview-card p {
+    line-height: 1.75;
+    color: #d5dfeb;
+}
+
+.definition-box {
+    border-left: 4px solid var(--tutorial-accent);
+    background: var(--tutorial-accent-soft);
+    padding: 14px 16px;
+    border-radius: 8px;
+    line-height: 1.7;
+}
+
+.key-points {
+    margin: 12px 0 0;
+    padding-left: 20px;
+}
+
+.key-points li {
+    margin: 8px 0;
+    color: #d5dfeb;
+    line-height: 1.55;
+}
+
+code.inline-code {
+    background: rgba(148, 163, 184, 0.12);
+    padding: 2px 6px;
+    border-radius: 5px;
+    color: #bae6fd;
+}
+
+/* ============================================================
+ * SQL CODE BLOCKS
+ * ============================================================ */
+
+.sql-code-block {
+    position: relative;
+    margin: 0;
+    overflow-x: auto;
+    border: 1px solid rgba(56, 189, 248, 0.13);
+    border-radius: 11px;
+    background: var(--tutorial-code);
+}
+
+.sql-code-block pre {
+    margin: 0;
+    padding: 17px;
+    min-width: max-content;
+    color: #dbeafe;
+    line-height: 1.55;
+    font-size: 0.88rem;
+}
+
+/* ============================================================
+ * PRACTICE EDITOR
+ * ============================================================ */
+
+.practice-card {
+    background:
+        linear-gradient(145deg, rgba(56, 189, 248, 0.07), transparent),
+        var(--tutorial-panel);
+}
+
+.practice-label {
+    color: #7dd3fc;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.practice-question {
+    font-size: 1rem;
+    margin: 8px 0 16px;
+}
+
+.practice-editor {
+    width: 100%;
+    min-height: 145px;
+    resize: vertical;
+    box-sizing: border-box;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 11px;
+    background: #050c16;
+    color: #e2e8f0;
+    padding: 14px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    outline: none;
+}
+
+.practice-editor:focus {
+    border-color: var(--tutorial-accent);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.10);
+}
+
+.practice-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 10px;
+}
+
+.practice-toolbar button {
+    border: 0;
+    border-radius: 9px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #fff;
+    background: #0284c7;
+}
+
+.practice-toolbar button:hover {
+    filter: brightness(1.08);
+}
+
+.practice-toolbar button:disabled {
+    opacity: 0.55;
     cursor: not-allowed;
 }
 
-@media (max-width: 900px) {
-    .tutorial-lesson-navigation {
-        flex-wrap: wrap;
+.practice-database {
+    margin-left: auto;
+    color: var(--tutorial-muted);
+    font-size: 0.8rem;
+}
+
+.practice-status {
+    min-height: 22px;
+    margin-top: 10px;
+    color: var(--tutorial-muted);
+    line-height: 1.4;
+}
+
+.practice-status.success {
+    color: var(--tutorial-success);
+}
+
+.practice-status.error {
+    color: var(--tutorial-danger);
+}
+
+/* ============================================================
+ * RESULTS
+ * ------------------------------------------------------------
+ * Hidden by default. tutorial.js only opens this after Run Query.
+ * The viewport intentionally shows roughly 3 rows before scrolling.
+ * ============================================================ */
+
+.practice-results {
+    display: none;
+    margin-top: 14px;
+    border: 1px solid rgba(56, 189, 248, 0.24);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #07111f;
+}
+
+.practice-results.visible {
+    display: block;
+    animation: resultReveal 0.25s ease both;
+}
+
+.practice-results-header {
+    padding: 10px 13px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--tutorial-border);
+    background: rgba(30, 41, 59, 0.72);
+}
+
+.practice-results-header strong {
+    font-size: 0.9rem;
+}
+
+.practice-results-header span {
+    color: var(--tutorial-muted);
+    font-size: 0.76rem;
+}
+
+.practice-results-scroll {
+    max-height: 178px;
+    overflow: auto;
+}
+
+.practice-results table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: max-content;
+}
+
+.practice-results th,
+.practice-results td {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    border-right: 1px solid rgba(148, 163, 184, 0.08);
+    padding: 9px 11px;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+.practice-results th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #132238;
+    color: #bae6fd;
+}
+
+.practice-results td {
+    color: #dbe5f1;
+}
+
+/* ============================================================
+ * VISUAL CONCEPTS
+ * ============================================================ */
+
+.concept-visual {
+    display: grid;
+    gap: 10px;
+}
+
+.acid-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.acid-card {
+    padding: 15px;
+    border: 1px solid var(--tutorial-border);
+    border-radius: 11px;
+    background: rgba(30, 41, 59, 0.55);
+    animation: floatIn 0.5s ease both;
+}
+
+.acid-card:nth-child(2) { animation-delay: 0.08s; }
+.acid-card:nth-child(3) { animation-delay: 0.16s; }
+.acid-card:nth-child(4) { animation-delay: 0.24s; }
+
+.acid-card strong {
+    display: block;
+    color: #7dd3fc;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.acid-card span {
+    color: var(--tutorial-muted);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.normalization-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 9px;
+}
+
+.normalization-step {
+    min-height: 100px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 12px;
+    border: 1px solid var(--tutorial-border);
+    border-radius: 11px;
+    background: rgba(30, 41, 59, 0.55);
+    animation: floatIn 0.55s ease both;
+}
+
+.normalization-step strong {
+    color: #c4b5fd;
+}
+
+.flow-arrow {
+    color: var(--tutorial-accent);
+    font-size: 1.5rem;
+    animation: pulseArrow 1.6s ease-in-out infinite;
+}
+
+/* ============================================================
+ * LESSON NAVIGATION
+ * ============================================================ */
+
+.lesson-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.lesson-navigation button {
+    border: 1px solid var(--tutorial-border);
+    background: var(--tutorial-panel-soft);
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.lesson-navigation button:hover:not(:disabled) {
+    border-color: var(--tutorial-accent);
+}
+
+.lesson-navigation button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+.lesson-counter {
+    color: var(--tutorial-muted);
+    font-size: 0.82rem;
+}
+
+/* ============================================================
+ * LOADING + ANIMATIONS
+ * ============================================================ */
+
+.tutorial-loading {
+    min-height: 50vh;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    color: var(--tutorial-muted);
+    gap: 12px;
+}
+
+.loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(148, 163, 184, 0.22);
+    border-top-color: var(--tutorial-accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes resultReveal {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
+@keyframes floatIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseArrow {
+    0%, 100% { transform: translateX(0); opacity: 0.65; }
+    50% { transform: translateX(4px); opacity: 1; }
+}
+
+/* ============================================================
+ * RESPONSIVE LAYOUT
+ * ============================================================ */
+
+@media (max-width: 1050px) {
+    .tutorial-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .tutorial-header nav {
+        justify-content: flex-start;
+    }
+
+    .tutorial-shell {
+        grid-template-columns: 260px minmax(0, 1fr);
+    }
+
+    .acid-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 820px) {
+    .tutorial-shell {
+        display: block;
+    }
+
+    .tutorial-sidebar {
+        position: static;
+        height: auto;
+        max-height: none;
+        border-right: 0;
+        border-bottom: 1px solid var(--tutorial-border);
+    }
+
+    .tutorial-roadmap {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .tutorial-content {
+        padding: 22px 15px 45px;
+    }
+
+    .normalization-flow {
+        grid-template-columns: 1fr;
+    }
+
+    .flow-arrow {
+        transform: rotate(90deg);
+    }
+
+    .practice-database {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .tutorial-header {
+        padding: 14px 15px;
+    }
+
+    .tutorial-header nav {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        width: 100%;
+    }
+
+    .tutorial-header nav a {
+        text-align: center;
+    }
+
+    .tutorial-roadmap {
+        grid-template-columns: 1fr;
+    }
+
+    .acid-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tutorial-section,
+    .practice-card,
+    .interview-card,
+    .concept-visual-card {
+        padding: 15px;
+    }
+
+    .lesson-navigation {
+        flex-wrap: wrap;
+    }
+
+    .lesson-counter {
+        order: -1;
+        width: 100%;
+        text-align: center;
+    }
+}
