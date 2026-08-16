@@ -1,0 +1,603 @@
+/*
+ * SQL Learning Platform - Tutorial CSS
+ * ============================================================
+ * TUTORIAL V3
+ *
+ * Scope
+ * -----
+ * All selectors are tutorial-specific so this stylesheet does not
+ * intentionally modify Playground, Challenge or Sandbox styling.
+ * ============================================================
+ */
+
+.tutorial-container {
+    display: flex;
+    min-height: calc(100vh - 80px);
+    background: #0b1220;
+    color: #e5e7eb;
+}
+
+/* ============================================================
+ * LEFT ROADMAP / COLLAPSIBLE TRACKS
+ * ============================================================ */
+
+.tutorial-sidebar {
+    width: 320px;
+    flex: 0 0 320px;
+    background: #111827;
+    border-right: 1px solid #273449;
+    padding: 22px 16px;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+.tutorial-sidebar h2 {
+    margin: 0 0 16px;
+    font-size: 1.2rem;
+}
+
+.tutorial-sidebar > ul,
+.tutorial-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tutorial-track-group {
+    margin-bottom: 10px;
+}
+
+.tutorial-track-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 13px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #dbeafe;
+    background: rgba(30, 41, 59, 0.5);
+    transition: 0.2s ease;
+}
+
+.tutorial-track-link:hover,
+.tutorial-track-link.active {
+    background: rgba(37, 99, 235, 0.18);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+.tutorial-track-title {
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.tutorial-collapse-button {
+    border: 0;
+    background: transparent;
+    color: #bfdbfe;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 3px 6px;
+}
+
+.tutorial-track-lessons {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.25s ease, opacity 0.25s ease;
+    opacity: 1;
+}
+
+.tutorial-track-group.is-collapsed .tutorial-track-lessons {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.tutorial-track-lessons > ul {
+    min-height: 0;
+    overflow: hidden;
+    padding: 7px 0 2px 8px;
+}
+
+.tutorial-lesson-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    margin: 2px 0;
+    border-radius: 9px;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    transition: 0.18s ease;
+}
+
+.tutorial-lesson-link:hover {
+    color: #e0f2fe;
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.tutorial-lesson-link.active {
+    color: #ffffff;
+    background: rgba(37, 99, 235, 0.28);
+}
+
+.tutorial-lesson-number {
+    min-width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(148, 163, 184, 0.13);
+    font-size: 0.72rem;
+}
+
+/* ============================================================
+ * MAIN CONTENT
+ * ============================================================ */
+
+.tutorial-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 34px clamp(18px, 4vw, 54px) 70px;
+}
+
+.tutorial-track-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 20px;
+    margin-bottom: 22px;
+    border: 1px solid #2b3a50;
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(30, 41, 59, 0.95),
+        rgba(15, 23, 42, 0.95)
+    );
+}
+
+.tutorial-track-badge {
+    display: inline-flex;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #bfdbfe;
+    font-weight: 800;
+}
+
+.tutorial-track-header p {
+    margin: 8px 0 0;
+    color: #94a3b8;
+}
+
+.tutorial-lesson-count {
+    white-space: nowrap;
+    color: #93c5fd;
+    font-weight: 800;
+}
+
+.tutorial-lesson {
+    background: #111827;
+    border: 1px solid #273449;
+    border-radius: 18px;
+    padding: clamp(20px, 4vw, 38px);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.22);
+}
+
+.tutorial-lesson-kicker {
+    color: #60a5fa;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.tutorial-lesson h1 {
+    margin: 7px 0 28px;
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    line-height: 1.15;
+}
+
+.tutorial-section {
+    margin: 22px 0;
+}
+
+.tutorial-section h2,
+.tutorial-practice h2 {
+    margin: 0 0 10px;
+    font-size: 1.12rem;
+}
+
+.tutorial-section p,
+.tutorial-practice p {
+    color: #cbd5e1;
+    line-height: 1.75;
+    margin: 0;
+}
+
+.tutorial-lesson pre {
+    margin: 12px 0 0;
+    padding: 17px;
+    background: #07101d;
+    border: 1px solid #26354b;
+    border-radius: 12px;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.tutorial-lesson code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    color: #dbeafe;
+    font-size: 0.92rem;
+}
+
+/* ============================================================
+ * FLOW VISUALS
+ * ============================================================ */
+
+.tutorial-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    padding: 16px;
+    border: 1px solid #2b3a50;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.75);
+}
+
+.tutorial-flow-step {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: linear-gradient(
+        135deg,
+        rgba(30, 64, 175, 0.35),
+        rgba(30, 41, 59, 0.8)
+    );
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    color: #e0f2fe;
+    font-weight: 700;
+    text-align: center;
+}
+
+.tutorial-flow-arrow {
+    text-align: center;
+    color: #60a5fa;
+    font-weight: 900;
+    animation: tutorial-flow-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes tutorial-flow-pulse {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.65;
+    }
+    50% {
+        transform: translateY(3px);
+        opacity: 1;
+    }
+}
+
+/* ============================================================
+ * VISUAL TABLES
+ * ============================================================ */
+
+.tutorial-visual-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #2b3a50;
+    border-radius: 12px;
+}
+
+.tutorial-visual-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.tutorial-visual-table th,
+.tutorial-visual-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #26354b;
+    text-align: left;
+}
+
+.tutorial-visual-table th {
+    background: #172235;
+    color: #bfdbfe;
+}
+
+.tutorial-visual-table td {
+    color: #cbd5e1;
+}
+
+/* ============================================================
+ * PRACTICE / QUERY EDITOR
+ * ============================================================ */
+
+.tutorial-practice {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #36506f;
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(15, 118, 110, 0.10),
+        rgba(30, 41, 59, 0.55)
+    );
+}
+
+.tutorial-practice-badge {
+    display: inline-flex;
+    margin-bottom: 7px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(45, 212, 191, 0.12);
+    color: #99f6e4;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.tutorial-practice-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.tutorial-db-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.tutorial-db-select select {
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #0b1220;
+    color: #e5e7eb;
+}
+
+.tutorial-sql-editor {
+    width: 100%;
+    min-height: 170px;
+    margin-top: 16px;
+    resize: vertical;
+    box-sizing: border-box;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 15px;
+    background: #050b14;
+    color: #e2e8f0;
+    font: 0.9rem/1.55 "SFMono-Regular", Consolas, monospace;
+    outline: none;
+}
+
+.tutorial-sql-editor:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+}
+
+.tutorial-editor-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 12px;
+}
+
+.tutorial-run-button,
+.tutorial-reset-button,
+.tutorial-nav-button {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.tutorial-run-button {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.tutorial-run-button:hover {
+    background: #1d4ed8;
+}
+
+.tutorial-run-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.tutorial-reset-button {
+    background: #334155;
+    color: #e2e8f0;
+}
+
+.tutorial-editor-hint {
+    color: #94a3b8;
+    font-size: 0.78rem;
+}
+
+.tutorial-query-status {
+    min-height: 22px;
+    margin-top: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.tutorial-query-status.loading {
+    color: #facc15;
+}
+
+.tutorial-query-status.success {
+    color: #4ade80;
+}
+
+.tutorial-query-status.error {
+    color: #f87171;
+}
+
+/* ============================================================
+ * COMPACT SCROLLABLE RESULTS
+ * ============================================================ */
+
+.tutorial-query-results {
+    margin-top: 16px;
+    border: 1px solid #36506f;
+    border-radius: 13px;
+    background: #0b1220;
+    overflow: hidden;
+}
+
+.tutorial-results-header {
+    padding: 12px 14px;
+    border-bottom: 1px solid #26354b;
+    background: #111c2d;
+}
+
+.tutorial-results-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.tutorial-results-header span {
+    color: #94a3b8;
+    font-size: 0.78rem;
+}
+
+.tutorial-results-scroll {
+    max-height: 190px;
+    overflow: auto;
+}
+
+.tutorial-results-scroll table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.tutorial-results-scroll th,
+.tutorial-results-scroll td {
+    padding: 9px 11px;
+    border-bottom: 1px solid #26354b;
+    border-right: 1px solid #26354b;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.tutorial-results-scroll th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #172235;
+    color: #bfdbfe;
+}
+
+.tutorial-results-scroll td {
+    color: #cbd5e1;
+}
+
+.tutorial-results-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.tutorial-results-scroll::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 999px;
+}
+
+/* ============================================================
+ * LESSON NAVIGATION
+ * ============================================================ */
+
+.tutorial-lesson-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 13px 0;
+    color: #94a3b8;
+}
+
+.tutorial-nav-button {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+.tutorial-nav-button:hover:not(:disabled) {
+    background: #334155;
+}
+
+.tutorial-nav-button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+ * RESPONSIVE
+ * ============================================================ */
+
+@media (max-width: 900px) {
+    .tutorial-container {
+        flex-direction: column;
+    }
+
+    .tutorial-sidebar {
+        width: auto;
+        flex-basis: auto;
+        position: relative;
+        top: auto;
+        height: auto;
+        max-height: 46vh;
+    }
+
+    .tutorial-content {
+        padding: 22px 14px 50px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tutorial-track-header,
+    .tutorial-practice-heading {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tutorial-lesson {
+        padding: 18px 14px;
+    }
+
+    .tutorial-practice {
+        padding: 15px;
+    }
+
+    .tutorial-lesson-navigation {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tutorial-editor-actions {
+        align-items: stretch;
+    }
+
+    .tutorial-run-button,
+    .tutorial-reset-button {
+        flex: 1;
+    }
+}
