@@ -259,6 +259,14 @@ const expertFill =
 const activeLevelStatus =
     document.getElementById("active-level-status");
 
+/*
+ * The level card itself is hidden until the user reaches the first
+ * real milestone. This prevents a locked/empty level badge from
+ * appearing before the user has earned anything.
+ */
+const activeLevelCard =
+    document.getElementById("active-level-card");
+
 const milestoneCelebrationOverlay =
     document.getElementById(
         "milestone-celebration-overlay"
@@ -2051,9 +2059,21 @@ function updateActiveLevelStatus(
     completedDifficulty = null
 ) {
 
-    if (!activeLevelStatus) {
-        return;
-    }
+    /*
+     * ============================================================
+     * ACTIVE LEVEL UNLOCK RULES
+     * ------------------------------------------------------------
+     * No level card is shown until the user earns a real milestone.
+     *
+     * Priority:
+     *   1. Expert  >= 10 completed -> Expert / 💀 BOSS
+     *   2. Intermediate >= 20      -> Intermediate / ⭐
+     *   3. Beginner >= 50          -> Easy / 50/50 ✔️
+     *
+     * Once a higher level is unlocked it replaces the lower level
+     * in the "Your Level" card.
+     * ============================================================
+     */
 
     const beginnerCompleted =
         getCompletedCountForDifficulty(
@@ -2070,9 +2090,31 @@ function updateActiveLevelStatus(
             "Expert"
         );
 
-    let statusText = "";
+    /*
+     * Hide the card by default.
+     *
+     * This is important on first load and after a reset so users do
+     * NOT see "Expert - 🔒", "Easy - 0/50", etc.
+     */
+    if (activeLevelCard) {
+        activeLevelCard.style.display = "none";
+    }
 
-    if (expertCompleted > 0) {
+    if (!activeLevelStatus) {
+        return;
+    }
+
+    let statusText = "";
+    let unlocked = false;
+
+    /*
+     * Expert has highest priority.
+     */
+    if (
+        expertCompleted >=
+        INTERMEDIATE_STAR_MILESTONES.length &&
+        expertCompleted >= 10
+    ) {
 
         const currentExpert =
             getCurrentExpertMilestone(
@@ -2087,11 +2129,17 @@ function updateActiveLevelStatus(
                     " " +
                     currentExpert.rank
                 )
-                : "Expert - 🔒";
+                : "Expert - 💀 BOSS";
 
+        unlocked = true;
     }
 
-    else if (intermediateCompleted > 0) {
+    /*
+     * Intermediate becomes the active level after 20 completed.
+     */
+    else if (
+        intermediateCompleted >= 20
+    ) {
 
         const currentIntermediate =
             getCurrentIntermediateMilestone(
@@ -2101,30 +2149,52 @@ function updateActiveLevelStatus(
         const stars =
             currentIntermediate
                 ? currentIntermediate.stars
-                : 0;
+                : 1;
 
         statusText =
             "Intermediate - " +
-            (
-                stars > 0
-                    ? "⭐".repeat(stars)
-                    : "0⭐"
+            "⭐".repeat(
+                Math.max(1, stars)
             );
 
+        unlocked = true;
     }
 
-    else {
+    /*
+     * Beginner becomes visible only after all 50 Beginner
+     * challenges have been completed.
+     */
+    else if (
+        beginnerCompleted >=
+        CHALLENGE_V1_TARGETS.Beginner
+    ) {
 
         statusText =
             "Easy - " +
-            beginnerCompleted +
+            CHALLENGE_V1_TARGETS.Beginner +
             "/" +
-            CHALLENGE_V1_TARGETS.Beginner;
+            CHALLENGE_V1_TARGETS.Beginner +
+            " ✔️";
 
+        unlocked = true;
     }
 
-    activeLevelStatus.textContent =
-        statusText;
+    /*
+     * No milestone yet: keep Your Level completely hidden.
+     */
+    if (!unlocked) {
+
+        activeLevelStatus.textContent = "";
+
+    } else {
+
+        activeLevelStatus.textContent =
+            statusText;
+
+        if (activeLevelCard) {
+            activeLevelCard.style.display = "block";
+        }
+    }
 
 
     /*
@@ -2186,27 +2256,12 @@ function updateActiveLevelStatus(
             );
 
             showMilestoneCelebration(
-                newlyReached,
-                completedDifficulty
+                completedDifficulty,
+                newlyReached
             );
-
         }
-
     }
-
 }
-
-
-/*
- * Compatibility wrapper retained so existing calls from the
- * Challenge page remain safe during this UI revision.
- */
-function updateChallengeProgression() {
-
-    updateActiveLevelStatus();
-
-}
-
 
 /* ============================================================
  * RESET PROGRESS
@@ -2420,7 +2475,7 @@ window.addEventListener(
  */
 
 console.log(
-    "✅ challenge.js loaded successfully"
+    "✅ challenge.js loaded successfully — Challenge Fix v28"
 );
 
 /* ============================================================
