@@ -16,3 +16,4 @@ An interactive SQL learning platform inspired by Snowflake.
 Under development.
 redeploy code1
 api deployed on render at -  https://sql-learning-platform-5fu8.onrender.com
+.
