@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Login | SQL Learning Platform</title>
+    <link rel="stylesheet" href="admin-login.css">
+</head>
+<body>
+
+<main class="login-shell">
+    <section class="login-card">
+        <div class="brand">
+            <span class="brand-mark">SQL</span>
+            <div>
+                <strong>SQL Learning</strong>
+                <small>Administrator</small>
+            </div>
+        </div>
+
+        <span class="eyebrow">PRIVATE ADMIN AREA</span>
+        <h1>Welcome back</h1>
+        <p class="intro">
+            Sign in to manage feedback and view real platform traffic.
+        </p>
+
+        <form id="adminLoginForm">
+            <label>
+                Email or phone
+                <input
+                    id="identifier"
+                    name="identifier"
+                    type="text"
+                    autocomplete="username"
+                    required
+                    placeholder="Admin email or phone">
+            </label>
+
+            <label>
+                Password
+                <div class="password-field">
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autocomplete="current-password"
+                        required
+                        placeholder="Your admin password">
+                    <button
+                        id="togglePassword"
+                        type="button"
+                        aria-label="Show password">
+                        Show
+                    </button>
+                </div>
+            </label>
+
+            <button class="submit-button" type="submit">
+                Sign in to Admin
+            </button>
+
+            <p id="loginStatus" class="status" role="alert"></p>
+        </form>
+
+        <a class="back-link" href="../home/home.html">
+            ← Back to SQL Learning Platform
+        </a>
+    </section>
+</main>
+
+<script src="admin-login.js"></script>
+</body>
+</html>
