@@ -1,0 +1,41 @@
+SQL Learning Platform
+│
+├── frontend/
+│   ├── assets/
+│   │   ├── healthcare-schema.sql
+│   │   ├── healthcare-seed.sql
+│   │   ├── banking-schema.sql
+│   │   ├── banking-seed.sql
+│   │   ├── challenge.js
+│   │   ├── challenges.js
+│   │   ├── questions-beginner.json
+│   │   ├── questions-intermediate.json
+│   │   └── questions-expert.json
+│   │
+│   ├── home/
+│   ├── tutorial/
+│   ├── playground/
+│   ├── challenge/
+│   ├── sandbox/
+│   ├── authentication/
+│   └── admin/
+│
+└── Backend/
+    ├── api/
+    │   └── server.js
+    │
+    ├── config/
+    │   └── db.js
+    │
+    ├── database/
+    │   ├── init.js
+    │   ├── auth-schema.sql
+    │   ├── analytics-schema.sql
+    │   └── sql-learning.db
+    │
+    └── routes/
+        ├── queryRoutes.js
+        ├── schemaRoutes.js
+        ├── authRoutes.js
+        ├── feedbackRoutes.js
+        └── analyticsRoutes.js
