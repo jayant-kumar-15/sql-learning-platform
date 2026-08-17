@@ -1,3 +1,7 @@
+
+/*
+ * FILE: Backend/routes/queryRoutes.js
+ */
 const express = require("express");
 
 const queryService = require("../services/queryService");
