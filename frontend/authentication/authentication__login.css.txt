@@ -1,0 +1,108 @@
+/* ============================================================
+   LOGIN / AUTHENTICATION PAGE
+   ============================================================ */
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px 20px;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(53, 167, 255, 0.14), transparent 30%),
+        #07111f;
+}
+
+.login-card {
+    width: min(400px, 100%);
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid rgba(120, 170, 230, 0.18);
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.30);
+}
+
+.login-back {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #9eb1c8;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.login-brand {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 15px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #35a7ff, #7773ff);
+    color: #07111f;
+    font-weight: 900;
+}
+
+.login-card h1 {
+    margin: 0 0 10px;
+    color: #edf5ff;
+    font-size: 22px;
+}
+
+.login-card h2 {
+    margin: 0 0 25px;
+    color: #9eb1c8;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.login-card form {
+    text-align: left;
+}
+
+.login-card label {
+    display: block;
+    margin: 0 0 7px;
+    color: #cbd5e1;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    color: #ffffff;
+    background: #111827;
+    outline: none;
+}
+
+.login-card input:focus {
+    border-color: #35a7ff;
+}
+
+.login-card button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #07111f;
+    font-weight: 800;
+    background: linear-gradient(135deg, #5fc7ff, #8e8aff);
+}
+
+.login-card .register-btn {
+    color: #ffffff;
+    background: #374151;
+}
+
+#loginMessage {
+    min-height: 20px;
+    margin: 15px 0 0;
+    color: #9eb1c8;
+    font-size: 13px;
+}

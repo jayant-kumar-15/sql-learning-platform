@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Authentication page metadata -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Login | SQL Learning Platform</title>
+
+    <!-- Corrected paths for the new authentication folder -->
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+    <main class="login-container">
+        <section class="login-card">
+            <a class="login-back" href="../home/home.html">← Back to Home</a>
+
+            <div class="login-brand">SQL</div>
+
+            <h1>SQL Learning Platform</h1>
+            <h2>Login / Sign up</h2>
+
+            <form id="loginForm">
+                <label for="loginEmail">Email</label>
+                <input
+                    id="loginEmail"
+                    name="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                    required
+                >
+
+                <label for="loginPassword">Password</label>
+                <input
+                    id="loginPassword"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required
+                >
+
+                <button type="submit">Login</button>
+            </form>
+
+            <button class="register-btn" type="button" id="registerButton">
+                Create Account
+            </button>
+
+            <p id="loginMessage" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <!-- Authentication JavaScript can be connected later. -->
+    <script src="login.js"></script>
+</body>
+</html>
