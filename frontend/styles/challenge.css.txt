@@ -1,0 +1,1445 @@
+/*
+ * ============================================================
+ * FILE PATH: frontend/styles/challenge.css
+ * ============================================================
+ * PURPOSE
+ * -------
+ * SQL Learning Platform module.
+ *
+ * DOCUMENTATION
+ * -------------
+ * Keep this path header during future revisions. Add section
+ * comments before every new major feature, state object,
+ * event group, API call, or validation rule.
+ *
+ * Existing functionality is preserved in this documentation
+ * revision.
+ * ============================================================
+ */
+
+.challenge-container {
+
+    padding: 40px;
+}
+
+.subtitle {
+
+    color: #cbd5e1;
+
+    margin-bottom: 30px;
+}
+
+.difficulty-cards {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: stretch;
+
+    gap: 25px;
+
+    margin-bottom: 25px;
+
+}
+
+.challenge-card {
+
+    background: #1e293b;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    flex: 1;
+
+}
+
+.challenge-card h2 {
+
+    margin-bottom: 15px;
+}
+
+.challenge-card p {
+
+    color: #cbd5e1;
+
+    margin-bottom: 20px;
+}
+
+.challenge-card button {
+
+    padding: 10px 18px;
+
+    background: #2563eb;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+}
+
+.sample-question {
+
+    margin-top: 40px;
+
+    background: #111827;
+
+    padding: 25px;
+
+    border-radius: 12px;
+}
+
+
+.sample-question {
+
+    margin-top: 40px;
+
+    padding: 25px;
+
+    background: #1e293b;
+
+    border-radius: 12px;
+}
+
+.sample-question h2 {
+
+    margin-bottom: 15px;
+}
+
+.sample-question p {
+
+    margin-bottom: 12px;
+}
+
+.sample-question table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 15px;
+}
+
+.sample-question th,
+.sample-question td {
+
+    border: 1px solid #475569;
+
+    padding: 12px;
+
+    text-align: left;
+}
+
+.sample-question th {
+
+    background: #0f172a;
+}
+
+.question-buttons {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-top: 20px;
+
+}
+
+.question-buttons button {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    background: #2563eb;
+
+    color: white;
+
+}
+
+#questions-popup {
+
+    position: fixed;
+
+    top: 50%;
+
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 90%;
+
+    max-width: 750px;
+
+    max-height: 80vh;
+
+    background: #1e293b;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+
+    z-index: 1000;
+
+    overflow: hidden;
+
+}
+
+/* The list remains scrollable while each question card grows naturally. */
+.questions-grid {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin: 20px 0;
+
+    max-height: 60vh;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding-right: 8px;
+
+}
+
+.question-filters {
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+
+    margin: 15px 0;
+
+}
+
+.filter-btn {
+
+    padding: 8px 14px;
+
+    border: 1px solid #475569;
+
+    border-radius: 8px;
+
+    background: #334155;
+
+    color: #e2e8f0;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+}
+
+.filter-btn:hover {
+
+    background: #475569;
+
+}
+
+.filter-btn.active {
+
+    background: #3b82f6;
+
+    color: white;
+
+    border: 2px solid #93c5fd;
+
+    font-weight: 600;
+
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.45);
+
+}
+
+/* ============================================================
+ * QUESTION POPUP CARDS - AUTO HEIGHT
+ * ------------------------------------------------------------
+ * Short and long questions must occupy only the space they need.
+ * The previous minimum-height/flex-centering combination could make
+ * long descriptive questions visually collide with the next card.
+ * ============================================================ */
+.question-popup-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px;
+    background: #334155;
+    border: 1px solid #475569;
+    border-radius: 10px;
+    min-height: 0;
+    height: auto;
+    box-sizing: border-box;
+    /* FIX (overlapping question rows / hidden Start button):
+       .questions-grid caps its height at 60vh and scrolls. Without
+       flex-shrink:0, flexbox is allowed to compress each card BELOW
+       its actual text height once the list is long enough to exceed
+       that 60vh cap (min-height:0 above removes the browser's normal
+       "never shrink under content" protection). That compression is
+       exactly what made rows visually collide and swallowed the
+       Start button into the next card. Locking flex-shrink/grow to 0
+       forces every card to keep its natural, content-based height —
+       short questions stay compact, long ones grow — and the list
+       simply scrolls instead of overlapping. */
+    flex: 0 0 auto;
+}
+
+.question-popup-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: #f8fafc;
+    line-height: 1.55;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+} 
+
+.question-popup-text strong {
+    display: block;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.question-popup-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+    align-self: flex-start;
+}
+
+.question-status {
+
+    font-size: 20px;
+
+}
+
+.popup-start-btn {
+
+    padding: 9px 16px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #2563eb;
+
+    color: white;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+}
+
+.popup-start-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+/* FIX (Start button forced to 90px / not displaying correctly):
+   This rule is leftover from an older design where the entire
+   question card was a single <button>. Cards are now <div class=
+   "question-popup-card"> with a small nested <button class=
+   "popup-start-btn">, but ".questions-grid button" still matches
+   that nested button — and because "class + tag" (0,1,1) beats
+   ".popup-start-btn" alone (0,1,0), it was overriding padding,
+   border-radius, text-align and forcing min-height:90px onto the
+   small Start button. Combined with the card-shrinking bug above,
+   that oversized/misaligned button is what disappeared into the
+   overlap. Scoped to :not(.popup-start-btn) so it no longer touches
+   the Start button, restoring its intended compact size. */
+.questions-grid button:not(.popup-start-btn) {
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #334155;
+
+    color: white;
+
+    cursor: pointer;
+
+    min-height: 90px;
+
+    text-align: center;
+
+    line-height: 1.5;
+}
+
+.questions-grid small {
+
+    color: #cbd5e1;
+
+    font-size: 12px;
+}
+
+#close-popup {
+
+    padding: 10px 18px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #ef4444;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+#overlay {
+
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.7);
+
+    z-index: 999;
+}
+
+.difficulty-progress {
+
+    margin-top: 20px;
+
+}
+
+.progress-item {
+
+    margin-bottom: 20px;
+
+}
+
+.progress-item p {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+
+}
+
+.progress-bar {
+
+    width: 100%;
+
+    height: 14px;
+    position: relative;
+
+    background-color: #e0e0e0;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+}
+
+.progress-fill {
+
+    width: 0%;
+
+    height: 100%;
+
+    display: block;
+
+    background: linear-gradient(
+        to right,
+        #4caf50,
+        #81c784
+    );
+
+    transition: width 0.5s ease;
+
+}
+
+.challenge-layout {
+
+    display: flex;
+
+    gap: 30px;
+
+    margin-top: 30px;
+
+}
+
+.sample-question {
+
+    width: 40%;
+
+}
+
+.editor-panel {
+
+    width: 60%;
+
+}
+
+.editor-panel textarea {
+
+    width: 100%;
+
+    min-height: 500px;
+
+    background: #0f172a;
+
+    color: white;
+
+    border-radius: 10px;
+
+    padding: 15px;
+
+    font-size: 16px;
+
+}
+
+.popup-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+
+}
+
+#question-search {
+
+    width: 100%;
+
+    padding: 12px;
+
+    margin-bottom: 20px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #334155;
+
+    color: white;
+
+    font-size: 16px;
+
+}
+
+/* ============================================================
+ * VIEW TABLE SCHEMA
+ * ============================================================
+ */
+
+.view-schema-btn {
+
+    margin: 10px 0 15px 0;
+
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    background: #e8f1ff;
+
+    color: #1d4ed8;
+
+    transition: 0.2s;
+
+}
+
+.view-schema-btn:hover {
+
+    background: #dbeafe;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* ============================================================
+ * SCHEMA OVERLAY
+ * ============================================================
+ */
+
+.schema-overlay {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    z-index: 9998;
+
+}
+
+
+/* ============================================================
+ * SCHEMA POPUP
+ * ============================================================
+ */
+
+.schema-popup {
+
+    position: fixed;
+
+    top: 50%;
+
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: min(900px, 92vw);
+
+    max-height: 85vh;
+
+    overflow-y: auto;
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.3);
+
+    z-index: 9999;
+
+}
+
+
+/* ============================================================
+ * SCHEMA HEADER
+ * ============================================================
+ */
+
+.schema-popup-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 15px;
+
+}
+
+.schema-popup-header h2 {
+
+    margin: 0;
+
+}
+
+.close-schema-btn {
+
+    border: none;
+
+    background: transparent;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+}
+
+
+/* ============================================================
+ * DATABASE NAME
+ * ============================================================
+ */
+
+.schema-database-name {
+
+    margin-bottom: 20px;
+
+    padding: 10px;
+
+    background: #f3f4f6;
+
+    border-radius: 8px;
+
+}
+
+
+/* ============================================================
+ * TABLE CARD
+ * ============================================================
+ */
+
+.schema-table-card {
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 10px;
+
+    margin-bottom: 20px;
+
+    overflow: hidden;
+
+}
+
+.schema-table-title {
+
+    padding: 12px 15px;
+
+    background: #eef2ff;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+ * SCHEMA TABLE
+ * ============================================================
+ */
+
+.schema-columns-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+}
+
+.schema-columns-table th,
+.schema-columns-table td {
+
+    padding: 10px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+.schema-columns-table th {
+
+    background: #f9fafb;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+ * PRIMARY KEY
+ * ============================================================
+ */
+
+.schema-primary-key {
+
+    color: #b45309;
+
+    font-weight: 700;
+
+}
+
+
+/* ============================================================
+ * FOREIGN KEY
+ * ============================================================
+ */
+
+.schema-foreign-key {
+
+    color: #2563eb;
+
+    font-weight: 600;
+
+}
+
+
+/* ============================================================
+ * RELATIONSHIPS
+ * ============================================================
+ */
+
+.schema-relationships {
+
+    margin-top: 12px;
+
+    padding: 12px;
+
+    background: #eff6ff;
+
+    border-radius: 8px;
+
+}
+
+.schema-relationships h4 {
+
+    margin-top: 0;
+
+}
+
+.schema-relationship-item {
+
+    padding: 6px 0;
+
+    font-family: monospace;
+
+}
+
+
+/* ============================================================
+ * MOBILE
+ * ============================================================
+ */
+
+@media (max-width: 700px) {
+
+    .schema-popup {
+
+        width: 94vw;
+
+        padding: 12px;
+
+    }
+
+    .schema-columns-table {
+
+        font-size: 13px;
+
+    }
+
+    .schema-columns-table th,
+    .schema-columns-table td {
+
+        padding: 7px;
+
+    }
+
+}
+
+/* ============================================================
+ * SCHEMA POPUP - VISIBILITY FIX
+ * ============================================================
+ */
+
+.schema-popup {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+.schema-popup-header {
+    background: #ffffff !important;
+    color: #111827 !important;
+}
+
+.schema-popup-header h2 {
+    color: #111827 !important;
+}
+
+.close-schema-btn {
+    color: #111827 !important;
+}
+
+.schema-database-name {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+.schema-content {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+.schema-table-card {
+    background: #ffffff !important;
+    border: 1px solid #d1d5db !important;
+}
+
+.schema-table-title {
+    background: #e0e7ff !important;
+    color: #111827 !important;
+}
+
+.schema-columns-table {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+.schema-columns-table th {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+.schema-columns-table td {
+    background: #ffffff !important;
+    color: #1f2937 !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+.schema-primary-key {
+    color: #b45309 !important;
+}
+
+.schema-foreign-key {
+    color: #2563eb !important;
+}
+
+.schema-relationships {
+    background: #eff6ff !important;
+    color: #1e3a8a !important;
+}
+
+.schema-relationships h4 {
+    color: #1e3a8a !important;
+}
+
+.schema-relationship-item {
+    color: #1e3a8a !important;
+}
+
+/* ============================================================
+   SQL QUERY RESULTS TABLE
+   ============================================================ */
+
+.query-results-container {
+    width: 100%;
+    margin-top: 20px;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.query-results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 18px;
+    background: #f3f4f6;
+    border-bottom: 1px solid #d1d5db;
+}
+
+.query-results-header h3 {
+    margin: 0;
+    color: #111827;
+}
+
+#query-result-summary {
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.query-results-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#query-results-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    color: #111827;
+    font-size: 14px;
+}
+
+#query-results-table thead th {
+    background: #e5e7eb;
+    color: #111827;
+    font-weight: 700;
+    text-align: left;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    white-space: nowrap;
+}
+
+#query-results-table tbody td {
+    padding: 11px 14px;
+    border: 1px solid #e5e7eb;
+    color: #1f2937;
+    background: #ffffff;
+    vertical-align: top;
+}
+
+#query-results-table tbody tr:nth-child(even) td {
+    background: #f9fafb;
+}
+
+#query-results-table tbody tr:hover td {
+    background: #eef2ff;
+}
+
+/* NULL values */
+#query-results-table tbody td {
+    max-width: 350px;
+    word-break: break-word;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .query-results-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #query-results-table {
+        min-width: 600px;
+    }
+
+    #query-results-table thead th,
+    #query-results-table tbody td {
+        padding: 9px 11px;
+        font-size: 13px;
+    }
+
+}
+
+/* ============================================================
+   EXPECTED OUTPUT - HORIZONTAL SCROLL
+   ============================================================ */
+
+/* ============================================================
+   EXPECTED OUTPUT - SCROLLABLE PREVIEW
+   ------------------------------------------------------------
+   The question data may contain hundreds/thousands of rows.
+   We keep the complete expected result in the DOM for reference,
+   but constrain the visible area so long outputs never push the
+   question card out of shape. Users can scroll vertically through
+   every matching row and horizontally when many columns exist.
+   ============================================================ */
+.expected-output-wrapper {
+    width: 100%;
+    max-width: 100%;
+    max-height: 240px;
+    overflow-x: auto;
+    overflow-y: auto;
+    margin-top: 10px;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/*
+ * Keep the table wide enough to display all columns.
+ * The wrapper above will provide horizontal scrolling.
+ */
+#expected-output {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+#expected-output th,
+#expected-output td {
+    padding: 11px 14px;
+    border: 1px solid #d1d5db;
+    text-align: left;
+}
+
+#expected-output th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #e5e7eb;
+    color: #111827;
+    font-weight: 700;
+}
+
+#expected-output td {
+    background: #ffffff;
+    color: #1f2937;
+}
+
+#expected-output tbody tr:nth-child(even) td {
+    background: #f9fafb;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .expected-output-wrapper {
+        max-width: 100%;
+        max-height: 220px;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    #expected-output {
+        min-width: max-content;
+    }
+
+    #expected-output th,
+    #expected-output td {
+        padding: 9px 12px;
+        font-size: 13px;
+    }
+
+}
+
+/* ============================================================
+ * YOUR LEVEL CARD
+ * ============================================================
+ * Compact status-only card requested for the top of the Challenge page.
+ * Detailed milestone messages are intentionally kept out of this card.
+ * ============================================================ */
+
+.challenge-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 25px;
+}
+
+.challenge-heading {
+    flex: 1;
+    min-width: 0;
+}
+
+.challenge-heading .subtitle {
+    margin-bottom: 0;
+}
+
+/* ============================================================
+ * YOUR LEVEL CARD
+ * ------------------------------------------------------------
+ * Compact status-only card for the top-right of the Challenge page.
+ * All three levels are visible; milestone messages stay in the popup.
+ * ============================================================ */
+.your-level-card {
+    width: 330px;
+    flex-shrink: 0;
+    padding: 16px 18px;
+    border: 2px solid #f59e0b;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #172033, #111827);
+    box-shadow: 0 10px 28px rgba(245, 158, 11, 0.16);
+}
+
+.your-level-header {
+    margin-bottom: 8px;
+    color: #fbbf24;
+    font-size: 1.08rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.your-level-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    min-height: 38px;
+    padding: 8px 2px;
+    border-top: 1px solid rgba(148, 163, 184, 0.18);
+    color: #e2e8f0;
+}
+
+.level-status-label {
+    color: #cbd5e1;
+    font-weight: 700;
+}
+
+.your-level-row strong {
+    color: #ffffff;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    text-align: right;
+}
+
+.level-status-beginner strong {
+    color: #86efac;
+}
+
+.level-status-intermediate strong {
+    color: #facc15;
+}
+
+.level-status-expert strong {
+    color: #f87171;
+}
+
+/* ============================================================
+ * LEVEL-UP CELEBRATION POPUP
+ * ============================================================
+ * Appears only when a new Intermediate star or Expert rank is earned.
+ * ============================================================ */
+
+.level-celebration-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(2, 6, 23, 0.78);
+    z-index: 12000;
+}
+
+.level-celebration-popup {
+    position: relative;
+    width: min(460px, 92vw);
+    padding: 34px 28px 28px;
+    overflow: hidden;
+    text-align: center;
+    border: 2px solid #f59e0b;
+    border-radius: 20px;
+    background: #1e293b;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+}
+
+.level-celebration-pop {
+    animation: levelCelebrationPop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.25);
+}
+
+.level-celebration-badge {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 78px;
+    margin-bottom: 12px;
+    font-size: 3.4rem;
+    animation: levelBadgeBounce 0.9s ease-in-out infinite alternate;
+}
+
+.level-celebration-popup h2 {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 12px;
+    color: #fbbf24;
+    font-size: 1.65rem;
+}
+
+.level-celebration-popup p {
+    position: relative;
+    z-index: 2;
+    margin: 0 auto 22px;
+    max-width: 360px;
+    color: #f8fafc;
+    font-size: 1.05rem;
+    line-height: 1.55;
+}
+
+.level-celebration-close {
+    position: relative;
+    z-index: 2;
+    padding: 11px 22px;
+    border: none;
+    border-radius: 9px;
+    background: #2563eb;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.level-celebration-close:hover {
+    background: #1d4ed8;
+}
+
+.celebration-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.celebration-particles span {
+    position: absolute;
+    font-size: 1.25rem;
+    animation: celebrationFloat 1.8s ease-in-out infinite;
+}
+
+.celebration-particles span:nth-child(1) { top: 12%; left: 12%; animation-delay: 0s; }
+.celebration-particles span:nth-child(2) { top: 18%; right: 13%; animation-delay: 0.25s; }
+.celebration-particles span:nth-child(3) { top: 52%; left: 7%; animation-delay: 0.45s; }
+.celebration-particles span:nth-child(4) { top: 58%; right: 8%; animation-delay: 0.7s; }
+.celebration-particles span:nth-child(5) { bottom: 13%; left: 20%; animation-delay: 0.9s; }
+.celebration-particles span:nth-child(6) { bottom: 12%; right: 19%; animation-delay: 1.1s; }
+
+@keyframes levelCelebrationPop {
+    0% {
+        transform: scale(0.72) translateY(20px);
+        opacity: 0;
+    }
+    70% {
+        transform: scale(1.03) translateY(-2px);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes levelBadgeBounce {
+    from {
+        transform: translateY(0) rotate(-4deg);
+    }
+    to {
+        transform: translateY(-8px) rotate(4deg);
+    }
+}
+
+@keyframes celebrationFloat {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.65;
+    }
+    50% {
+        transform: translateY(-12px) scale(1.18);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 800px) {
+
+    .challenge-header-row {
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .your-level-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .question-popup-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .question-popup-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+}
+
+/* ============================================================
+ * CHALLENGE RESULTS - COMPACT SCROLLABLE VIEW
+ * ------------------------------------------------------------
+ * Keeps the Results section compact so large query results do not
+ * push the Challenge page far down. Approximately 4-5 rows remain
+ * visible at normal row height; the remaining rows are scrollable.
+ *
+ * Existing horizontal scrolling is preserved for wide result sets.
+ * ============================================================ */
+
+.query-results-container {
+    border: 2px solid #475569;
+    border-radius: 14px;
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.18),
+        0 0 0 1px rgba(148, 163, 184, 0.08);
+}
+
+.query-results-table-wrapper {
+    max-height: 255px;
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+/* Keep the result-table header visible while scrolling. */
+#query-results-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+}
+
+
+/* ============================================================
+ * EXPECTED OUTPUT - BEAUTIFUL BORDER
+ * ------------------------------------------------------------
+ * Preserves the existing Expected Output scrolling behavior and
+ * adds only a clearer visual boundary.
+ * ============================================================ */
+
+.expected-output-wrapper {
+    border: 2px solid #94a3b8;
+    box-shadow:
+        0 6px 18px rgba(15, 23, 42, 0.14),
+        0 0 0 1px rgba(148, 163, 184, 0.08);
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+ * MOBILE RESULTS
+ * ============================================================ */
+
+@media (max-width: 768px) {
+
+    .query-results-table-wrapper {
+        max-height: 230px;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    .query-results-container,
+    .expected-output-wrapper {
+        border-radius: 12px;
+    }
+}
+
+
+
+/* ============================================================
+ * FINAL MOBILE RESPONSIVE OVERRIDES
+ * Desktop layout above is intentionally unchanged.
+ * ============================================================ */
+.challenge-mobile-menu-toggle{display:none;border:1px solid rgba(148,163,184,.35);background:rgba(30,41,59,.9);color:#f8fafc;width:42px;height:42px;border-radius:10px;cursor:pointer;font-size:22px;line-height:1}
+.challenge-mobile-menu-toggle:focus-visible{outline:2px solid #55c2ff;outline-offset:3px}
+.challenge-site-footer{margin-top:60px;border-top:1px solid rgba(148,163,184,.18);background:rgba(7,17,31,.92);color:#cbd5e1}
+.challenge-footer-inner{max-width:1200px;margin:auto;padding:28px 5vw;display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:28px}
+.challenge-footer-brand strong{display:block;color:#f8fafc;margin-bottom:7px}.challenge-footer-brand span,.challenge-footer-meta span{display:block;color:#94a3b8;font-size:.86rem;line-height:1.55}.challenge-footer-links{display:flex;flex-wrap:wrap;gap:9px 16px}.challenge-footer-links a{color:#cbd5e1;text-decoration:none;font-size:.88rem}.challenge-footer-links a:hover{color:#fff}.challenge-footer-meta{text-align:right}
+#active-level-card[hidden]{display:none!important}
+@media(max-width:760px){
+.challenge-platform-header{min-height:64px;padding:10px 16px;display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap}
+.challenge-mobile-menu-toggle{display:grid;place-items:center;order:1}.challenge-platform-brand{order:2;min-width:0}.challenge-platform-brand-mark{width:40px;height:40px}.challenge-platform-brand-text strong{font-size:15px}.challenge-platform-header nav{order:3;display:none;width:100%;padding:10px 4px 4px;flex-direction:column;align-items:stretch;gap:0}.challenge-platform-header nav.mobile-menu-open{display:flex}.challenge-platform-header nav a{display:block;padding:11px 10px;font-size:14px;border-radius:8px}
+.challenge-container{padding:22px 16px 0}.challenge-header-row{flex-direction:column;align-items:stretch;gap:14px}.your-level-card[hidden]{display:none!important}.difficulty-cards{display:grid;grid-template-columns:1fr;gap:14px}.challenge-card{width:100%;min-height:176px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;padding:20px}.challenge-card p{flex:1;line-height:1.5}.challenge-card button{align-self:flex-start;min-height:42px;min-width:96px}
+.challenge-layout{display:flex;flex-direction:column;gap:20px;margin-top:24px}.sample-question,.editor-panel{width:100%;max-width:none;box-sizing:border-box;margin-top:0}.sample-question{padding:18px}.view-schema-btn{width:100%;min-height:46px}.expected-output-wrapper{width:100%;max-width:100%;overflow-x:auto;overflow-y:auto;-webkit-overflow-scrolling:touch}.expected-output-wrapper table{min-width:max-content}.question-buttons{display:flex;flex-direction:column;gap:10px}.question-buttons button{width:100%;min-height:44px}.editor-panel{padding:18px;border-radius:12px}.editor-panel textarea{width:100%;min-height:360px;height:360px;box-sizing:border-box;resize:vertical;font-size:16px;line-height:1.5}#run-query-btn{width:100%;min-height:46px}.query-results-table-wrapper{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.challenge-site-footer{margin-top:42px}.challenge-footer-inner{grid-template-columns:1fr;gap:18px;padding:24px 16px}.challenge-footer-meta{text-align:left}
+}
+@media(max-width:380px){.challenge-platform-brand-text strong{font-size:14px}.challenge-container{padding-left:12px;padding-right:12px}.sample-question,.editor-panel{padding:15px}}
+@media(prefers-reduced-motion:reduce){.challenge-platform-brand,.challenge-platform-header nav a{transition:none!important}}
