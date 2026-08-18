@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- ============================================================
+         SQL LEARNING PLATFORM
+         ============================================================
+
+         FILE
+         ----
+         frontend/playground/playground.html
+
+         PURPOSE
+         -------
+         Read-only SQL practice environment.
+         ============================================================ -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SQL Playground for practicing SQL with Healthcare and Banking databases.">
+
+    <title>SQL Playground | SQL Learning Platform</title>
+
+    <link rel="stylesheet" href="../styles/main.css?v=17">
+    <link rel="stylesheet" href="playground.css?v=4">
+
+</head>
+
+<body>
+
+    <!-- ============================================================
+         PLATFORM HEADER
+         ============================================================ -->
+    <header class="platform-header">
+
+        <a class="platform-brand-link" href="../home/home.html" aria-label="SQL Learning Platform home">
+            <span class="platform-brand-mark" aria-hidden="true">SQL</span>
+            <span class="platform-brand-text">
+                <strong>SQL Learning</strong>
+                <small>Platform</small>
+            </span>
+        </a>
+
+        <nav class="platform-nav" aria-label="Main navigation">
+            <a href="../home/home.html">Home</a>
+            <a href="../tutorial/tutorial.html">Tutorial</a>
+            <a href="playground.html" class="active" aria-current="page">Playground</a>
+            <a href="../pages/challenge.html">Challenges</a>
+            <a href="../sandbox/sandbox.html">Sandbox</a>
+        </nav>
+
+    </header>
+
+    <!-- ============================================================
+         MOBILE SIDEBAR BUTTON
+         ============================================================ -->
+    <button
+        id="mobile-sidebar-button"
+        class="mobile-sidebar-button"
+        type="button"
+        aria-label="Open database explorer"
+        title="Open database explorer"
+    >
+        <span class="mobile-sidebar-icon">🗄️</span>
+        <span class="mobile-sidebar-label">Tables / Explorer</span>
+    </button>
+
+    <!-- ============================================================
+         MAIN PLAYGROUND APPLICATION
+         ============================================================ -->
+    <main class="playground-layout" id="playground-layout">
+
+        <!-- ========================================================
+             DATABASE EXPLORER SIDEBAR
+             ======================================================== -->
+        <aside id="database-sidebar" class="database-sidebar" aria-label="Database Explorer">
+
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <span class="sidebar-title-icon">🗄️</span>
+                    <span>DATABASE EXPLORER</span>
+                </div>
+
+                <button
+                    id="close-sidebar-button"
+                    class="close-sidebar-button"
+                    type="button"
+                    aria-label="Close database explorer"
+                    title="Close Explorer"
+                >
+                    ×
+                </button>
+            </div>
+
+            <!-- Database Search -->
+            <div class="database-search">
+                <label for="database-search-input" class="visually-hidden">
+                    Search databases and tables
+                </label>
+                <input
+                    id="database-search-input"
+                    type="search"
+                    placeholder="Search databases or tables..."
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+            </div>
+
+            <!-- Database Tree -->
+            <div id="database-tree" class="database-tree" role="tree" aria-label="Learning databases">
+                <div id="database-loading-message" class="database-loading-message">
+                    <div class="database-loading-icon">⏳</div>
+                    <p>Loading databases...</p>
+                </div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <span>Read-only learning databases</span>
+            </div>
+
+        </aside>
+
+        <!-- ========================================================
+             MAIN WORKSPACE
+             ======================================================== -->
+        <section class="playground-workspace" id="playground-workspace">
+
+            <!-- Information Banner -->
+            <section class="playground-info-banner" aria-label="Playground information">
+                <div class="playground-info-icon">💻</div>
+                <div class="playground-info-content">
+                    <strong>SQL Playground</strong>
+                    <span>Practice SQL using read-only Healthcare and Banking learning databases.</span>
+                </div>
+            </section>
+
+            <!-- Query Tab Bar -->
+            <section class="query-tabs-container" id="query-tabs-container" aria-label="SQL query worksheets">
+                <div id="query-tabs" class="query-tabs" role="tablist" aria-label="Query tabs">
+                    <button
+                        id="query-tab-1"
+                        class="query-tab active"
+                        data-query-id="1"
+                        type="button"
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="sql-editor"
+                    >
+                        <span class="query-tab-name">Query 1</span>
+                    </button>
+
+                    <button
+                        id="new-query-button"
+                        class="new-query-button"
+                        type="button"
+                        title="New Query"
+                        aria-label="Create new query"
+                    >
+                        ＋
+                    </button>
+                </div>
+            </section>
+
+            <!-- SQL Worksheet -->
+            <section class="sql-editor-section" id="sql-editor-section">
+
+                <!-- Worksheet Toolbar -->
+                <div class="workspace-toolbar" role="toolbar" aria-label="SQL worksheet actions">
+                    <div class="workspace-title">
+                        <span class="workspace-title-icon">▤</span>
+                        <span>SQL WORKSHEET</span>
+                    </div>
+
+                    <div class="workspace-actions">
+                        <button id="describe-table-button" class="toolbar-button" type="button" title="Describe a table">
+                            Describe
+                        </button>
+                        <button id="view-schema-button" class="toolbar-button" type="button" title="View database schema">
+                            Schema
+                        </button>
+                        <button id="view-relationships-button" class="toolbar-button" type="button" title="View table relationships">
+                            Relationships
+                        </button>
+                        <button id="run-query-button" class="run-query-button" type="button" title="Run SQL">
+                            ▶ Run Query
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SQL Editor Box -->
+                <div class="editor-wrapper" id="editor-wrapper">
+                    <textarea
+                        id="sql-editor"
+                        class="sql-editor"
+                        spellcheck="false"
+                        wrap="off"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        aria-label="SQL query editor"
+                        placeholder="-- Active database: None
+-- To change database: USE database_name;
+
+-- Write your SQL query here.
+
+-- Example:
+SELECT *
+FROM Patients;"
+                    ></textarea>
+                </div>
+
+                <!-- Worksheet Status -->
+                <div id="playground-status" class="playground-status" role="status" aria-live="polite"></div>
+
+            </section>
+
+            <!-- Query Results -->
+            <section id="results-section" class="results-section results-hidden" aria-label="Query results">
+
+                <div id="results-resize-handle" class="results-resize-handle" title="Drag to resize results" aria-label="Resize query results" role="separator" aria-orientation="horizontal"></div>
+
+                <div class="results-header">
+                    <div class="results-title-container">
+                        <div class="results-title">
+                            <span class="results-title-icon">▦</span>
+                            <h2>Query Results</h2>
+                        </div>
+                        <span id="results-summary" class="results-summary">No query executed</span>
+                    </div>
+
+                    <div class="results-actions">
+                        <button id="download-results-button" class="download-button" type="button" disabled title="Download query results as CSV" aria-label="Download results as CSV">
+                            ↓ CSV
+                        </button>
+                        <button id="minimize-results-button" class="results-control-button" type="button" title="Minimize results" aria-label="Minimize results">
+                            −
+                        </button>
+                        <button id="maximize-results-button" class="results-control-button" type="button" title="Maximize results" aria-label="Maximize results">
+                            ⛶
+                        </button>
+                        <button id="close-results-button" class="results-control-button" type="button" title="Close results" aria-label="Close results">
+                            ×
+                        </button>
+                    </div>
+                </div>
+
+                <div id="results-container" class="results-container">
+                    <div class="empty-results">
+                        <div class="empty-results-icon">▦</div>
+                        <p>Run a SQL query to see results here.</p>
+                    </div>
+                </div>
+
+            </section>
+
+        </section>
+
+    </main>
+
+    <!-- Table Selector Modal -->
+    <div id="table-selector-overlay" class="modal-overlay hidden" aria-hidden="true"></div>
+    <section id="table-selector-modal" class="modal modal-medium hidden" role="dialog" aria-modal="true" aria-labelledby="table-selector-title">
+        <div class="modal-header">
+            <div>
+                <span class="modal-kicker">DATABASE TABLES</span>
+                <h2 id="table-selector-title">Select Table</h2>
+            </div>
+            <button id="close-table-selector" class="modal-close" type="button" aria-label="Close table selector" title="Close">
+                ×
+            </button>
+        </div>
+        <div id="table-selector-list" class="table-selector-list"></div>
+    </section>
+
+    <!-- Table Details / Describe Modal -->
+    <div id="table-details-overlay" class="modal-overlay hidden" aria-hidden="true"></div>
+    <section id="table-details-modal" class="modal modal-large hidden" role="dialog" aria-modal="true" aria-labelledby="table-details-title">
+        <div class="modal-header">
+            <div>
+                <span class="modal-kicker">TABLE INFORMATION</span>
+                <h2 id="table-details-title">Table Details</h2>
+            </div>
+            <button id="close-table-details" class="modal-close" type="button" aria-label="Close table details" title="Close">
+                ×
+            </button>
+        </div>
+        <div id="table-details-container" class="table-details-container"></div>
+    </section>
+
+    <!-- Relationships / Data Model Modal -->
+    <div id="relationships-overlay" class="modal-overlay hidden" aria-hidden="true"></div>
+    <section id="relationships-modal" class="modal modal-xl hidden" role="dialog" aria-modal="true" aria-labelledby="relationships-title">
+        <div class="modal-header">
+            <div>
+                <span class="modal-kicker">DATA MODEL</span>
+                <h2 id="relationships-title">Data Model / Relationships</h2>
+            </div>
+            <button id="close-relationships" class="modal-close" type="button" aria-label="Close relationships" title="Close">
+                ×
+            </button>
+        </div>
+        <div id="relationships-container" class="relationships-container">
+            <div class="relationships-empty-state">
+                <div class="relationships-empty-icon">🔗</div>
+                <p>Select a database to view its relationships.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Database Sidebar Overlay -->
+    <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay" aria-hidden="true"></div>
+
+    <!-- Scripts -->
+    <script src="../services/sqliteWasmLoader.js?v=1"></script>
+    <script src="../services/browserSqlEngine.js?v=2"></script>
+    <script src="../js/queryApi.js?v=2"></script>
+    <script src="../js/queryResults.js?v=2"></script>
+    <script src="../services/sqlEngine.js?v=2"></script>
+    <script src="playground.js?v=4"></script>
+
+</body>
+</html>
+
