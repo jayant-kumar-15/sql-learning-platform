@@ -1154,7 +1154,7 @@ function renderRelationshipDiagram(database) {
     const cardWidth = 220;
     const cardGapX = 55;
     const cardGapY = 75;
-    const cardHeightEstimate = 170;
+    const cardHeightEstimate = 250;
     const rowCount = Math.max(1, Math.ceil(tables.length / columnsPerRow));
     const canvasWidth = Math.max(900, columnsPerRow * cardWidth + (columnsPerRow - 1) * cardGapX + 80);
     const canvasHeight = Math.max(540, rowCount * cardHeightEstimate + (rowCount - 1) * cardGapY + 80);
