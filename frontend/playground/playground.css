@@ -4401,3 +4401,47 @@ body > .modal .relationships-container {
     position: relative;
     z-index: 2011 !important;
 }
+
+/* ============================================================
+   DESKTOP RESULTS MAXIMIZE - FINAL BOUNDARY FIX
+   ------------------------------------------------------------
+   Keep maximized Query Results inside the Playground workspace.
+   Do not allow it to cover the platform header.
+   Normal resize/minimize/close behavior remains unchanged.
+   ============================================================ */
+
+@media (min-width: 761px) {
+
+    #playground-workspace {
+        position: relative !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #results-section.results-maximized {
+        position: absolute !important;
+
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+
+        width: 100% !important;
+        height: auto !important;
+
+        max-height: none !important;
+
+        z-index: 500 !important;
+    }
+
+    #results-section.results-maximized .results-header,
+    #results-section.results-maximized .results-actions,
+    #results-section.results-maximized .results-control-button,
+    #results-section.results-maximized .download-button {
+        position: relative !important;
+        z-index: 502 !important;
+
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
