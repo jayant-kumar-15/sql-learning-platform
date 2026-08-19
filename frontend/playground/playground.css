@@ -4857,3 +4857,17 @@ body > .modal .relationships-container {
         font-size: 10.5px !important;
     }
 }
+
+/* ============================================================
+   MOBILE RUN BUTTON INITIAL-FLASH FIX
+   ------------------------------------------------------------
+   Prevents the desktop-positioned Run Query button from
+   briefly appearing in the mobile toolbar during page load.
+   JavaScript will move the same button to the mobile editor.
+   ============================================================ */
+
+@media (max-width: 760px) {
+    .workspace-actions > .run-query-button {
+        display: none !important;
+    }
+}
