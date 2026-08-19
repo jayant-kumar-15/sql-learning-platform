@@ -4559,9 +4559,15 @@ body > .platform-header .platform-nav {
 @media (max-width: 760px) {
 
     .playground-workspace {
-        min-height: 0 !important;
-        height: auto !important;
-        overflow: visible !important;
+    position: relative !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    overflow: visible !important;
     }
 
 }
