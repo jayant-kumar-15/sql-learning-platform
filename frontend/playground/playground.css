@@ -4377,3 +4377,26 @@ body > .modal .relationships-container {
         max-height: calc(100vh - 132px) !important;
     }
 }
+
+/* ============================================================
+   MODAL CLOSE BUTTON VISIBILITY FIX
+   ============================================================ */
+
+#table-selector-overlay,
+#table-details-overlay,
+#relationships-overlay {
+    z-index: 2000 !important;
+}
+
+#table-selector-modal,
+#table-details-modal,
+#relationships-modal {
+    z-index: 2010 !important;
+}
+
+#table-selector-modal .modal-close,
+#table-details-modal .modal-close,
+#relationships-modal .modal-close {
+    position: relative;
+    z-index: 2011 !important;
+}
