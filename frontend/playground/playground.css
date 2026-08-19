@@ -4445,3 +4445,64 @@ body > .modal .relationships-container {
         opacity: 1 !important;
     }
 }
+
+/* ============================================================
+   FINAL RESULTS DRAG + SCROLLBAR VISIBILITY FIX
+   ------------------------------------------------------------
+   Restore the resize handle while Results is maximized.
+   Also make the results scrollbar easier to see/use.
+   Existing resize JavaScript remains unchanged.
+   ============================================================ */
+
+@media (min-width: 761px) {
+
+    /* Restore the drag handle in maximized Results */
+    .results-section.results-maximized
+    .results-resize-handle {
+        display: block !important;
+
+        position: absolute !important;
+
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+
+        height: 12px !important;
+
+        z-index: 1001 !important;
+
+        cursor: ns-resize !important;
+
+        pointer-events: auto !important;
+    }
+
+    /* Make the drag indicator itself easier to see */
+    .results-section.results-maximized
+    .results-resize-handle::after {
+        width: 60px !important;
+        height: 5px !important;
+
+        top: 3px !important;
+
+        opacity: 1 !important;
+
+        border-radius: 5px !important;
+    }
+
+    /* Bigger vertical scrollbar */
+    .results-section.results-maximized
+    .results-container::-webkit-scrollbar {
+        width: 12px !important;
+    }
+
+    /* Bigger horizontal scrollbar */
+    .results-section.results-maximized
+    .results-container::-webkit-scrollbar:horizontal {
+        height: 12px !important;
+    }
+
+    .results-section.results-maximized
+    .results-container::-webkit-scrollbar-thumb {
+        border-radius: 8px !important;
+    }
+}
