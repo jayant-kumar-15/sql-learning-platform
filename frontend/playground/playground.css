@@ -4447,16 +4447,21 @@ body > .modal .relationships-container {
 }
 
 /* ============================================================
-   FINAL RESULTS DRAG + SCROLLBAR VISIBILITY FIX
+   FINAL RESULTS WINDOW FIX
    ------------------------------------------------------------
-   Restore the resize handle while Results is maximized.
-   Also make the results scrollbar easier to see/use.
-   Existing resize JavaScript remains unchanged.
+   - Keeps maximize / minimize / close working
+   - Restores drag handle when maximized
+   - Makes drag handle easier to see
+   - Makes Results scrollbar easier to grab
+   - Does not modify Results JavaScript
    ============================================================ */
 
 @media (min-width: 761px) {
 
-    /* Restore the drag handle in maximized Results */
+    /* --------------------------------------------------------
+       RESULTS DRAG HANDLE
+       -------------------------------------------------------- */
+
     .results-section.results-maximized
     .results-resize-handle {
         display: block !important;
@@ -4476,7 +4481,6 @@ body > .modal .relationships-container {
         pointer-events: auto !important;
     }
 
-    /* Make the drag indicator itself easier to see */
     .results-section.results-maximized
     .results-resize-handle::after {
         width: 60px !important;
@@ -4489,13 +4493,16 @@ body > .modal .relationships-container {
         border-radius: 5px !important;
     }
 
-    /* Bigger vertical scrollbar */
+
+    /* --------------------------------------------------------
+       RESULTS SCROLLBAR
+       -------------------------------------------------------- */
+
     .results-section.results-maximized
     .results-container::-webkit-scrollbar {
         width: 12px !important;
     }
 
-    /* Bigger horizontal scrollbar */
     .results-section.results-maximized
     .results-container::-webkit-scrollbar:horizontal {
         height: 12px !important;
