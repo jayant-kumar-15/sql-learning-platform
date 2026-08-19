@@ -4575,24 +4575,7 @@ body > .platform-header .platform-nav {
         gap: 10px !important;
     }
 
-    body > .platform-header .mobile-sidebar-button {
-        display: inline-flex !important;
-        order: 1 !important;
-
-        flex: 0 0 42px !important;
-        width: 42px !important;
-        height: 42px !important;
-
-        margin: 0 !important;
-    }
-
-    body > .platform-header .platform-brand-link {
-        order: 2 !important;
-
-        flex: 0 1 auto !important;
-        margin: 0 !important;
-        min-width: 0 !important;
-    }
+    
 
 
     /* --------------------------------------------------------
