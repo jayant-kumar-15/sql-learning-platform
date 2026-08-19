@@ -4543,3 +4543,26 @@ body > .platform-header .platform-nav {
     }
 }
 
+
+/* ============================================================
+   PLAYGROUND MOBILE SPACE FIX
+   ------------------------------------------------------------
+   IMPORTANT:
+   - Does NOT modify navbar
+   - Does NOT modify hamburger
+   - Does NOT modify database explorer/sidebar
+   - Does NOT modify query editor height
+   - Does NOT modify Results controls
+   - Only removes unnecessary empty workspace space
+   ============================================================ */
+
+@media (max-width: 760px) {
+
+    .playground-workspace {
+        min-height: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+}
+
