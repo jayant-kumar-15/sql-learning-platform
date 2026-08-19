@@ -4871,3 +4871,31 @@ body > .modal .relationships-container {
         display: none !important;
     }
 }
+
+/* =========================================================
+   FULL-PAGE HEIGHT / FOOTER POSITIONING
+   Keeps the footer at the bottom when the content is short.
+   This is especially useful for Chrome "Desktop site" mode
+   on mobile devices.
+   ========================================================= */
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main page content should occupy available vertical space */
+main {
+    flex: 1 0 auto;
+}
+
+/* Footer stays at the bottom when there isn't enough content */
+footer {
+    margin-top: auto;
+}
