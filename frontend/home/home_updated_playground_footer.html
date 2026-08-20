@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ============================================================
+         SQL LEARNING PLATFORM — PUBLIC HOMEPAGE
+         ============================================================
+         PURPOSE
+         -------
+         Public landing page for the SQL Learning Platform.
+
+         ARCHITECTURE
+         ------------
+         • This page is primarily browser/UI content.
+         • No user login/signup is required for the public experience.
+         • Feedback and anonymous traffic analytics use backend APIs.
+         • Healthcare/Banking SQL is NOT executed by this page.
+           Playground/Challenge keep their own browser-first SQLite flow.
+
+         SEO
+         ---
+         The page includes descriptive metadata, canonical URL,
+         Open Graph metadata and JSON-LD structured data.
+         ============================================================ -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Learn SQL from beginner to expert with interactive tutorials, realistic Healthcare and Banking datasets, SQL challenges, interview preparation and a personal SQL sandbox.">
+    <meta name="keywords"
+          content="learn SQL, SQL tutorial, SQL practice, SQL challenges, SQL interview questions, data analyst SQL, data engineer SQL, SQL playground, SQL sandbox">
+    <meta name="robots" content="index, follow">
+
+    <!-- Replace only if the public GitHub Pages URL changes later. -->
+    <link rel="canonical"
+          href="https://jayant-kumar-15.github.io/sql-learning-platform/">
+
+    <meta property="og:title"
+          content="SQL Learning Platform | Learn, Practice & Master SQL">
+    <meta property="og:description"
+          content="Learn SQL step by step, practice with realistic datasets, solve challenges and prepare for real-world data roles.">
+    <meta property="og:type" content="website">
+    <meta property="og:url"
+          content="https://jayant-kumar-15.github.io/sql-learning-platform/">
+
+    <title>SQL Learning Platform | Learn, Practice & Master SQL</title>
+
+    <!-- Shared platform styling. -->
+    <link rel="stylesheet" href="../styles/main.css">
+
+    <!-- Homepage-only styling. -->
+    <link rel="stylesheet" href="home.css">
+</head>
+
+<body class="home-page">
+
+    <!-- ============================================================
+         HEADER / PUBLIC NAVIGATION
+         ============================================================
+         User authentication is intentionally NOT shown here.
+         The public learning experience should remain frictionless.
+         ============================================================ -->
+    <header class="site-header">
+
+        <a class="brand"
+           href="home.html"
+           aria-label="SQL Learning Platform home">
+
+            <span class="brand-mark">SQL</span>
+
+            <span>
+                <strong>SQL Learning</strong>
+                <small>Platform</small>
+            </span>
+        </a>
+
+        <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+            aria-expanded="false">
+            ☰
+        </button>
+
+        <nav
+            id="mainNavigation"
+            class="main-navigation"
+            aria-label="Main navigation">
+
+            <a href="home.html">Home</a>
+            <a href="../tutorial/tutorial.html">Tutorial</a>
+            <a href="../playground/playground.html">Playground</a>
+            <a href="../pages/challenge.html">Challenges</a>
+            <a href="../sandbox/sandbox.html">Sandbox</a>
+            <a href="#faq">FAQ</a>
+            <a href="#feedback">Feedback</a>
+        </nav>
+    </header>
+
+
+    <main>
+
+        <!-- ========================================================
+             HERO
+             ======================================================== -->
+        <section class="hero-section">
+
+            <div class="hero-content">
+
+                <span class="eyebrow">
+                    LEARN • PRACTICE • MASTER
+                </span>
+
+                <h1>
+                    From your first
+                    <span>SELECT</span>
+                    to advanced SQL mastery.
+                </h1>
+
+                <p>
+                    Learn SQL step by step, practice on realistic
+                    Healthcare and Banking datasets, solve progressive
+                    challenges and prepare for real-world data roles.
+                </p>
+
+                <div class="hero-actions">
+
+                    <a
+                        class="btn btn-primary"
+                        href="../tutorial/tutorial.html">
+                        Start Learning →
+                    </a>
+
+                    <a
+                        class="btn btn-secondary"
+                        href="../pages/challenge.html">
+                        Explore Challenges
+                    </a>
+
+                </div>
+
+                <div class="hero-trust">
+                    <span>✓ Beginner friendly</span>
+                    <span>✓ Real-world datasets</span>
+                    <span>✓ Interview focused</span>
+                    <span>✓ No account required</span>
+                </div>
+
+            </div>
+
+
+            <!-- Browser-only visual; this does not execute SQL. -->
+            <div class="sql-window" aria-label="SQL example">
+
+                <div class="window-bar">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="sql-demo-editor" aria-live="polite">
+                    <div class="sql-demo-topline">
+                        <span>worksheet.sql</span>
+                        <span class="sql-demo-status" id="sqlDemoStatus">Typing query…</span>
+                    </div>
+                    <pre class="sql-demo-code"><code id="sqlDemoCode"></code><span class="sql-cursor" aria-hidden="true"></span></pre>
+                    <div class="sql-demo-action">
+                        <span class="sql-demo-play">▶</span>
+                        <span id="sqlDemoAction">Preparing query</span>
+                    </div>
+                    <div class="sql-demo-results" id="sqlDemoResults" aria-hidden="true">
+                        <div class="sql-result-heading">
+                            <span>Query Results</span>
+                            <span class="sql-success">✓ 2 rows</span>
+                        </div>
+                        <div class="sql-result-table-wrap">
+                            <table>
+                                <thead><tr><th>first_name</th><th>last_name</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Jay</td><td>Sharma</td></tr>
+                                    <tr><td>Anita</td><td>Patil</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             PLATFORM HIGHLIGHTS
+             ======================================================== -->
+        <section
+            class="stats-section"
+            aria-label="Platform highlights">
+
+            <div class="stat-item">
+                <strong id="activeLearnerCount">20+</strong>
+                <span>Active learners</span>
+            </div>
+
+            <div class="stat-item">
+                <strong>4</strong>
+                <span>Learning tracks</span>
+            </div>
+
+            <div class="stat-item">
+                <strong>200+</strong>
+                <span>SQL challenges</span>
+            </div>
+
+            <div class="stat-item">
+                <strong>2</strong>
+                <span>Real-world databases</span>
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             LEARNING PATH
+             ======================================================== -->
+        <section
+            class="content-section"
+            id="learning-path">
+
+            <span class="eyebrow">LEARNING PATH</span>
+
+            <h2>
+                Learn in the order that makes sense.
+            </h2>
+
+            <p class="section-intro">
+                Build your SQL foundation first, then progress toward
+                advanced SQL patterns and interview preparation.
+            </p>
+
+
+            <div class="learning-grid">
+
+                <a
+                    class="learning-card"
+                    href="../tutorial/tutorial.html?track=beginner">
+
+                    <span class="card-icon">🌱</span>
+
+                    <h3>Beginner</h3>
+
+                    <p>
+                        SQL fundamentals, databases, tables, keys,
+                        operators, filtering, sorting and grouping.
+                    </p>
+
+                    <strong>Start basics →</strong>
+                </a>
+
+
+                <a
+                    class="learning-card"
+                    href="../tutorial/tutorial.html?track=intermediate">
+
+                    <span class="card-icon">⚡</span>
+
+                    <h3>Intermediate</h3>
+
+                    <p>
+                        Joins, aggregates, subqueries, CTEs, views
+                        and practical SQL patterns.
+                    </p>
+
+                    <strong>Build skills →</strong>
+                </a>
+
+
+                <a
+                    class="learning-card"
+                    href="../tutorial/tutorial.html?track=expert">
+
+                    <span class="card-icon">🏆</span>
+
+                    <h3>Expert</h3>
+
+                    <p>
+                        Window functions, advanced SQL patterns,
+                        optimization and complex analytical queries.
+                    </p>
+
+                    <strong>Go advanced →</strong>
+                </a>
+
+
+                <a
+                    class="learning-card"
+                    href="../tutorial/tutorial.html?track=interview">
+
+                    <span class="card-icon">🎯</span>
+
+                    <h3>Interview</h3>
+
+                    <p>
+                        Conceptual and query-based questions designed
+                        around real data-role interviews.
+                    </p>
+
+                    <strong>Prepare →</strong>
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             PRACTICE AREAS
+             ======================================================== -->
+        <section class="content-section section-alt">
+
+            <span class="eyebrow">PRACTICE</span>
+
+            <h2>
+                Don't just read SQL. Write it.
+            </h2>
+
+            <div class="practice-grid">
+
+                <a
+                    class="practice-card"
+                    href="../playground/playground.html">
+
+                    <span class="card-icon">💻</span>
+
+                    <div>
+                        <h3>SQL Playground</h3>
+
+                        <p>
+                            Practice read-only SQL using predefined
+                            Healthcare and Banking learning databases.
+                        </p>
+
+                        <strong>Open Playground →</strong>
+                    </div>
+
+                </a>
+
+
+                <a
+                    class="practice-card"
+                    href="../pages/challenge.html">
+
+                    <span class="card-icon">🧩</span>
+
+                    <div>
+                        <h3>SQL Challenges</h3>
+
+                        <p>
+                            Solve progressively harder SQL problems
+                            using realistic datasets.
+                        </p>
+
+                        <strong>Solve Challenges →</strong>
+                    </div>
+
+                </a>
+
+
+                <a
+                    class="practice-card"
+                    href="../sandbox/sandbox.html">
+
+                    <span class="card-icon">🛠️</span>
+
+                    <div>
+                        <h3>Personal Sandbox</h3>
+
+                        <p>
+                            Create your own databases and tables and
+                            practice data manipulation safely.
+                        </p>
+
+                        <strong>Open Sandbox →</strong>
+                    </div>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             REAL-WORLD DATABASES
+             ======================================================== -->
+        <section class="content-section">
+
+            <span class="eyebrow">REAL-WORLD DATA</span>
+
+            <h2>
+                Practice with meaningful datasets.
+            </h2>
+
+            <div class="database-grid">
+
+                <article class="database-card">
+
+                    <span class="database-icon">🏥</span>
+
+                    <h3>Healthcare</h3>
+
+                    <p>
+                        Work with patients, doctors, appointments,
+                        prescriptions, hospitals, billing, insurance
+                        and related healthcare data.
+                    </p>
+
+                    <a href="../playground/playground.html">
+                        Practice Healthcare SQL →
+                    </a>
+
+                </article>
+
+
+                <article class="database-card">
+
+                    <span class="database-icon">🏦</span>
+
+                    <h3>Banking</h3>
+
+                    <p>
+                        Work with customers, accounts, transactions,
+                        loans, payments, cards, branches and employees.
+                    </p>
+
+                    <a href="../playground/playground.html">
+                        Practice Banking SQL →
+                    </a>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             WHY THIS PLATFORM
+             ======================================================== -->
+        <section class="content-section section-alt">
+
+            <span class="eyebrow">WHY THIS PLATFORM</span>
+
+            <h2>
+                Designed around how people actually learn SQL.
+            </h2>
+
+            <div class="benefit-grid">
+
+                <article class="benefit-card is-active" data-learning-step="0">
+                    <b>01</b>
+                    <div>
+                        <h3>Understand first</h3>
+                        <p>
+                            Learn the concept before being asked
+                            to solve a problem.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="benefit-card" data-learning-step="1">
+                    <b>02</b>
+                    <div>
+                        <h3>Practice immediately</h3>
+                        <p>
+                            Connect explanations with hands-on
+                            SQL execution.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="benefit-card" data-learning-step="2">
+                    <b>03</b>
+                    <div>
+                        <h3>Progress gradually</h3>
+                        <p>
+                            Move from fundamentals to advanced
+                            real-world SQL patterns.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="benefit-card" data-learning-step="3">
+                    <b>04</b>
+                    <div>
+                        <h3>Prepare for interviews</h3>
+                        <p>
+                            Practice both conceptual and query-based
+                            questions for data roles.
+                        </p>
+                    </div>
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             FAQ
+             ======================================================== -->
+        <section
+            class="content-section"
+            id="faq">
+
+            <span class="eyebrow">FAQ</span>
+
+            <h2>
+                Questions you may have.
+            </h2>
+
+            <div class="faq-list">
+
+                <details>
+                    <summary>
+                        Is the platform suitable for complete beginners?
+                    </summary>
+
+                    <p>
+                        Yes. The Tutorial track starts with database
+                        and SQL fundamentals and gradually progresses
+                        toward advanced SQL.
+                    </p>
+                </details>
+
+
+                <details>
+                    <summary>
+                        Do I need an account to learn SQL?
+                    </summary>
+
+                    <p>
+                        No. The public learning experience is designed
+                        to be accessible without forcing users to
+                        create an account.
+                    </p>
+                </details>
+
+
+                <details>
+                    <summary>
+                        What is the difference between Playground and Sandbox?
+                    </summary>
+
+                    <p>
+                        Playground provides predefined learning
+                        databases for SQL practice. Sandbox is intended
+                        for creating and modifying your own databases
+                        and tables.
+                    </p>
+                </details>
+
+
+                <details>
+                    <summary>
+                        Can I practice using realistic datasets?
+                    </summary>
+
+                    <p>
+                        Yes. Healthcare and Banking datasets are
+                        available for practical SQL learning.
+                    </p>
+                </details>
+
+
+                <details>
+                    <summary>
+                        Does the platform include interview preparation?
+                    </summary>
+
+                    <p>
+                        Yes. The Interview track is designed around
+                        conceptual and query-based SQL questions
+                        relevant to data roles.
+                    </p>
+                </details>
+
+
+                <details>
+                    <summary>
+                        Can I send appreciation, feedback or another query?
+                    </summary>
+
+                    <p>
+                        Yes. Use the form below and choose the
+                        appropriate category. You do not need an
+                        account to contact the platform.
+                    </p>
+                </details>
+
+                <div class="faq-more-wrap">
+                    <button type="button" class="faq-more-button" id="faqMoreButton" aria-expanded="false" aria-controls="faqMoreContent">
+                        <span>More FAQ questions</span>
+                        <span aria-hidden="true">⌄</span>
+                    </button>
+                </div>
+
+                <div class="faq-more-content" id="faqMoreContent" hidden>
+                    <details><summary>What should be the learning flow on this platform?</summary><p>Start with Tutorial to understand concepts, move to Challenges to test your reasoning, use Playground for hands-on SQL, then use Sandbox to create and modify your own database objects. Interview preparation can run alongside the learning path.</p></details>
+                    <details><summary>Is the platform enough to prepare for SQL-focused job interviews?</summary><p>It is designed to cover the SQL knowledge commonly expected for entry-level and early-career Data Analyst and Data Engineer roles. Use the full Tutorial, Challenges, Playground and Interview tracks together for the strongest preparation.</p></details>
+                    <details><summary>Does the platform cover the important SQL topics?</summary><p>The Tutorial is organized from fundamentals through advanced SQL and interview preparation, including RDBMS concepts, DDL/DML/TCL, filtering, joins, aggregates, subqueries, CTEs, views, window functions and other practical SQL patterns.</p></details>
+                    <details><summary>Do I need to install SQL software?</summary><p>No for the public learning experience. The platform is designed to provide browser-based practice wherever possible, so learners can start without setting up a database locally.</p></details>
+                    <details><summary>What is the best way to use the Challenges?</summary><p>Learn the relevant concept first, attempt the challenge without opening the solution, execute your query, review the result and then move to the next question. This keeps practice focused on problem solving.</p></details>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================
+             APPRECIATION / FEEDBACK / OTHER QUERY
+             ========================================================
+             This is the only public form submission on the homepage.
+             It sends data to the backend API so the Admin system can
+             view submissions centrally.
+             ======================================================== -->
+        <section
+            class="content-section section-alt"
+            id="feedback">
+
+            <span class="eyebrow">YOUR VOICE MATTERS</span>
+
+            <h2>
+                Appreciation, feedback or a question?
+            </h2>
+
+            <p class="section-intro">
+                One simple form. Choose a category and tell us what
+                you think.
+            </p>
+
+
+            <form
+                id="feedbackForm"
+                class="feedback-form"
+                novalidate>
+
+                <div
+                    class="category-options"
+                    role="radiogroup"
+                    aria-label="Message category">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="category"
+                            value="appreciation"
+                            checked>
+
+                        <span>❤️ Appreciation</span>
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="category"
+                            value="feedback">
+
+                        <span>💡 Feedback</span>
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="category"
+                            value="query">
+
+                        <span>❓ Other Query</span>
+                    </label>
+
+                </div>
+
+
+                <div class="input-grid">
+
+                    <label>
+                        Name
+                        <input
+                            type="text"
+                            name="name"
+                            maxlength="80"
+                            autocomplete="name"
+                            placeholder="Your name"
+                             required>
+                    </label>
+
+
+                    <label>
+                        Email
+                        <input
+                            type="email"
+                            name="email"
+                            maxlength="120"
+                            autocomplete="email"
+                            placeholder="you@example.com"
+                             required>
+                    </label>
+
+                </div>
+
+
+                <label>
+                    Message
+
+                    <textarea
+                        name="message"
+                        rows="6"
+                        maxlength="2000"
+                        placeholder="Write your message..."
+                        required></textarea>
+                </label>
+
+
+                <div class="form-submit-row">
+
+                    <button
+                        class="btn btn-primary"
+                        id="feedbackSubmitButton"
+                        type="submit">
+                        Send Message
+                    </button>
+
+                    <span
+                        id="feedbackStatus"
+                        role="status"
+                        aria-live="polite"></span>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- ========================================================
+             PUBLIC CTA
+             ========================================================
+             No login/signup CTA here by design.
+             ======================================================== -->
+        <section class="final-cta">
+
+            <span class="eyebrow">
+                READY WHEN YOU ARE
+            </span>
+
+            <h2>
+                Start learning SQL today.
+            </h2>
+
+            <p>
+                No account required. Pick a tutorial, open the
+                Playground, or jump straight into a challenge.
+            </p>
+
+            <div class="learning-journey" aria-label="SQL learning journey">
+                <a class="journey-step" href="../tutorial/tutorial.html">
+                    <span class="journey-number">01</span><span><b>SQL Tutorial</b><small>Understand the concepts</small></span>
+                </a>
+                <span class="journey-arrow" aria-hidden="true">→</span>
+                <a class="journey-step" href="../pages/challenge.html">
+                    <span class="journey-number">02</span><span><b>Challenges</b><small>Test your thinking</small></span>
+                </a>
+                <span class="journey-arrow" aria-hidden="true">→</span>
+                <a class="journey-step" href="../playground/playground.html">
+                    <span class="journey-number">03</span><span><b>Playground</b><small>Write real SQL</small></span>
+                </a>
+                <span class="journey-arrow" aria-hidden="true">→</span>
+                <a class="journey-step" href="../sandbox/sandbox.html">
+                    <span class="journey-number">04</span><span><b>Sandbox</b><small>Build your own database</small></span>
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <!-- ============================================================
+         FOOTER
+         ------------------------------------------------------------
+         Matches the current locked Playground footer structure.
+         ============================================================ -->
+    <footer class="challenge-site-footer">
+        <div class="challenge-footer-inner">
+
+            <div class="challenge-footer-brand">
+                <a
+                    href="home.html"
+                    aria-label="SQL Learning Platform home"
+                >
+                    <span
+                        class="challenge-footer-brand-mark"
+                        aria-hidden="true"
+                    >SQL</span>
+
+                    <span>
+                        <strong>SQL Learning Platform</strong>
+                        <small>
+                            Learn SQL. Practice SQL. Master SQL.
+                        </small>
+                    </span>
+                </a>
+            </div>
+
+            <nav
+                class="challenge-footer-links"
+                aria-label="Footer navigation"
+            >
+                <a href="home.html">Home</a>
+                <a href="../tutorial/tutorial.html">Tutorials</a>
+                <a href="../pages/challenge.html">Challenges</a>
+                <a href="../playground/playground.html">Playground</a>
+                <a href="../sandbox/sandbox.html">Sandbox</a>
+            </nav>
+
+            <div class="challenge-footer-copy">
+                <p>&copy; 2026 SQL Learning Platform</p>
+                <p>Built for SQL learners and interview preparation.</p>
+            </div>
+
+        </div>
+    </footer>
+
+
+    <!-- ============================================================
+         HOMEPAGE JAVASCRIPT
+         ============================================================ -->
+
+    <!-- Temporary presentation count configuration. -->
+    <script src="learner-count.js"></script>
+
+    <!-- Anonymous real-traffic tracking. -->
+    <script src="../scripts/traffic-tracker.js"></script>
+
+    <!-- Homepage UI + feedback logic. -->
+    <script src="home.js"></script>
+
+</body>
+</html>
