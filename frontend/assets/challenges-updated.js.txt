@@ -1,0 +1,51 @@
+(function () {
+        const menuButton = document.getElementById('challengeMobileMenuButton');
+        const navigation = document.getElementById('challengeMainNavigation');
+
+        if (!menuButton || !navigation) return;
+
+        menuButton.addEventListener('click', function () {
+            const isOpen = navigation.classList.toggle('mobile-open');
+            menuButton.setAttribute('aria-expanded', String(isOpen));
+            menuButton.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
+            menuButton.textContent = isOpen ? '✕' : '☰';
+        });
+
+        navigation.addEventListener('click', function (event) {
+            if (event.target.closest('a')) {
+                navigation.classList.remove('mobile-open');
+                menuButton.setAttribute('aria-expanded', 'false');
+                menuButton.setAttribute('aria-label', 'Open navigation');
+                menuButton.textContent = '☰';
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!navigation.contains(event.target) && !menuButton.contains(event.target)) {
+                navigation.classList.remove('mobile-open');
+                menuButton.setAttribute('aria-expanded', 'false');
+                menuButton.setAttribute('aria-label', 'Open navigation');
+                menuButton.textContent = '☰';
+            }
+        });
+
+        /*
+         * MOBILE NAVIGATION SCROLL BEHAVIOR — CHALLENGES ONLY
+         * ------------------------------------------------------------
+         * Close the expanded mobile navigation when the user starts
+         * scrolling. This prevents the sticky/open menu from remaining
+         * over the Challenge content.
+         *
+         * Desktop behavior and all Challenge logic remain untouched.
+         */
+        window.addEventListener('scroll', function () {
+            if (!navigation.classList.contains('mobile-open')) {
+                return;
+            }
+
+            navigation.classList.remove('mobile-open');
+            menuButton.setAttribute('aria-expanded', 'false');
+            menuButton.setAttribute('aria-label', 'Open navigation');
+            menuButton.textContent = '☰';
+        }, { passive: true });
+    }());
