@@ -1,4 +1,4 @@
-/*
+tu/*
  * ============================================================
  * FILE PATH: frontend/styles/challenge.css
  * ============================================================
@@ -2133,8 +2133,7 @@ body.query-results-resizing {
 
     .challenge-mobile-menu-button {
         position: absolute !important;
-        /* left: 12px !important;*/
-        left: auto !important ;
+        left: 12px !important;
         right: auto !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
@@ -2157,7 +2156,8 @@ body.query-results-resizing {
 
 @media (max-width: 420px) {
     .challenge-mobile-menu-button {
-        left: 10px !important;
+        /*left: 10px !important; */
+        left: 0px !important;
     }
 
     .challenge-platform-brand {
