@@ -2156,8 +2156,7 @@ body.query-results-resizing {
 
 @media (max-width: 420px) {
     .challenge-mobile-menu-button {
-        /*left: 10px !important; */
-        left: 0px !important;
+        left: 10px !important; 
     }
 
     .challenge-platform-brand {
