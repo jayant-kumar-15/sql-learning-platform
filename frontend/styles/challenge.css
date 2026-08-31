@@ -2950,3 +2950,15 @@ body > .challenge-site-footer .challenge-footer-brand small {
     line-height: 1.4;
     letter-spacing: normal;
 }
+
+/* ============================================================
+ * CHALLENGES — MOBILE NAV FULL-WIDTH VISUAL FIX ONLY
+ * ============================================================ */
+@media (max-width: 768px) {
+    .challenge-platform-header nav {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
