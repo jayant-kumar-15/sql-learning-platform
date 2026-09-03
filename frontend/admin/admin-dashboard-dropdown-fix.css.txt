@@ -1,0 +1,32 @@
+/*
+ * ============================================================
+ * ADMIN SELECT / DROPDOWN VISIBILITY FIX
+ * ------------------------------------------------------------
+ * The cleanup dropdowns use native <select> controls. On some
+ * Chrome/Edge desktop configurations, the opened option list can
+ * inherit a light native background while keeping the dashboard's
+ * light-on-dark text, making unselected options appear blank.
+ *
+ * This fix affects only select controls and their options.
+ * It does not change the dashboard layout, analytics, feedback,
+ * cleanup logic, authentication, or responsive behavior.
+ * ============================================================
+ */
+
+.admin-main select,
+.admin-main select option {
+    color: var(--text);
+    background-color: var(--surface-2);
+}
+
+/* Keep the currently selected option readable as well. */
+.admin-main select option:checked {
+    color: var(--text);
+    background-color: var(--surface-2);
+}
+
+/* Improve keyboard/focus visibility without changing dimensions. */
+.admin-main select:focus {
+    color: var(--text);
+    background-color: var(--surface-2);
+}
