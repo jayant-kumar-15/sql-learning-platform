@@ -58,10 +58,35 @@ pool.on("error", function (error) {
 });
 
 /*
- * The existing application routes use the small callback-style
- * interface that was originally provided by sqlite3. These helper
- * methods keep those route files stable while changing only their
- * database connection from SQLite to PostgreSQL.
+ * ============================================================
+ * SQLITE-COMPATIBLE QUERY HELPERS
+ * ============================================================
+ *
+ * Existing application routes use a small callback-style
+ * interface originally provided by sqlite3.
+ *
+ * These helpers keep those route files stable while PostgreSQL
+ * is used underneath.
+ *
+ * IMPORTANT:
+ * The callback is OPTIONAL for run().
+ *
+ * Some application operations intentionally execute a statement
+ * without waiting for a callback. The previous implementation
+ * attempted callback.call(...) even when callback was undefined,
+ * which caused the Render process to crash with:
+ *
+ *   TypeError: Cannot read properties of undefined (reading 'call')
+ *
+ * The implementation below safely handles both:
+ *
+ *   run(sql, params, callback)
+ *
+ * and:
+ *
+ *   run(sql, params)
+ *
+ * ============================================================
  */
 
 function convertPlaceholders(sql) {
@@ -73,10 +98,50 @@ function convertPlaceholders(sql) {
     });
 }
 
+/*
+ * ------------------------------------------------------------
+ * RUN
+ * ------------------------------------------------------------
+ * Executes INSERT / UPDATE / DELETE / other non-row queries.
+ *
+ * Supports:
+ *
+ *   run(sql, params, callback)
+ *   run(sql, params)
+ *   run(sql, callback)
+ * ------------------------------------------------------------
+ */
 function run(sql, params, callback) {
+    /*
+     * Support sqlite-style:
+     *
+     *   run(sql, callback)
+     */
+    if (typeof params === "function") {
+        callback = params;
+        params = [];
+    }
+
     const values = Array.isArray(params) ? params : [];
+
+    /*
+     * Normalize the callback.
+     *
+     * A callback is optional for fire-and-forget operations.
+     */
+    const hasCallback = typeof callback === "function";
+
     const query = convertPlaceholders(sql);
+
+    /*
+     * PostgreSQL does not automatically expose the inserted
+     * auto-generated ID in the same way sqlite3's lastID does.
+     *
+     * For application tables where routes depend on lastID,
+     * add RETURNING id automatically.
+     */
     const isInsert = /^\s*INSERT\s+/i.test(query);
+
     const needsReturnedId =
         isInsert &&
         /\b(auth_sessions|users|feedback)\b/i.test(query) &&
@@ -87,11 +152,36 @@ function run(sql, params, callback) {
         : query;
 
     pool.query(finalQuery, values, function (error, result) {
+        /*
+         * ----------------------------------------------------
+         * IMPORTANT FIX
+         * ----------------------------------------------------
+         *
+         * Never call callback.call(...) unless a callback
+         * was actually supplied.
+         */
         if (error) {
-            return callback.call(
-                { lastID: undefined, changes: 0 },
-                error
+            if (hasCallback) {
+                return callback.call(
+                    {
+                        lastID: undefined,
+                        changes: 0
+                    },
+                    error
+                );
+            }
+
+            /*
+             * Fire-and-forget operation:
+             * log the database error instead of crashing
+             * the Node.js process.
+             */
+            console.error(
+                "❌ PostgreSQL run() error:",
+                error.message
             );
+
+            return;
         }
 
         const lastID =
@@ -99,21 +189,42 @@ function run(sql, params, callback) {
                 ? result.rows[0].id
                 : undefined;
 
-        return callback.call(
-            {
-                lastID: lastID,
-                changes: result.rowCount || 0
-            },
-            null
-        );
+        if (hasCallback) {
+            return callback.call(
+                {
+                    lastID: lastID,
+                    changes: result.rowCount || 0
+                },
+                null
+            );
+        }
     });
 }
 
+/*
+ * ------------------------------------------------------------
+ * GET
+ * ------------------------------------------------------------
+ * Returns one row.
+ *
+ * Supports:
+ *
+ *   get(sql, params, callback)
+ *   get(sql, callback)
+ * ------------------------------------------------------------
+ */
 function get(sql, params, callback) {
-    const values = Array.isArray(params) ? params : [];
-
     if (typeof params === "function") {
         callback = params;
+        params = [];
+    }
+
+    const values = Array.isArray(params) ? params : [];
+
+    if (typeof callback !== "function") {
+        throw new Error(
+            "pgDb.get() requires a callback."
+        );
     }
 
     pool.query(
@@ -132,11 +243,30 @@ function get(sql, params, callback) {
     );
 }
 
+/*
+ * ------------------------------------------------------------
+ * ALL
+ * ------------------------------------------------------------
+ * Returns all matching rows.
+ *
+ * Supports:
+ *
+ *   all(sql, params, callback)
+ *   all(sql, callback)
+ * ------------------------------------------------------------
+ */
 function all(sql, params, callback) {
-    const values = Array.isArray(params) ? params : [];
-
     if (typeof params === "function") {
         callback = params;
+        params = [];
+    }
+
+    const values = Array.isArray(params) ? params : [];
+
+    if (typeof callback !== "function") {
+        throw new Error(
+            "pgDb.all() requires a callback."
+        );
     }
 
     pool.query(
@@ -147,24 +277,57 @@ function all(sql, params, callback) {
                 return callback(error);
             }
 
-            return callback(null, result.rows || []);
+            return callback(
+                null,
+                result.rows || []
+            );
         }
     );
 }
 
 /*
- * Execute a schema/migration script. PostgreSQL accepts multiple
- * statements in a simple query when no parameter values are passed.
+ * ------------------------------------------------------------
+ * EXEC
+ * ------------------------------------------------------------
+ * Executes a schema/migration script.
+ *
+ * PostgreSQL accepts multiple statements in a simple query
+ * when no parameter values are supplied.
+ * ------------------------------------------------------------
  */
 function exec(sql, callback) {
-    pool.query(String(sql), function (error) {
-        if (typeof callback === "function") {
-            callback(error || null);
+    pool.query(
+        String(sql),
+        function (error) {
+            if (typeof callback === "function") {
+                return callback(error || null);
+            }
+
+            if (error) {
+                console.error(
+                    "❌ PostgreSQL exec() error:",
+                    error.message
+                );
+            }
         }
-    });
+    );
 }
 
+/*
+ * ------------------------------------------------------------
+ * TEST CONNECTION
+ * ------------------------------------------------------------
+ * Used during server startup to verify that Neon/PostgreSQL
+ * is reachable before the application begins serving requests.
+ * ------------------------------------------------------------
+ */
 function testConnection(callback) {
+    if (typeof callback !== "function") {
+        throw new Error(
+            "pgDb.testConnection() requires a callback."
+        );
+    }
+
     pool.query(
         "SELECT 1 AS result",
         function (error, result) {
@@ -172,10 +335,19 @@ function testConnection(callback) {
                 return callback(error);
             }
 
-            return callback(null, result.rows[0]);
+            return callback(
+                null,
+                result.rows[0]
+            );
         }
     );
 }
+
+/*
+ * ============================================================
+ * EXPORTS
+ * ============================================================
+ */
 
 module.exports = {
     pool,
