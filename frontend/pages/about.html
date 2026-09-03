@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Learn about SQL Learning Platform, an educational platform for learning SQL, practicing queries, exploring databases, and preparing for technical interviews."
+    >
+
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+
+    <title>About | SQL Learning Platform</title>
+
+    <style>
+        /* =========================================================
+           GLOBAL RESET
+           ========================================================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+
+            background: #f6f8fb;
+            color: #1f2937;
+            line-height: 1.7;
+        }
+
+        /* =========================================================
+           PAGE WRAPPER
+           ========================================================= */
+        .page-wrapper {
+            min-height: 100vh;
+            padding: 48px 20px;
+        }
+
+        .content-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* =========================================================
+           HEADER
+           ========================================================= */
+        .page-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 38px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 15px;
+            color: #6b7280;
+        }
+
+        /* =========================================================
+           MAIN CONTENT CARD
+           ========================================================= */
+        .content-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        /* =========================================================
+           INTRODUCTION
+           ========================================================= */
+        .intro {
+            margin-bottom: 34px;
+        }
+
+        .intro h2 {
+            font-size: 24px;
+            line-height: 1.35;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .intro p {
+            font-size: 16px;
+            color: #4b5563;
+            margin-bottom: 12px;
+        }
+
+        /* =========================================================
+           CONTENT SECTIONS
+           ========================================================= */
+        .content-section {
+            margin-bottom: 30px;
+        }
+
+        .content-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-section h2 {
+            font-size: 21px;
+            line-height: 1.35;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .content-section p {
+            font-size: 15px;
+            color: #4b5563;
+            margin-bottom: 12px;
+        }
+
+        .content-section p:last-child {
+            margin-bottom: 0;
+        }
+
+        .content-section ul {
+            margin: 10px 0 0 22px;
+            color: #4b5563;
+        }
+
+        .content-section li {
+            font-size: 15px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        /* =========================================================
+           HIGHLIGHT BOX
+           ========================================================= */
+        .highlight-box {
+            background: #f8fafc;
+            border: 1px solid #dbe3ec;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0 30px;
+        }
+
+        .highlight-box p {
+            font-size: 15px;
+            color: #374151;
+            margin: 0;
+        }
+
+        .highlight-box strong {
+            color: #111827;
+        }
+
+        /* =========================================================
+           BACK TO HOME
+           ========================================================= */
+        .back-home {
+            margin-top: 34px;
+            text-align: center;
+        }
+
+        .back-home a {
+            display: inline-block;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2563eb;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease;
+        }
+
+        .back-home a:hover {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        /* =========================================================
+           MOBILE RESPONSIVE STYLES
+           ========================================================= */
+        @media (max-width: 700px) {
+
+            .page-wrapper {
+                padding: 28px 14px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 30px;
+            }
+
+            .page-header p {
+                font-size: 13px;
+            }
+
+            .content-card {
+                padding: 24px 20px;
+                border-radius: 14px;
+            }
+
+            .intro {
+                margin-bottom: 28px;
+            }
+
+            .intro h2 {
+                font-size: 21px;
+            }
+
+            .intro p {
+                font-size: 15px;
+            }
+
+            .content-section {
+                margin-bottom: 26px;
+            }
+
+            .content-section h2 {
+                font-size: 19px;
+            }
+
+            .content-section p,
+            .content-section li,
+            .highlight-box p {
+                font-size: 14px;
+            }
+
+            .content-section ul {
+                margin-left: 20px;
+            }
+        }
+
+        /* =========================================================
+           SMALL MOBILE DEVICES
+           ========================================================= */
+        @media (max-width: 420px) {
+
+            .page-wrapper {
+                padding: 22px 10px;
+            }
+
+            .page-header h1 {
+                font-size: 27px;
+            }
+
+            .content-card {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+
+        <main class="content-container">
+
+            <!-- =====================================================
+                 PAGE HEADER
+                 ===================================================== -->
+            <header class="page-header">
+
+                <h1>About SQL Learning Platform</h1>
+
+                <p>
+                    Learn SQL. Practice SQL. Master SQL.
+                </p>
+
+            </header>
+
+
+            <!-- =====================================================
+                 MAIN CONTENT
+                 ===================================================== -->
+            <article class="content-card">
+
+                <!-- Introduction -->
+                <section class="intro">
+
+                    <h2>Making SQL Learning Practical</h2>
+
+                    <p>
+                        SQL Learning Platform is an educational platform
+                        created to make learning and practicing SQL more
+                        practical, interactive, and accessible.
+                    </p>
+
+                    <p>
+                        Instead of learning SQL only through theory, the
+                        platform brings together tutorials, examples,
+                        practice databases, challenges, and interactive
+                        environments so learners can apply what they learn.
+                    </p>
+
+                </section>
+
+
+                <!-- Purpose -->
+                <section class="content-section">
+
+                    <h2>1. Our Purpose</h2>
+
+                    <p>
+                        The purpose of SQL Learning Platform is to provide a
+                        structured environment where learners can develop
+                        practical SQL skills step by step.
+                    </p>
+
+                    <p>
+                        The platform is designed to support learners who are
+                        beginning their SQL journey as well as users who want
+                        to strengthen their existing SQL knowledge.
+                    </p>
+
+                </section>
+
+
+                <!-- Learning -->
+                <section class="content-section">
+
+                    <h2>2. What You Can Learn</h2>
+
+                    <p>
+                        The platform covers SQL concepts through progressively
+                        structured learning material and practical exercises.
+                    </p>
+
+                    <ul>
+                        <li>SQL fundamentals and database concepts</li>
+                        <li>SELECT statements and filtering</li>
+                        <li>Sorting and grouping data</li>
+                        <li>Aggregate functions</li>
+                        <li>Joins and relationships between tables</li>
+                        <li>Subqueries and advanced querying</li>
+                        <li>Data modification and database operations</li>
+                        <li>Practical SQL problem solving</li>
+                        <li>Interview-oriented SQL questions</li>
+                    </ul>
+
+                </section>
+
+
+                <!-- Practice -->
+                <section class="content-section">
+
+                    <h2>3. Learn by Practicing</h2>
+
+                    <p>
+                        SQL Learning Platform is built around the idea that
+                        practicing SQL is an important part of understanding
+                        it.
+                    </p>
+
+                    <p>
+                        Users can work with interactive SQL environments,
+                        practice datasets, database explorers, and
+                        challenges to apply concepts rather than simply
+                        reading about them.
+                    </p>
+
+                    <div class="highlight-box">
+
+                        <p>
+                            <strong>Our approach:</strong>
+                            Learn a concept, write the query, run it, inspect
+                            the result, understand the mistake, and try again.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <!-- Practice Databases -->
+                <section class="content-section">
+
+                    <h2>4. Real-World Inspired Practice</h2>
+
+                    <p>
+                        The platform includes practice databases based on
+                        familiar real-world domains such as Healthcare and
+                        Banking.
+                    </p>
+
+                    <p>
+                        These datasets provide learners with opportunities to
+                        practice SQL against tables and relationships that
+                        resemble scenarios commonly encountered in data,
+                        analytics, and software environments.
+                    </p>
+
+                    <p>
+                        The practice datasets are intended for educational
+                        purposes and should not be treated as real production
+                        records.
+                    </p>
+
+                </section>
+
+
+                <!-- Challenges -->
+                <section class="content-section">
+
+                    <h2>5. SQL Challenges</h2>
+
+                    <p>
+                        SQL challenges are designed to help learners test
+                        their understanding and improve their problem-solving
+                        ability.
+                    </p>
+
+                    <p>
+                        Challenges can cover different levels of difficulty,
+                        allowing users to progressively work on more complex
+                        SQL problems.
+                    </p>
+
+                </section>
+
+
+                <!-- Playground -->
+                <section class="content-section">
+
+                    <h2>6. SQL Playground</h2>
+
+                    <p>
+                        The SQL Playground provides an interactive environment
+                        where users can write and execute SQL queries against
+                        supported practice databases.
+                    </p>
+
+                    <p>
+                        It is intended to help learners experiment with SQL,
+                        examine query results, and develop confidence through
+                        hands-on practice.
+                    </p>
+
+                </section>
+
+
+                <!-- Sandbox -->
+                <section class="content-section">
+
+                    <h2>7. SQL Sandbox</h2>
+
+                    <p>
+                        The Sandbox provides users with an environment for
+                        experimenting with their own database structures and
+                        SQL statements within the platform's supported
+                        limitations.
+                    </p>
+
+                    <p>
+                        It is designed for learning and experimentation,
+                        rather than production database workloads.
+                    </p>
+
+                </section>
+
+
+                <!-- Interview Preparation -->
+                <section class="content-section">
+
+                    <h2>8. Interview Preparation</h2>
+
+                    <p>
+                        SQL is an important skill for many data, analytics,
+                        database, software, and engineering roles.
+                    </p>
+
+                    <p>
+                        SQL Learning Platform provides practice questions and
+                        challenges that can help learners prepare for
+                        technical interviews and strengthen their
+                        problem-solving skills.
+                    </p>
+
+                    <p>
+                        The platform does not guarantee any particular
+                        interview, employment, examination, or career outcome.
+                    </p>
+
+                </section>
+
+
+                <!-- Content Philosophy -->
+                <section class="content-section">
+
+                    <h2>9. Our Content Approach</h2>
+
+                    <p>
+                        We aim to make SQL concepts understandable through
+                        practical explanations, examples, exercises, and
+                        progressively challenging problems.
+                    </p>
+
+                    <p>
+                        The platform may continue to evolve as new learning
+                        material, challenges, practice scenarios, and
+                        improvements are introduced.
+                    </p>
+
+                </section>
+
+
+                <!-- Accessibility -->
+                <section class="content-section">
+
+                    <h2>10. Built for Learners</h2>
+
+                    <p>
+                        SQL Learning Platform is designed with a focus on
+                        straightforward navigation, practical learning, and
+                        responsive access across desktop and mobile devices.
+                    </p>
+
+                    <p>
+                        We aim to provide an environment where learners can
+                        focus on understanding SQL instead of dealing with
+                        unnecessary complexity.
+                    </p>
+
+                </section>
+
+
+                <!-- Feedback -->
+                <section class="content-section">
+
+                    <h2>11. Feedback and Improvement</h2>
+
+                    <p>
+                        Learner feedback is valuable for improving the
+                        platform.
+                    </p>
+
+                    <p>
+                        Users can use the available feedback functionality to
+                        report issues, suggest improvements, or share ideas
+                        that may help make the learning experience better.
+                    </p>
+
+                </section>
+
+
+                <!-- Transparency -->
+                <section class="content-section">
+
+                    <h2>12. Transparency</h2>
+
+                    <p>
+                        SQL Learning Platform is intended to be a genuine
+                        educational resource focused on SQL learning and
+                        practical skill development.
+                    </p>
+
+                    <p>
+                        Platform features, educational content, practice
+                        environments, and supporting services may change over
+                        time as the platform develops.
+                    </p>
+
+                </section>
+
+
+                <!-- Final -->
+                <section class="content-section">
+
+                    <h2>13. Our Goal</h2>
+
+                    <p>
+                        Our goal is simple: help learners move from reading
+                        SQL concepts to confidently writing and understanding
+                        SQL queries.
+                    </p>
+
+                    <p>
+                        <strong>
+                            Learn SQL. Practice SQL. Master SQL.
+                        </strong>
+                    </p>
+
+                </section>
+
+
+                <!-- =====================================================
+                     BACK TO HOME
+                     ===================================================== -->
+                <div class="back-home">
+
+                    <a href="../home/home.html">
+                        &larr; Back to SQL Learning Platform
+                    </a>
+
+                </div>
+
+            </article>
+
+        </main>
+
+    </div>
+
+</body>
+</html>
