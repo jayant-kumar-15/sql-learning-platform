@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Admin pages are private and should not appear in search results. -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>Admin Dashboard | SQL Learning Platform</title>
+
+    <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+
+<body>
+
+<div class="admin-shell">
+
+    <aside class="admin-sidebar">
+        <div class="admin-brand">
+            <span class="brand-mark">SQL</span>
+            <div>
+                <strong>SQL Learning</strong>
+                <small>Admin</small>
+            </div>
+        </div>
+
+        <nav aria-label="Admin navigation">
+            <button class="nav-item active" data-section="overview">📊 Overview</button>
+            <button class="nav-item" data-section="feedback">💬 Feedback</button>
+            <button class="nav-item" data-section="data-management">🗄️ Data Management</button>
+        </nav>
+
+        <button id="logoutButton" class="logout-button" type="button">
+            Logout
+        </button>
+    </aside>
+
+    <main class="admin-main">
+
+        <header class="admin-header">
+            <div>
+                <span class="eyebrow">ADMIN CONSOLE</span>
+                <h1 id="welcomeHeading">Platform Overview</h1>
+                <p>Monitor real platform traffic and user feedback.</p>
+            </div>
+
+            <a href="../home/home.html" class="view-site-link">
+                View website ↗
+            </a>
+        </header>
+
+        <section id="overviewSection" class="admin-section">
+
+            <div class="metric-grid">
+                <article class="metric-card live-card">
+                    <span><span class="live-dot" aria-hidden="true"></span> Live visitors</span>
+                    <strong id="liveVisitors">—</strong>
+                    <small>Seen within the last 90 seconds</small>
+                </article>
+
+                <article class="metric-card">
+                    <span>Unique sessions · 30 days</span>
+                    <strong id="uniqueSessions">—</strong>
+                </article>
+
+                <article class="metric-card">
+                    <span>Page visits · 30 days</span>
+                    <strong id="pageVisits">—</strong>
+                </article>
+
+                <article class="metric-card">
+                    <span>Active days</span>
+                    <strong id="activeDays">—</strong>
+                </article>
+
+                <article class="metric-card">
+                    <span>New feedback</span>
+                    <strong id="newFeedback">—</strong>
+                </article>
+            </div>
+
+            <div class="panel traffic-panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Real Traffic</h2>
+                        <p>Anonymous traffic collected from the public website.</p>
+                    </div>
+
+                    <div class="range-buttons" aria-label="Traffic range">
+                        <button data-range="30d" class="range-button active">Daily</button>
+                        <button data-range="12w" class="range-button">Weekly</button>
+                        <button data-range="12m" class="range-button">Monthly</button>
+                        <button data-range="5y" class="range-button">Yearly</button>
+                    </div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="trafficChart" aria-label="Traffic chart"></canvas>
+                    <p id="chartEmpty" class="empty-state hidden">
+                        Traffic data will appear here after visitors use the website.
+                    </p>
+                </div>
+            </div>
+
+            <div class="two-column-grid">
+                <section class="panel">
+                    <div class="panel-heading compact">
+                        <div>
+                            <h2>Popular Pages</h2>
+                            <p>Last 30 days</p>
+                        </div>
+                    </div>
+                    <div id="popularPages" class="data-list"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-heading compact">
+                        <div>
+                            <h2>Traffic Storage</h2>
+                            <p>How the V1 analytics works</p>
+                        </div>
+                    </div>
+
+                    <ul class="info-list">
+                        <li>Daily traffic is stored from anonymous browser sessions.</li>
+                        <li>Weekly, monthly and yearly views are calculated from stored events.</li>
+                        <li>No public user account is required.</li>
+                        <li>No raw IP address is stored by this tracker.</li>
+                    </ul>
+                </section>
+            </div>
+        </section>
+
+        <section id="feedbackSection" class="admin-section hidden">
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>User Messages</h2>
+                        <p>Appreciation, feedback and other queries submitted from the public website.</p>
+                    </div>
+                </div>
+
+                <div class="feedback-filters">
+                    <button class="filter-button active" data-filter="all">All</button>
+                    <button class="filter-button" data-filter="appreciation">Appreciation</button>
+                    <button class="filter-button" data-filter="feedback">Feedback</button>
+                    <button class="filter-button" data-filter="query">Other Query</button>
+                </div>
+
+                <div id="feedbackList" class="feedback-list"></div>
+            </div>
+        </section>
+
+        <section id="dataManagementSection" class="admin-section hidden">
+            <div class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <h2>Data Management</h2>
+                        <p>Remove older traffic or feedback when storage needs to be reclaimed.</p>
+                    </div>
+                </div>
+
+                <div class="cleanup-grid">
+                    <article class="cleanup-card">
+                        <h3>Traffic data</h3>
+                        <p>Delete historical anonymous traffic events by age.</p>
+                        <label for="trafficDeleteMonths">Delete traffic older than</label>
+                        <select id="trafficDeleteMonths">
+                            <option value="1">1 month</option>
+                            <option value="3">3 months</option>
+                            <option value="6">6 months</option>
+                            <option value="12" selected>12 months</option>
+                            <option value="24">24 months</option>
+                        </select>
+                        <button id="deleteTrafficButton" class="danger-button" type="button">Delete old traffic</button>
+                    </article>
+
+                    <article class="cleanup-card">
+                        <h3>Feedback data</h3>
+                        <p>Delete older user messages without affecting newer feedback.</p>
+                        <label for="feedbackDeleteMonths">Delete feedback older than</label>
+                        <select id="feedbackDeleteMonths">
+                            <option value="1">1 month</option>
+                            <option value="3">3 months</option>
+                            <option value="6">6 months</option>
+                            <option value="12" selected>12 months</option>
+                            <option value="24">24 months</option>
+                        </select>
+                        <button id="deleteFeedbackButton" class="danger-button" type="button">Delete old feedback</button>
+                    </article>
+                </div>
+
+                <div class="cleanup-custom">
+                    <h3>Custom date range</h3>
+                    <p>Delete traffic and/or feedback between two dates. Both dates are inclusive.</p>
+                    <div class="date-fields">
+                        <label>From <input id="cleanupFromDate" type="date"></label>
+                        <label>To <input id="cleanupToDate" type="date"></label>
+                    </div>
+                    <div class="cleanup-actions">
+                        <button id="deleteTrafficRangeButton" class="danger-button" type="button">Delete traffic in range</button>
+                        <button id="deleteFeedbackRangeButton" class="danger-button" type="button">Delete feedback in range</button>
+                    </div>
+                </div>
+
+                <p id="cleanupStatus" class="cleanup-status" role="status"></p>
+                <p class="cleanup-warning">Deletion is permanent. The dashboard asks for confirmation before removing records.</p>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="admin-dashboard.js"></script>
+</body>
+</html>
