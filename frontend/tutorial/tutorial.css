@@ -1638,4 +1638,17 @@
         column-gap: 16px;
     }
 }
+/* =========================================================
+   TUTORIAL SIDEBAR — DESKTOP BOTTOM GAP
+   Keep the sidebar scrollable while leaving the same
+   visual gap above the footer as the main content section.
+   Mobile is intentionally untouched.
+   ========================================================= */
+@media (min-width: 901px) {
+    .tutorial-sidebar {
+        margin-bottom: 100px !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+}
 
