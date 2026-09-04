@@ -2605,7 +2605,7 @@ body.results-resizing {
     position: relative;
 
     min-width: 760px;
-    min-height: 750px;
+    min-height: 500px;
 
     background:
         radial-gradient(
