@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sql-platform.com/sitemap.xml
