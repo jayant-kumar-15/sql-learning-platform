@@ -2073,3 +2073,27 @@
         column-gap: 16px !important;
     }
 }
+
+/* =========================================================
+   TUTORIAL FOOTER — DESKTOP ONLY
+   Match Home footer's 2-line navigation layout.
+   Mobile footer remains completely unchanged.
+   ========================================================= */
+@media (min-width: 901px) {
+
+    .tutorial-site-footer .challenge-footer-inner {
+        grid-template-columns: 1.1fr 1.4fr 1fr !important;
+    }
+
+    .tutorial-site-footer .challenge-footer-links {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 10px 22px !important;
+        min-width: 0 !important;
+    }
+
+    .tutorial-site-footer .challenge-footer-links a {
+        white-space: nowrap !important;
+    }
+}
