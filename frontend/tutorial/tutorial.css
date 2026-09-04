@@ -1651,4 +1651,22 @@
         overflow-x: hidden !important;
     }
 }
+/* =========================================================
+   TUTORIAL MOBILE FOOTER — MATCH PLAYGROUND BRANDING
+   Branding stays LEFT. Nothing else is changed.
+   ========================================================= */
+@media (max-width: 760px) {
+    .tutorial-site-footer .challenge-footer-brand {
+        display: flex !important;
+        justify-content: flex-start !important;
+        justify-self: start !important;
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    .tutorial-site-footer .challenge-footer-brand a {
+        justify-content: flex-start !important;
+        text-align: left !important;
+    }
+}
 
