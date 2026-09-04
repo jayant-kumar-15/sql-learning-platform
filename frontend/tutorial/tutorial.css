@@ -1530,7 +1530,7 @@
    ========================================================= */
 @media (min-width: 901px) {
     .tutorial-sidebar {
-        margin-bottom: 40px !important;
+        margin-bottom: 100px !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
     }
