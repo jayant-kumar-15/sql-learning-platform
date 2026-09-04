@@ -3239,26 +3239,24 @@ body > .challenge-site-footer {
         white-space: nowrap !important;
     }
 
-    /* Exact Tutorial-style mobile footer link row.  It remains a
-       single horizontal row; on narrower phones it can scroll rather
-       than breaking into the 2/3-line layout seen previously. */
+        /* ============================================================
+       MOBILE FOOTER — MATCH TUTORIAL / PLAYGROUND
+       ------------------------------------------------------------
+       Allow footer links to wrap naturally into multiple centered
+       rows on mobile. This keeps the Sandbox footer consistent with
+       the other platform pages.
+       ============================================================ */
     body > .challenge-site-footer .challenge-footer-links {
         width: 100% !important;
         display: flex !important;
         flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
         align-items: center !important;
-        gap: 10px 18px !important;
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-        white-space: nowrap !important;
-        text-align: left !important;
-        scrollbar-width: none;
-    }
-
-    body > .challenge-site-footer .challenge-footer-links::-webkit-scrollbar {
-        display: none;
+        gap: 10px 22px !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        text-align: center !important;
     }
 
     body > .challenge-site-footer .challenge-footer-links a {
