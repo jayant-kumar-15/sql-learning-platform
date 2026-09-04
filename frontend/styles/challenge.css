@@ -3078,6 +3078,6 @@ body > .challenge-site-footer .challenge-footer-brand small {
 /* Desktop-only gap between View Table Schema and Share Challenge */
 @media (min-width: 701px) {
     .question-tools-row {
-        gap: 18px;
+        gap: 25px;
     }
 }
