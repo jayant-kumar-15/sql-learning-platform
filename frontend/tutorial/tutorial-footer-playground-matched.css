@@ -1,0 +1,1641 @@
+/*
+ * SQL Learning Platform - Tutorial CSS
+ * ============================================================
+ * TUTORIAL V3
+ *
+ * Scope
+ * -----
+ * All selectors are tutorial-specific so this stylesheet does not
+ * intentionally modify Playground, Challenge or Sandbox styling.
+ * ============================================================
+ */
+
+.tutorial-container {
+    display: flex;
+    min-height: calc(100vh - 80px);
+    background: #0b1220;
+    color: #e5e7eb;
+}
+
+
+/* ============================================================
+ * GLOBAL PLATFORM HEADER / BRAND
+ * ------------------------------------------------------------
+ * This section mirrors the visual identity used on the homepage.
+ * Selectors are scoped to the tutorial header so the existing lesson,
+ * roadmap, editor and result styles remain untouched.
+ * ============================================================ */
+
+.tutorial-site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    min-height: 72px;
+    padding: 0 clamp(16px, 5vw, 64px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(120, 170, 230, 0.18);
+    background: rgba(7, 17, 31, 0.92);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.tutorial-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+
+    color: #edf5ff;
+    text-decoration: none;
+}
+
+.tutorial-brand:focus-visible,
+.tutorial-main-navigation a:focus-visible {
+    outline: 2px solid #60a5fa;
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+.tutorial-brand .brand-mark {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+    background: linear-gradient(135deg, #35a7ff, #7773ff);
+
+    color: #04101e;
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 1;
+}
+
+.tutorial-brand .brand-copy {
+    min-width: 0;
+}
+
+.tutorial-brand strong {
+    display: block;
+    color: #edf5ff;
+    font-size: 16px;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.tutorial-brand small {
+    display: block;
+    margin-top: 3px;
+
+    color: #9eb1c8;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.tutorial-main-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.tutorial-main-navigation a {
+    color: #9eb1c8;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 1.2;
+
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tutorial-main-navigation a:hover {
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.tutorial-main-navigation a[aria-current="page"] {
+    color: #ffffff;
+    font-weight: 800;
+}
+
+@media (max-width: 900px) {
+    .tutorial-site-header {
+        padding: 10px 18px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .tutorial-main-navigation {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 12px 18px;
+        padding-bottom: 3px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tutorial-site-header {
+        min-height: 64px;
+        padding: 10px 14px;
+        gap: 10px;
+    }
+
+    .tutorial-brand .brand-mark {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+    }
+
+    .tutorial-brand strong {
+        font-size: 15px;
+    }
+
+    .tutorial-main-navigation {
+        gap: 10px 14px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 5px;
+        scrollbar-width: thin;
+    }
+
+    .tutorial-main-navigation a {
+        flex: 0 0 auto;
+        font-size: 13px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tutorial-main-navigation a {
+        transition: none;
+    }
+}
+
+/* ============================================================
+ * LEFT ROADMAP / COLLAPSIBLE TRACKS
+ * ============================================================ */
+
+.tutorial-sidebar {
+    width: 320px;
+    flex: 0 0 320px;
+    background: #111827;
+    border-right: 1px solid #273449;
+    padding: 22px 16px;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+.tutorial-sidebar h2 {
+    margin: 0 0 16px;
+    font-size: 1.2rem;
+}
+
+.tutorial-sidebar > ul,
+.tutorial-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tutorial-track-group {
+    margin-bottom: 10px;
+}
+
+.tutorial-track-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 13px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #dbeafe;
+    background: rgba(30, 41, 59, 0.5);
+    transition: 0.2s ease;
+}
+
+.tutorial-track-link:hover,
+.tutorial-track-link.active {
+    background: rgba(37, 99, 235, 0.18);
+    border-color: rgba(96, 165, 250, 0.35);
+}
+
+.tutorial-track-title {
+    font-weight: 800;
+    line-height: 1.3;
+}
+
+.tutorial-collapse-button {
+    border: 0;
+    background: transparent;
+    color: #bfdbfe;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 3px 6px;
+}
+
+.tutorial-track-lessons {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 0.25s ease, opacity 0.25s ease;
+    opacity: 1;
+}
+
+.tutorial-track-group.is-collapsed .tutorial-track-lessons {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.tutorial-track-lessons > ul {
+    min-height: 0;
+    overflow: hidden;
+    padding: 7px 0 2px 8px;
+}
+
+.tutorial-lesson-link {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 10px;
+    margin: 2px 0;
+    border-radius: 9px;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    transition: 0.18s ease;
+}
+
+.tutorial-lesson-link:hover {
+    color: #e0f2fe;
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.tutorial-lesson-link.active {
+    color: #ffffff;
+    background: rgba(37, 99, 235, 0.28);
+}
+
+.tutorial-lesson-number {
+    min-width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(148, 163, 184, 0.13);
+    font-size: 0.72rem;
+}
+
+/* ============================================================
+ * MAIN CONTENT
+ * ============================================================ */
+
+.tutorial-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 34px clamp(18px, 4vw, 54px) 70px;
+}
+
+.tutorial-track-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 20px;
+    margin-bottom: 22px;
+    border: 1px solid #2b3a50;
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(30, 41, 59, 0.95),
+        rgba(15, 23, 42, 0.95)
+    );
+}
+
+.tutorial-track-badge {
+    display: inline-flex;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #bfdbfe;
+    font-weight: 800;
+}
+
+.tutorial-track-header p {
+    margin: 8px 0 0;
+    color: #94a3b8;
+}
+
+.tutorial-lesson-count {
+    white-space: nowrap;
+    color: #93c5fd;
+    font-weight: 800;
+}
+
+.tutorial-lesson {
+    background: #111827;
+    border: 1px solid #273449;
+    border-radius: 18px;
+    padding: clamp(20px, 4vw, 38px);
+    box-shadow: 0 16px 45px rgba(0, 0, 0, 0.22);
+}
+
+.tutorial-lesson-kicker {
+    color: #60a5fa;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.tutorial-lesson h1 {
+    margin: 7px 0 28px;
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    line-height: 1.15;
+}
+
+.tutorial-section {
+    margin: 22px 0;
+}
+
+.tutorial-section h2,
+.tutorial-practice h2 {
+    margin: 0 0 10px;
+    font-size: 1.12rem;
+}
+
+.tutorial-section p,
+.tutorial-practice p {
+    color: #cbd5e1;
+    line-height: 1.75;
+    margin: 0;
+}
+
+.tutorial-lesson pre {
+    margin: 12px 0 0;
+    padding: 17px;
+    background: #07101d;
+    border: 1px solid #26354b;
+    border-radius: 12px;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.tutorial-lesson code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    color: #dbeafe;
+    font-size: 0.92rem;
+}
+
+/* ============================================================
+ * FLOW VISUALS
+ * ============================================================ */
+
+.tutorial-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    padding: 16px;
+    border: 1px solid #2b3a50;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.75);
+}
+
+.tutorial-flow-step {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: linear-gradient(
+        135deg,
+        rgba(30, 64, 175, 0.35),
+        rgba(30, 41, 59, 0.8)
+    );
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    color: #e0f2fe;
+    font-weight: 700;
+    text-align: center;
+}
+
+.tutorial-flow-arrow {
+    text-align: center;
+    color: #60a5fa;
+    font-weight: 900;
+    animation: tutorial-flow-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes tutorial-flow-pulse {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.65;
+    }
+    50% {
+        transform: translateY(3px);
+        opacity: 1;
+    }
+}
+
+/* ============================================================
+ * VISUAL TABLES
+ * ============================================================ */
+
+.tutorial-visual-table-wrapper {
+    overflow-x: auto;
+    border: 1px solid #2b3a50;
+    border-radius: 12px;
+}
+
+.tutorial-visual-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.tutorial-visual-table th,
+.tutorial-visual-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #26354b;
+    text-align: left;
+}
+
+.tutorial-visual-table th {
+    background: #172235;
+    color: #bfdbfe;
+}
+
+.tutorial-visual-table td {
+    color: #cbd5e1;
+}
+
+/* ============================================================
+ * PRACTICE / QUERY EDITOR
+ * ============================================================ */
+
+.tutorial-practice {
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #36506f;
+    border-radius: 16px;
+    background: linear-gradient(
+        135deg,
+        rgba(15, 118, 110, 0.10),
+        rgba(30, 41, 59, 0.55)
+    );
+}
+
+.tutorial-practice-badge {
+    display: inline-flex;
+    margin-bottom: 7px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(45, 212, 191, 0.12);
+    color: #99f6e4;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.tutorial-practice-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.tutorial-db-select {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.tutorial-db-select select {
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #0b1220;
+    color: #e5e7eb;
+}
+
+.tutorial-sql-editor {
+    width: 100%;
+    min-height: 170px;
+    margin-top: 16px;
+    resize: vertical;
+    box-sizing: border-box;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 15px;
+    background: #050b14;
+    color: #e2e8f0;
+    font: 0.9rem/1.55 "SFMono-Regular", Consolas, monospace;
+    outline: none;
+}
+
+.tutorial-sql-editor:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+}
+
+.tutorial-editor-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 12px;
+}
+
+.tutorial-run-button,
+.tutorial-reset-button,
+.tutorial-nav-button {
+    border: 0;
+    border-radius: 9px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.tutorial-run-button {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.tutorial-run-button:hover {
+    background: #1d4ed8;
+}
+
+.tutorial-run-button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.tutorial-reset-button {
+    background: #334155;
+    color: #e2e8f0;
+}
+
+.tutorial-editor-hint {
+    color: #94a3b8;
+    font-size: 0.78rem;
+}
+
+.tutorial-query-status {
+    min-height: 22px;
+    margin-top: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.tutorial-query-status.loading {
+    color: #facc15;
+}
+
+.tutorial-query-status.success {
+    color: #4ade80;
+}
+
+.tutorial-query-status.error {
+    color: #f87171;
+}
+
+/* ============================================================
+ * COMPACT SCROLLABLE RESULTS
+ * ============================================================ */
+
+.tutorial-query-results {
+    margin-top: 16px;
+    border: 1px solid #36506f;
+    border-radius: 13px;
+    background: #0b1220;
+    overflow: hidden;
+}
+
+.tutorial-results-header {
+    padding: 12px 14px;
+    border-bottom: 1px solid #26354b;
+    background: #111c2d;
+}
+
+.tutorial-results-header h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.tutorial-results-header span {
+    color: #94a3b8;
+    font-size: 0.78rem;
+}
+
+.tutorial-results-scroll {
+    max-height: 190px;
+    overflow: auto;
+}
+
+.tutorial-results-scroll table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.tutorial-results-scroll th,
+.tutorial-results-scroll td {
+    padding: 9px 11px;
+    border-bottom: 1px solid #26354b;
+    border-right: 1px solid #26354b;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.tutorial-results-scroll th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #172235;
+    color: #bfdbfe;
+}
+
+.tutorial-results-scroll td {
+    color: #cbd5e1;
+}
+
+.tutorial-results-scroll::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.tutorial-results-scroll::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 999px;
+}
+
+/* ============================================================
+ * LESSON NAVIGATION
+ * ============================================================ */
+
+.tutorial-lesson-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 13px 0;
+    color: #94a3b8;
+}
+
+.tutorial-nav-button {
+    background: #1e293b;
+    color: #e2e8f0;
+}
+
+.tutorial-nav-button:hover:not(:disabled) {
+    background: #334155;
+}
+
+.tutorial-nav-button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* ============================================================
+ * RESPONSIVE
+ * ============================================================ */
+
+@media (max-width: 900px) {
+    .tutorial-container {
+        flex-direction: column;
+    }
+
+    .tutorial-sidebar {
+        width: auto;
+        flex-basis: auto;
+        position: relative;
+        top: auto;
+        height: auto;
+        max-height: 46vh;
+    }
+
+    .tutorial-content {
+        padding: 22px 14px 50px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tutorial-track-header,
+    .tutorial-practice-heading {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tutorial-lesson {
+        padding: 18px 14px;
+    }
+
+    .tutorial-practice {
+        padding: 15px;
+    }
+
+    .tutorial-lesson-navigation {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tutorial-editor-actions {
+        align-items: stretch;
+    }
+
+    .tutorial-run-button,
+    .tutorial-reset-button {
+        flex: 1;
+    }
+}
+
+
+/* ============================================================
+ * MOBILE NAVIGATION FIX — TUTORIAL ONLY
+ * ------------------------------------------------------------
+ * Desktop: hamburger is hidden and the existing inline navigation
+ * remains unchanged.
+ * Mobile: the full navigation is hidden until the hamburger is
+ * clicked. The hamburger sits below the platform logo, matching the
+ * working Playground mobile header pattern.
+ * ============================================================ */
+
+.tutorial-mobile-menu-button {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .tutorial-site-header {
+        min-height: 0;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 10px;
+    }
+
+    .tutorial-brand {
+        align-self: flex-start;
+    }
+
+    .tutorial-mobile-menu-button {
+        display: grid;
+        align-self: center;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        margin: 0;
+        border: 1px solid rgba(148, 163, 184, 0.20);
+        border-radius: 10px;
+        background: rgba(14, 28, 48, 0.86);
+        color: #ffffff;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 1002;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .tutorial-mobile-menu-button:focus-visible {
+        outline: 2px solid #60a5fa;
+        outline-offset: 3px;
+    }
+
+    .tutorial-main-navigation {
+        display: none;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        border: 1px solid rgba(120, 170, 230, 0.18);
+        border-radius: 14px;
+        background: #0b1829;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .tutorial-main-navigation.open {
+        display: grid;
+    }
+
+    .tutorial-main-navigation a {
+        display: block;
+        padding: 10px 8px;
+        border-radius: 8px;
+        text-align: center;
+        font-size: 14px;
+    }
+}
+
+/* ============================================================
+ * TRY IT YOURSELF / PRACTICE CARD FIX
+ * ------------------------------------------------------------
+ * tutorial.js renders this component with .practice-card and
+ * .practice-* classes. These styles restore the intended card
+ * presentation without changing the editor or execution logic.
+ * ============================================================ */
+
+.practice-card {
+    border: 1px solid rgba(148, 163, 184, 0.20);
+    border-radius: 15px;
+    padding: 20px;
+    background:
+        linear-gradient(145deg, rgba(56, 189, 248, 0.07), transparent),
+        rgba(15, 27, 45, 0.94);
+    box-sizing: border-box;
+}
+
+.practice-card h3 {
+    margin: 0 0 8px;
+    color: #e5edf8;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.practice-label {
+    margin-bottom: 7px;
+    color: #7dd3fc;
+    font-weight: 800;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.practice-question {
+    margin: 8px 0 16px;
+    color: #d5dfeb;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+.practice-editor {
+    width: 100%;
+    min-height: 145px;
+    resize: vertical;
+    box-sizing: border-box;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 11px;
+    background: #050c16;
+    color: #e2e8f0;
+    padding: 14px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    outline: none;
+}
+
+.practice-editor:focus {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.10);
+}
+
+.practice-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 10px;
+}
+
+.practice-toolbar button {
+    border: 0;
+    border-radius: 9px;
+    padding: 9px 14px;
+    cursor: pointer;
+    font-weight: 700;
+    color: #ffffff;
+    background: #0284c7;
+}
+
+.practice-toolbar button:hover {
+    filter: brightness(1.08);
+}
+
+.practice-toolbar button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.practice-database {
+    margin-left: auto;
+    color: #9fb0c5;
+    font-size: 0.8rem;
+}
+
+.practice-status {
+    min-height: 22px;
+    margin-top: 10px;
+    color: #9fb0c5;
+    line-height: 1.4;
+}
+
+.practice-status.success {
+    color: #34d399;
+}
+
+.practice-status.error {
+    color: #fb7185;
+}
+
+.practice-results {
+    display: none;
+    margin-top: 14px;
+    border: 1px solid rgba(56, 189, 248, 0.24);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #07111f;
+}
+
+.practice-results.visible {
+    display: block;
+    animation: resultReveal 0.25s ease both;
+}
+
+.practice-results-header {
+    padding: 10px 13px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.20);
+    background: rgba(30, 41, 59, 0.72);
+}
+
+.practice-results-header strong {
+    font-size: 0.9rem;
+}
+
+.practice-results-header span {
+    color: #9fb0c5;
+    font-size: 0.76rem;
+}
+
+.practice-results-scroll {
+    max-height: 178px;
+    overflow: auto;
+}
+
+.practice-results table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: max-content;
+}
+
+.practice-results th,
+.practice-results td {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    border-right: 1px solid rgba(148, 163, 184, 0.08);
+    padding: 9px 11px;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 0.8rem;
+}
+
+.practice-results th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #132238;
+    color: #bae6fd;
+}
+
+.practice-results td {
+    color: #dbe5f1;
+}
+
+@media (max-width: 600px) {
+    .practice-card {
+        padding: 15px;
+    }
+
+    .practice-database {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+
+/* ============================================================
+ * FINAL PLAYGROUND-STYLE MOBILE HEADER + FOOTER FIX
+ * ------------------------------------------------------------
+ * ONLY the Tutorial header/footer are affected here.
+ *
+ * Desktop:
+ *   - Existing Tutorial layout remains unchanged.
+ *   - Header keeps the same platform branding.
+ *
+ * Mobile:
+ *   - Hamburger is LEFT of the SQL logo, never centered.
+ *   - Full Tutorial navigation is hidden until hamburger is tapped.
+ *   - The six requested links are available in that menu:
+ *       Home, Tutorials, Challenges, Sandbox, FAQ, Feedback.
+ *
+ * Footer:
+ *   - Uses the locked Playground/Challenges branding and spacing.
+ * ============================================================ */
+
+/* ---------- Platform-style Tutorial header ---------- */
+.tutorial-site-header {
+    width: 100%;
+    min-height: 72px;
+    padding: 0 5vw;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 2000;
+    background: rgba(7, 17, 31, 0.94);
+    border-bottom: 1px solid rgba(120, 170, 230, 0.18);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+.tutorial-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+    min-width: 0;
+    color: #edf5ff;
+    text-decoration: none;
+    border-radius: 14px;
+}
+
+.tutorial-brand-mark,
+.tutorial-brand .tutorial-brand-mark {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #35a7ff, #7773ff);
+    color: #04101e;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 0 8px 22px rgba(53, 167, 255, 0.18);
+}
+
+.tutorial-brand-text {
+    display: block;
+    min-width: 0;
+    line-height: 1.1;
+}
+
+.tutorial-brand-text strong {
+    display: block;
+    color: #edf5ff;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
+.tutorial-brand-text small {
+    display: block;
+    margin-top: 4px;
+    color: #9eb1c8;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.tutorial-main-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.tutorial-main-navigation a {
+    color: #9eb1c8;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tutorial-main-navigation a:hover,
+.tutorial-main-navigation a[aria-current="page"] {
+    color: #ffffff;
+}
+
+/* ---------- Mobile hamburger: exact left-of-logo pattern ---------- */
+.tutorial-mobile-menu-button {
+    display: none;
+}
+
+@media (max-width: 760px) {
+    .tutorial-site-header {
+        min-height: 64px;
+        height: auto;
+        padding: 10px 12px;
+        display: grid;
+        grid-template-columns: 44px minmax(0, max-content) 1fr;
+        grid-template-rows: 44px;
+        align-items: center;
+        justify-content: start;
+        gap: 10px;
+        flex-wrap: nowrap;
+        box-sizing: border-box;
+    }
+
+    .tutorial-mobile-menu-button {
+        grid-column: 1;
+        grid-row: 1;
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        background: #0f1b2e;
+        color: #e2e8f0;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 2003;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .tutorial-mobile-menu-button:hover {
+        background: #172033;
+        border-color: #475569;
+    }
+
+    .tutorial-mobile-menu-button:focus-visible {
+        outline: 2px solid #55c2ff;
+        outline-offset: 3px;
+    }
+
+    .tutorial-brand {
+        grid-column: 2 / 4;
+        grid-row: 1;
+        width: max-content;
+        max-width: 100%;
+        margin: 0;
+        justify-self: start;
+        align-self: center;
+    }
+
+    .tutorial-brand-mark,
+    .tutorial-brand .tutorial-brand-mark {
+        width: 48px;
+        height: 48px;
+        flex-basis: 48px;
+    }
+
+    .tutorial-brand-text strong {
+        font-size: 16px;
+    }
+
+    .tutorial-main-navigation {
+        display: none !important;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        box-sizing: border-box;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 0;
+        padding: 10px 14px 14px;
+        background: rgba(7, 17, 31, 0.98);
+        border-top: 1px solid rgba(120, 170, 230, 0.12);
+        border-bottom: 1px solid rgba(120, 170, 230, 0.18);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+        z-index: 2002;
+    }
+
+    .tutorial-main-navigation.open {
+        display: flex !important;
+    }
+
+    .tutorial-main-navigation a {
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 8px;
+        color: #cbd5e1;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    .tutorial-main-navigation a:hover,
+    .tutorial-main-navigation a[aria-current="page"] {
+        background: rgba(53, 167, 255, 0.10);
+        color: #ffffff;
+    }
+}
+
+@media (max-width: 420px) {
+    .tutorial-site-header {
+        grid-template-columns: 40px minmax(0, max-content) 1fr;
+        gap: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .tutorial-mobile-menu-button {
+        width: 40px;
+        height: 40px;
+    }
+
+    .tutorial-brand {
+        max-width: calc(100vw - 70px);
+    }
+
+    .tutorial-brand-mark,
+    .tutorial-brand .tutorial-brand-mark {
+        width: 40px;
+        height: 40px;
+        flex-basis: 40px;
+    }
+
+    .tutorial-brand-text strong {
+        font-size: 15px;
+    }
+
+    .tutorial-brand-text small {
+        font-size: 10px;
+    }
+}
+
+/* ---------- Locked Playground/Challenges-style footer ---------- */
+.tutorial-site-footer {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 32px;
+    padding: 28px 5vw 24px;
+    background: #07111f;
+    border-top: 1px solid rgba(120, 170, 230, 0.18);
+}
+
+.tutorial-site-footer .challenge-footer-inner {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    align-items: start;
+    gap: 36px;
+}
+
+.tutorial-site-footer .challenge-footer-brand a {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: #edf5ff;
+    text-decoration: none;
+}
+
+.tutorial-site-footer .challenge-footer-brand-mark {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #35a7ff, #7773ff);
+    color: #04101e;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 0 8px 22px rgba(53, 167, 255, 0.18);
+}
+
+.tutorial-site-footer .challenge-footer-brand strong {
+    display: block;
+    color: #edf5ff;
+    font-size: 16px;
+    line-height: 1.2;
+}
+
+.tutorial-site-footer .challenge-footer-brand small {
+    display: block;
+    margin-top: 5px;
+    color: #9eb1c8;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.tutorial-site-footer .challenge-footer-links {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px 22px;
+    text-align: center;
+}
+
+.tutorial-site-footer .challenge-footer-links a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tutorial-site-footer .challenge-footer-links a:hover,
+.tutorial-site-footer .challenge-footer-links a[aria-current="page"] {
+    color: #ffffff;
+    transform: translateX(2px);
+}
+
+.tutorial-site-footer .challenge-footer-copy {
+    color: #9eb1c8;
+    font-size: 13px;
+    line-height: 1.6;
+    text-align: right;
+}
+
+.tutorial-site-footer .challenge-footer-copy p {
+    margin: 0 0 8px;
+}
+
+@media (max-width: 760px) {
+    .tutorial-site-footer {
+        margin-top: 32px;
+        padding: 28px 18px 24px;
+    }
+
+    .tutorial-site-footer .challenge-footer-inner {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        text-align: center;
+    }
+
+    .tutorial-site-footer .challenge-footer-brand {
+        display: flex;
+        justify-content: center;
+    }
+
+    .tutorial-site-footer .challenge-footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 9px 16px;
+        text-align: center;
+    }
+
+    .tutorial-site-footer .challenge-footer-copy {
+        text-align: center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tutorial-mobile-menu-button,
+    .tutorial-brand,
+    .tutorial-main-navigation,
+    .tutorial-main-navigation a,
+    .tutorial-site-footer a {
+        transition: none !important;
+    }
+}
+
+
+/* ============================================================
+ * FINAL MOBILE VIEWPORT WIDTH FIX — TUTORIAL ONLY
+ * ------------------------------------------------------------
+ * PURPOSE:
+ *   Fixes the normal phone/mobile-mode issue where the Tutorial
+ *   page can render at only about half of the available viewport.
+ *
+ * IMPORTANT:
+ *   - Applies ONLY to normal mobile CSS viewports (<= 800px).
+ *   - Laptop/desktop layout is untouched.
+ *   - Phone "Desktop site" mode is untouched because its CSS
+ *     viewport is handled by the existing desktop/touch rules.
+ *   - Existing hamburger, logo, navigation, roadmap, lesson
+ *     content and footer styling are not changed.
+ * ============================================================ */
+
+@media (max-width: 800px) {
+
+    html,
+    body {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+    }
+
+    .tutorial-site-header,
+    .tutorial-container,
+    .tutorial-site-footer {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .tutorial-container {
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+    }
+
+    .tutorial-sidebar,
+    .tutorial-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .tutorial-sidebar {
+        flex: 0 0 auto !important;
+    }
+
+    .tutorial-content {
+        flex: 0 0 auto !important;
+        overflow-x: hidden !important;
+    }
+}
+
+/* ============================================================
+   TUTORIAL FOOTER — MATCH PLAYGROUND EXACTLY ON LAPTOP/DESKTOP
+   ------------------------------------------------------------
+   This override is intentionally limited to the footer and only
+   applies above the mobile breakpoint.
+
+   The Playground footer is the reference baseline:
+   - same footer height/spacing
+   - same 3-column proportions
+   - same brand typography
+   - same navigation wrapping
+   - same copyright alignment
+
+   Mobile Tutorial footer rules below remain unchanged.
+   No tutorial content, roadmap, sidebar, header, or JS is changed.
+   ============================================================ */
+
+@media (min-width: 761px) {
+
+    .tutorial-site-footer {
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 40px;
+        padding: 32px 5vw 28px;
+        background: #07111f;
+        border-top: 1px solid rgba(120, 170, 230, 0.18);
+    }
+
+    .tutorial-site-footer .challenge-footer-inner {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns:
+            minmax(220px, 1.15fr)
+            minmax(320px, 1.7fr)
+            minmax(220px, 0.95fr);
+        align-items: start;
+        gap: 28px;
+    }
+
+    .tutorial-site-footer .challenge-footer-brand a {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: #edf5ff;
+        text-decoration: none;
+    }
+
+    .tutorial-site-footer .challenge-footer-brand-mark {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #35a7ff, #7773ff);
+        color: #04101e;
+        font-size: 13px;
+        font-weight: 900;
+        line-height: 1;
+        box-shadow: 0 8px 22px rgba(53, 167, 255, 0.18);
+    }
+
+    .tutorial-site-footer .challenge-footer-brand strong {
+        display: block;
+        color: #ffffff;
+        font-size: 16px;
+        line-height: 1.2;
+    }
+
+    .tutorial-site-footer .challenge-footer-brand small {
+        display: block;
+        margin: 6px 0;
+        color: #9eb1c8;
+        font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .tutorial-site-footer .challenge-footer-links {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        align-content: flex-start;
+        row-gap: 10px;
+        column-gap: 20px;
+        min-width: 0;
+        line-height: 1.4;
+        white-space: normal;
+        text-align: center;
+    }
+
+    .tutorial-site-footer .challenge-footer-links a {
+        flex: 0 0 auto;
+        color: #cbd5e1;
+        text-decoration: none;
+        font-size: 14px;
+        white-space: nowrap;
+        transition: color .2s ease, transform .2s ease;
+    }
+
+    .tutorial-site-footer .challenge-footer-links a:hover,
+    .tutorial-site-footer .challenge-footer-links a[aria-current="page"] {
+        color: #ffffff;
+        transform: translateX(2px);
+    }
+
+    .tutorial-site-footer .challenge-footer-copy {
+        min-width: 0;
+        color: #9eb1c8;
+        font-size: 13px;
+        line-height: 1.6;
+        text-align: right;
+    }
+
+    .tutorial-site-footer .challenge-footer-copy p {
+        margin: 0 0 8px;
+    }
+}
+
+/* Playground uses a tighter desktop layout for widths from 761px
+   through 900px. Keep the same breakpoint behavior here. */
+@media (max-width: 900px) and (min-width: 761px) {
+
+    .tutorial-site-footer .challenge-footer-inner {
+        grid-template-columns:
+            minmax(190px, 1fr)
+            minmax(280px, 1.4fr)
+            minmax(190px, 0.9fr);
+        gap: 22px;
+    }
+
+    .tutorial-site-footer .challenge-footer-links {
+        column-gap: 16px;
+    }
+}
+
